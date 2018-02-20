@@ -1,24 +1,1788 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>1170</width>
+    <height>629</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>MainWindow</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <property name="windowTitle">
+   <string notr="true">OwlSql</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../res/icons.qrc">
+    <normaloff>:/icons/main/chloe.svg</normaloff>:/icons/main/chloe.svg</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_8">
+    <property name="spacing">
+     <number>6</number>
+    </property>
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitterLog">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QSplitter" name="splitterSessionsTree">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_3"/>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_2"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTreeView" name="connectionsTreeView">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
+        <property name="currentIndex">
+         <number>4</number>
+        </property>
+        <widget class="QWidget" name="tabHost">
+         <attribute name="icon">
+          <iconset resource="../res/icons.qrc">
+           <normaloff>:/icons/computer.png</normaloff>:/icons/computer.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Host</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QTabWidget" name="tabWidget_2">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tabDatabases">
+             <attribute name="icon">
+              <iconset resource="../res/icons.qrc">
+               <normaloff>:/icons/database.png</normaloff>:/icons/database.png</iconset>
+             </attribute>
+             <attribute name="title">
+              <string>Databases</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <property name="leftMargin">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>2</number>
+              </property>
+              <property name="bottomMargin">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QTableView" name="tableView_3"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tabVariables">
+             <attribute name="icon">
+              <iconset resource="../res/icons.qrc">
+               <normaloff>:/icons/cog.png</normaloff>:/icons/cog.png</iconset>
+             </attribute>
+             <attribute name="title">
+              <string>Variables</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="leftMargin">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>2</number>
+              </property>
+              <property name="bottomMargin">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QTableView" name="tableView_4"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tabStatus">
+             <attribute name="icon">
+              <iconset resource="../res/icons.qrc">
+               <normaloff>:/icons/lightning.png</normaloff>:/icons/lightning.png</iconset>
+             </attribute>
+             <attribute name="title">
+              <string>Status</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="leftMargin">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>2</number>
+              </property>
+              <property name="bottomMargin">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QTableView" name="tableView_5"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tabProcesses">
+             <attribute name="icon">
+              <iconset resource="../res/icons.qrc">
+               <normaloff>:/icons/artsbuilderexecute.png</normaloff>:/icons/artsbuilderexecute.png</iconset>
+             </attribute>
+             <attribute name="title">
+              <string>Processes</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <property name="leftMargin">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>2</number>
+              </property>
+              <property name="bottomMargin">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QSplitter" name="splitter_3">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <widget class="QTableView" name="tableView_6"/>
+                <widget class="QWidget" name="layoutWidget">
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                    <item>
+                     <widget class="QLabel" name="label_3">
+                      <property name="text">
+                       <string>Process SQL:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_4">
+                      <property name="text">
+                       <string>EXPLAIN</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QTextEdit" name="textEdit_2"/>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tabCommandStatistics">
+             <attribute name="icon">
+              <iconset resource="../res/icons.qrc">
+               <normaloff>:/icons/chart_bar.png</normaloff>:/icons/chart_bar.png</iconset>
+             </attribute>
+             <attribute name="title">
+              <string>Command-Statistics</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <property name="leftMargin">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>2</number>
+              </property>
+              <property name="bottomMargin">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QTableView" name="tableView_7"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabDataBase">
+         <attribute name="icon">
+          <iconset resource="../res/icons.qrc">
+           <normaloff>:/icons/database.png</normaloff>:/icons/database.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Database</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QTableView" name="tableView_2"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabTable">
+         <attribute name="icon">
+          <iconset resource="../res/icons.qrc">
+           <normaloff>:/icons/table.png</normaloff>:/icons/table.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Table</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QSplitter" name="splitter_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QTabWidget" name="tabWidget_3">
+             <property name="currentIndex">
+              <number>4</number>
+             </property>
+             <widget class="QWidget" name="tabTableBasic">
+              <attribute name="icon">
+               <iconset resource="../res/icons.qrc">
+                <normaloff>:/icons/table.png</normaloff>:/icons/table.png</iconset>
+              </attribute>
+              <attribute name="title">
+               <string>Basic</string>
+              </attribute>
+             </widget>
+             <widget class="QWidget" name="tabTableOptions">
+              <attribute name="icon">
+               <iconset resource="../res/icons.qrc">
+                <normaloff>:/icons/wrench.png</normaloff>:/icons/wrench.png</iconset>
+              </attribute>
+              <attribute name="title">
+               <string>Options</string>
+              </attribute>
+             </widget>
+             <widget class="QWidget" name="tabTableIndexes">
+              <attribute name="icon">
+               <iconset resource="../res/icons.qrc">
+                <normaloff>:/icons/lightning.png</normaloff>:/icons/lightning.png</iconset>
+              </attribute>
+              <attribute name="title">
+               <string>Indexes</string>
+              </attribute>
+             </widget>
+             <widget class="QWidget" name="tabTableForeignKeys">
+              <attribute name="icon">
+               <iconset resource="../res/icons.qrc">
+                <normaloff>:/icons/table_relationship.png</normaloff>:/icons/table_relationship.png</iconset>
+              </attribute>
+              <attribute name="title">
+               <string>Foreign keys</string>
+              </attribute>
+             </widget>
+             <widget class="QWidget" name="tabTableCreateCode">
+              <attribute name="icon">
+               <iconset resource="../res/icons.qrc">
+                <normaloff>:/icons/script_gear.png</normaloff>:/icons/script_gear.png</iconset>
+              </attribute>
+              <attribute name="title">
+               <string>CREATE code</string>
+              </attribute>
+             </widget>
+             <widget class="QWidget" name="tabTableAlterCode">
+              <attribute name="icon">
+               <iconset resource="../res/icons.qrc">
+                <normaloff>:/icons/script_gear.png</normaloff>:/icons/script_gear.png</iconset>
+              </attribute>
+              <attribute name="title">
+               <string>ALTER code</string>
+              </attribute>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="layoutWidget">
+             <layout class="QVBoxLayout" name="verticalLayout_11">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>TextLabel</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_6">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_7">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_8">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="toolButton_9">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTableView" name="tableView_8"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabData">
+         <attribute name="icon">
+          <iconset resource="../res/icons.qrc">
+           <normaloff>:/icons/text_columns.png</normaloff>:/icons/text_columns.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Data</string>
+         </attribute>
+         <widget class="QWidget" name="horizontalLayoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>9</y>
+            <width>751</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="toolButton_2">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="toolButton_3">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="toolButton_4">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="toolButton_5">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="toolButton">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QTableView" name="tableView">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>126</y>
+            <width>701</width>
+            <height>161</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>39</y>
+            <width>671</width>
+            <height>84</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QTextEdit" name="textEdit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit"/>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QPushButton" name="pushButton">
+                 <property name="text">
+                  <string>PushButton</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_2">
+                 <property name="text">
+                  <string>PushButton</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tabQuery">
+         <attribute name="icon">
+          <iconset resource="../res/icons.qrc">
+           <normaloff>:/icons/artsbuilderexecute.png</normaloff>:/icons/artsbuilderexecute.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Query</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_13">
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <property name="sizeConstraint">
+           <enum>QLayout::SetNoConstraint</enum>
+          </property>
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QSplitter" name="splitterQueryResults">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QSplitter" name="splitterQueryHelper">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <widget class="QPlainTextEdit" name="textEdit_3">
+              <property name="font">
+               <font>
+                <family>DejaVu Sans Mono</family>
+               </font>
+              </property>
+             </widget>
+             <widget class="QTreeView" name="treeView"/>
+            </widget>
+            <widget class="QWidget" name="layoutWidget">
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTableView" name="tableView_9"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QPlainTextEdit" name="logTextEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>DejaVu Sans Mono</family>
+        </font>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1170</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionSession_manager"/>
+    <addaction name="actionNew_window"/>
+    <addaction name="actionNew_query_tab"/>
+    <addaction name="actionClose_query_tab"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_session_background_color"/>
+    <addaction name="actionExport_settings"/>
+    <addaction name="actionImport_settings"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionCut"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_all"/>
+    <addaction name="actionInvert_selection"/>
+    <addaction name="actionFilter_panel"/>
+    <addaction name="actionReformat_SQL"/>
+   </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionNext_tab"/>
+    <addaction name="actionPrevious_tab"/>
+    <addaction name="separator"/>
+    <addaction name="actionUser_manager"/>
+    <addaction name="actionMaintenance"/>
+    <addaction name="actionBulk_table_editor"/>
+    <addaction name="separator"/>
+    <addaction name="actionExport_Database_as_SQL"/>
+    <addaction name="actionExport_grid_rows"/>
+    <addaction name="actionSynchronize_database"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_SQL_file"/>
+    <addaction name="actionImport_CSV_file"/>
+    <addaction name="actionInsert_files"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <widget class="QMenu" name="menuSearch">
+    <property name="title">
+     <string>Search</string>
+    </property>
+    <addaction name="actionFind_text"/>
+    <addaction name="actionFind_or_replace_again"/>
+    <addaction name="actionReplace_text"/>
+    <addaction name="actionFind_text_on_server"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionSQL_Help"/>
+    <addaction name="separator"/>
+    <addaction name="actionCheck_for_updates"/>
+    <addaction name="actionDownload_page"/>
+    <addaction name="actionSupport_forum"/>
+    <addaction name="actionChangelog"/>
+    <addaction name="actionReadme"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
+   <addaction name="menuSearch"/>
+   <addaction name="menu_Tools"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionDisconnect"/>
+   <addaction name="separator"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionPrint"/>
+   <addaction name="separator"/>
+   <addaction name="actionUser_manager"/>
+   <addaction name="actionImport_CSV_file"/>
+   <addaction name="actionExport_Database_as_SQL"/>
+   <addaction name="separator"/>
+   <addaction name="actionSQL_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="dataToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionFirst"/>
+   <addaction name="actionLast"/>
+   <addaction name="actionInsert_row"/>
+   <addaction name="actionDelete_selected_row"/>
+   <addaction name="actionPost"/>
+   <addaction name="actionCancel_editing"/>
+  </widget>
+  <widget class="QToolBar" name="SQLToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLoad_SQL_file"/>
+   <addaction name="actionSave_SQL_to_file"/>
+   <addaction name="actionSave_as_snippet"/>
+   <addaction name="actionFind_text"/>
+   <addaction name="actionReplace_text"/>
+   <addaction name="actionReformat_SQL"/>
+   <addaction name="actionStop_on_batch_errors"/>
+   <addaction name="actionView_bin_as_text"/>
+   <addaction name="actionWrap_long_lines"/>
+   <addaction name="actionSet_delimeter"/>
+   <addaction name="actionCancel"/>
+  </widget>
+  <action name="actionSQL_Help">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/help_icon</normaloff>:/help_icon</iconset>
+   </property>
+   <property name="text">
+    <string>SQL Help</string>
+   </property>
+   <property name="toolTip">
+    <string>SQL Help Browser</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionExport_Database_as_SQL">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/database_save.png</normaloff>:/icons/database_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export Database as SQL</string>
+   </property>
+   <property name="toolTip">
+    <string>Dump database objects to an SQL file</string>
+   </property>
+  </action>
+  <action name="actionUser_manager">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/group.png</normaloff>:/icons/group.png</iconset>
+   </property>
+   <property name="text">
+    <string>User manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage user authetication and previlegies</string>
+   </property>
+  </action>
+  <action name="actionImport_CSV_file">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/page_white_put.png</normaloff>:/icons/page_white_put.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import CSV file...</string>
+   </property>
+   <property name="toolTip">
+    <string>Import a CSV or tab delimited file</string>
+   </property>
+  </action>
+  <action name="actionCheck_for_updates">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/transmit_blue.png</normaloff>:/icons/transmit_blue.png</iconset>
+   </property>
+   <property name="text">
+    <string>Check for updates...</string>
+   </property>
+   <property name="toolTip">
+    <string>Check for updates</string>
+   </property>
+  </action>
+  <action name="actionDownload_page">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/world_go.png</normaloff>:/icons/world_go.png</iconset>
+   </property>
+   <property name="text">
+    <string>Download page</string>
+   </property>
+  </action>
+  <action name="actionSupport_forum">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/comments.png</normaloff>:/icons/comments.png</iconset>
+   </property>
+   <property name="text">
+    <string>Support forum</string>
+   </property>
+   <property name="toolTip">
+    <string>Support forum</string>
+   </property>
+  </action>
+  <action name="actionChangelog">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/page_white_text.png</normaloff>:/icons/page_white_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Changelog</string>
+   </property>
+  </action>
+  <action name="actionReadme">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/page_white_text.png</normaloff>:/icons/page_white_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Readme</string>
+   </property>
+   <property name="toolTip">
+    <string>Open readme file</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/information.png</normaloff>:/icons/information.png</iconset>
+   </property>
+   <property name="text">
+    <string>About application</string>
+   </property>
+   <property name="toolTip">
+    <string>About this application</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionAuto_refresh">
+   <property name="text">
+    <string>Auto refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F5</string>
+   </property>
+  </action>
+  <action name="actionSet_refresh_interval">
+   <property name="text">
+    <string>Set interval...</string>
+   </property>
+   <property name="toolTip">
+    <string>Set auto refresh interval</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/arrow_refresh.png</normaloff>:/icons/arrow_refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/printer.png</normaloff>:/icons/printer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Print List or data</string>
+   </property>
+   <property name="toolTip">
+    <string>Print List or data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/arrow_undo.png</normaloff>:/icons/arrow_undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z, Alt+Backspace</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/paste_plain.png</normaloff>:/icons/paste_plain.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste from Clipboard</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/page_copy.png</normaloff>:/icons/page_copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy to Clipboard</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionDisconnect">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/disconnect.png</normaloff>:/icons/disconnect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+   <property name="toolTip">
+    <string>Disconnect from server</string>
+   </property>
+  </action>
+  <action name="actionSession_manager">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/server_connect.png</normaloff>:/icons/server_connect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Session manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Display session manager</string>
+   </property>
+   <property name="statusTip">
+    <string>Display session manager</string>
+   </property>
+  </action>
+  <action name="actionFirst">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/resultset_first.png</normaloff>:/icons/resultset_first.png</iconset>
+   </property>
+   <property name="text">
+    <string>First</string>
+   </property>
+   <property name="toolTip">
+    <string>First</string>
+   </property>
+  </action>
+  <action name="actionLast">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/resultset_last.png</normaloff>:/icons/resultset_last.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last</string>
+   </property>
+   <property name="toolTip">
+    <string>Last</string>
+   </property>
+  </action>
+  <action name="actionInsert_row">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Insert row into table</string>
+   </property>
+   <property name="toolTip">
+    <string>Insert row into table</string>
+   </property>
+  </action>
+  <action name="actionDelete_selected_row">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete selected row(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete selected row(s)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Del</string>
+   </property>
+  </action>
+  <action name="actionPost">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/tick.png</normaloff>:/icons/tick.png</iconset>
+   </property>
+   <property name="text">
+    <string>Post</string>
+   </property>
+   <property name="toolTip">
+    <string>Post</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Return</string>
+   </property>
+  </action>
+  <action name="actionCancel_editing">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/cross.png</normaloff>:/icons/cross.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cancel editing</string>
+   </property>
+   <property name="toolTip">
+    <string>Cancel editing</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionExecute_SQL">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/artsbuilderexecute.png</normaloff>:/icons/artsbuilderexecute.png</iconset>
+   </property>
+   <property name="text">
+    <string>Execute SQL...</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute SQL-query/queries...</string>
+   </property>
+   <property name="shortcut">
+    <string>F9</string>
+   </property>
+  </action>
+  <action name="actionRun_selection">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/execute_selection.png</normaloff>:/icons/execute_selection.png</iconset>
+   </property>
+   <property name="text">
+    <string>Run selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute selected SQL-query/queries...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F9</string>
+   </property>
+  </action>
+  <action name="actionRun_current_query">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/execute_line.png</normaloff>:/icons/execute_line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Run current query</string>
+   </property>
+   <property name="toolTip">
+    <string>Run currently focused SQL query</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F9</string>
+   </property>
+  </action>
+  <action name="actionSend_queries_one_by_one">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Send queries one by one</string>
+   </property>
+  </action>
+  <action name="actionSend_batch_in_one_go">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Send batch in one go</string>
+   </property>
+   <property name="toolTip">
+    <string>Send up to max_allowed_packet batch at once</string>
+   </property>
+  </action>
+  <action name="actionLoad_SQL_file">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/folder_explore.png</normaloff>:/icons/folder_explore.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load SQL file...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load SQL file...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave_SQL_to_file">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/disk.png</normaloff>:/icons/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save SQL to file</string>
+   </property>
+   <property name="toolTip">
+    <string>Save SQL to file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSave_as_snippet">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/script_save.png</normaloff>:/icons/script_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save as snippet</string>
+   </property>
+   <property name="toolTip">
+    <string>Save as snippet</string>
+   </property>
+  </action>
+  <action name="actionFind_text">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/find.png</normaloff>:/icons/find.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find text...</string>
+   </property>
+   <property name="toolTip">
+    <string>Find text...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionReplace_text">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/text_replace.png</normaloff>:/icons/text_replace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Replace text...</string>
+   </property>
+   <property name="toolTip">
+    <string>Replace text...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionReformat_SQL">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/page_white_paint.png</normaloff>:/icons/page_white_paint.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reformat SQL</string>
+   </property>
+   <property name="toolTip">
+    <string>Automatically reformat disordered SQL in active editor to make it more readable</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F8</string>
+   </property>
+  </action>
+  <action name="actionStop_on_batch_errors">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/error_delete.png</normaloff>:/icons/error_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop on errors in batch mode</string>
+   </property>
+   <property name="toolTip">
+    <string>Stop on errors in batch mode</string>
+   </property>
+  </action>
+  <action name="actionView_bin_as_text">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/page_white_text_hex.png</normaloff>:/icons/page_white_text_hex.png</iconset>
+   </property>
+   <property name="text">
+    <string>View binary data as text (instead of HEX)</string>
+   </property>
+   <property name="toolTip">
+    <string>View binary data as text (instead of HEX)</string>
+   </property>
+  </action>
+  <action name="actionWrap_long_lines">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/wordwrap.png</normaloff>:/icons/wordwrap.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wrap long lines</string>
+   </property>
+   <property name="toolTip">
+    <string>Wrap long lines</string>
+   </property>
+  </action>
+  <action name="actionSet_delimeter">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/delimiter.png</normaloff>:/icons/delimiter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set delimeter used in SQL execution (current value: %1)</string>
+   </property>
+   <property name="toolTip">
+    <string>Set delimeter used in SQL execution (current value: %1)</string>
+   </property>
+  </action>
+  <action name="actionCancel">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cancel running operation</string>
+   </property>
+   <property name="toolTip">
+    <string>Cancel running operation</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionFind_or_replace_again">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/find_again.png</normaloff>:/icons/find_again.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find or replace again</string>
+   </property>
+   <property name="toolTip">
+    <string>Find or replace again</string>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
+   </property>
+  </action>
+  <action name="actionFind_text_on_server">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/magnifier.png</normaloff>:/icons/magnifier.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find text on server</string>
+   </property>
+   <property name="toolTip">
+    <string>Searches selected tables for text occurences</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/cut_red.png</normaloff>:/icons/cut_red.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="toolTip">
+    <string>Cuts the selection and puts it on the Clipboard</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionSelect_all">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/selectall.png</normaloff>:/icons/selectall.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select all</string>
+   </property>
+   <property name="toolTip">
+    <string>Select all items or text</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionInvert_selection">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/arrow_switch.png</normaloff>:/icons/arrow_switch.png</iconset>
+   </property>
+   <property name="text">
+    <string>Invert selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Invert selection</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionFilter_panel">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/find.png</normaloff>:/icons/find.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter panel</string>
+   </property>
+   <property name="toolTip">
+    <string>Activates the filter panel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+F</string>
+   </property>
+  </action>
+  <action name="actionNext_tab">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/tab_next.png</normaloff>:/icons/tab_next.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next tab</string>
+   </property>
+   <property name="toolTip">
+    <string>Go to the next tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Tab</string>
+   </property>
+  </action>
+  <action name="actionPrevious_tab">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/tab_previous.png</normaloff>:/icons/tab_previous.png</iconset>
+   </property>
+   <property name="text">
+    <string>Previous tab</string>
+   </property>
+   <property name="toolTip">
+    <string>Go back to the previous tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Backtab</string>
+   </property>
+  </action>
+  <action name="actionMaintenance">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/wrench.png</normaloff>:/icons/wrench.png</iconset>
+   </property>
+   <property name="text">
+    <string>Maintenance</string>
+   </property>
+   <property name="toolTip">
+    <string>Optimize, repair and analyse tables</string>
+   </property>
+  </action>
+  <action name="actionBulk_table_editor">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/table_multiple.png</normaloff>:/icons/table_multiple.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bulk table editor</string>
+   </property>
+   <property name="toolTip">
+    <string>Bulk table editor</string>
+   </property>
+  </action>
+  <action name="actionExport_grid_rows">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/table_save.png</normaloff>:/icons/table_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export grid rows...</string>
+   </property>
+   <property name="toolTip">
+    <string>Export rows to file or copy to clipboard, in various formats</string>
+   </property>
+  </action>
+  <action name="actionSynchronize_database">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/database_go.png</normaloff>:/icons/database_go.png</iconset>
+   </property>
+   <property name="text">
+    <string>Synchronize database</string>
+   </property>
+   <property name="toolTip">
+    <string>Synchronize database</string>
+   </property>
+  </action>
+  <action name="actionInsert_files">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/images.png</normaloff>:/icons/images.png</iconset>
+   </property>
+   <property name="text">
+    <string>Insert files into TEXT/BLOB fields...</string>
+   </property>
+   <property name="toolTip">
+    <string>Insert files into TEXT/BLOB fields...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/wrench_orange.png</normaloff>:/icons/wrench_orange.png</iconset>
+   </property>
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionNew_window">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/server_connect.png</normaloff>:/icons/server_connect.png</iconset>
+   </property>
+   <property name="text">
+    <string>New window</string>
+   </property>
+   <property name="toolTip">
+    <string>New window...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionNew_query_tab">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/tab_add.png</normaloff>:/icons/tab_add.png</iconset>
+   </property>
+   <property name="text">
+    <string>New query tab</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a blank query tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionClose_query_tab">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/tab_delete.png</normaloff>:/icons/tab_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close query tab</string>
+   </property>
+   <property name="toolTip">
+    <string>Close current query tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F4</string>
+   </property>
+  </action>
+  <action name="actionSelect_session_background_color">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/color_swatch.png</normaloff>:/icons/color_swatch.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select session background color...</string>
+   </property>
+   <property name="toolTip">
+    <string>Lets you choose a per session color value for the database tree</string>
+   </property>
+  </action>
+  <action name="actionExport_settings">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/export_settings.png</normaloff>:/icons/export_settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export settings...</string>
+   </property>
+   <property name="toolTip">
+    <string>Export settings</string>
+   </property>
+  </action>
+  <action name="actionImport_settings">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/import_settings.png</normaloff>:/icons/import_settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import settings...</string>
+   </property>
+   <property name="toolTip">
+    <string>Import settings</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/icons/cross.png</normaloff>:/icons/cross.png</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit application</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/qt/icons/qt/qt_icon.png</normaloff>:/qt/icons/qt/qt_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+   <property name="toolTip">
+    <string>About Qt library</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
- <resources/>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../res/icons.qrc"/>
+ </resources>
  <connections/>
+ <slots>
+  <slot>openSessionsManager()</slot>
+ </slots>
 </ui>

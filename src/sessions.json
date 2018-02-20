@@ -1,0 +1,50 @@
+{
+    "sessions": [{
+        "type": 2,
+        "name": "Test folder",
+        "sessions": [{
+            "type": 1,
+            "name": "Test server",
+            "comment": "This is a tes session",
+            "hostName": "127.0.0.1",
+            "port": 3306,
+            "user": "test",
+            "password": "123",
+            "created": "",
+            "connectionsCount": 0,
+            "lastConnection": "",
+            "refusedCount": 0
+        }, {
+            "type": 1,
+            "name": "Secon server",
+            "comment": "This is a tes session",
+            "hostName": "127.0.0.1",
+            "port": 3306,
+            "user": "test",
+            "password": "123",
+            "created": "",
+            "connectionsCount": 0,
+            "lastConnection": "",
+            "refusedCount": 0
+        }, {
+            "type": 2,
+            "name": "Yet another folder",
+            "sessions": [{
+                "type": 2,
+                "name": "Folder again"
+            }]
+        }]
+    }, {
+        "type": 1,
+        "name": "Server without folder",
+        "comment": "This is a tes session",
+        "hostName": "127.0.0.1",
+        "port": 3306,
+        "user": "test",
+        "password": "123",
+        "created": "",
+        "connectionsCount": 0,
+        "lastConnection": "",
+        "refusedCount": 0
+    }]
+}

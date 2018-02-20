@@ -3,9 +3,10 @@
 
 #endif // CONSTS_H
 
-const QString APPNAME           = "OwlSql";
-const QString DEVELOPER         = "Alex_Crack";
-const QString APPDOMAIN         = "https://alexcrack.github.io/owlsql/";
+const QString APP_NAME = "OwlSql";
+const QString APP_VERSION = "0.0.1";
+const QString APP_DEVELOPER = "Alex_Crack";
+const QString APP_DOMAIN = "https://alexcrack.github.io/owlsql/";
 
 // General things
 const QString REGKEY_SESSIONS   = "Servers";

@@ -25,11 +25,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow/mainwindow.cpp
+        mainwindow/mainwindow.cpp \
+    session_manager/sessionmanager.cpp \
+    session_manager/dbcombobox.cpp \
+    session_manager/sessiondelegate.cpp \
+    session_manager/sessionstreemodel.cpp \
+    session_manager/treeitem.cpp \
+    session_manager/foldertreeitem.cpp \
+    session_manager/sessiontreeitem.cpp
 
 HEADERS += \
         mainwindow/mainwindow.h \
-    consts.h
+    consts.h \
+    session_manager/sessionmanager.h \
+    session_manager/dbcombobox.h \
+    session_manager/sessiondelegate.h \
+    session_manager/sessionstreemodel.h \
+    session_manager/treeitem.h \
+    session_manager/foldertreeitem.h \
+    session_manager/sessiontreeitem.h
 
 FORMS += \
-        mainwindow/mainwindow.ui
+        mainwindow/mainwindow.ui \
+    session_manager/sessionmanager.ui
+
+RESOURCES += \
+    res/icons.qrc \
+    res/simpletreemodel.qrc
