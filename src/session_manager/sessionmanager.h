@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QMenu>
+#include <QFileDialog>
 #include <QSignalMapper>
+#include <QSortFilterProxyModel>
 #include "sessionstreemodel.h"
 
 namespace Ui {
@@ -23,21 +25,26 @@ public:
 private slots:
     void popupConnectionsListHeaderMenu(QPoint position);
     void showHideSessionsListColumn(int column);
-
+    void openFileDialog(QWidget* pathWidget);
     void on_btnOpenConnection_clicked();
 
     void on_btnCancel_clicked();
+
+    void on_actionNew_folder_triggered();
 
 private:
     Ui::SessionManager *ui;
 
     QSettings settings;
     SessionsTreeModel *sessionsModel;
+    QSortFilterProxyModel *sortedSessionsModel;
 
     void saveWindowParameters();
     void loadWindowParameters();
     void setSignalSlots();
     void setSessionsActions();
+    void setSessionsModel();
+    void selectForRename(const QModelIndex &index);
 };
 
 #endif // SESSIONMANAGER_H
