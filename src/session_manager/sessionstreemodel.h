@@ -9,7 +9,7 @@ class SessionsTreeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    explicit SessionsTreeModel(const QString &data, QObject *parent = nullptr);
+    explicit SessionsTreeModel(QObject *parent = nullptr);
     ~SessionsTreeModel();
 
     // Header:
@@ -39,9 +39,15 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
 
+    QModelIndex createFolder(const QString &name, const QModelIndex &index);
+    void createServer(const QString &name, const QModelIndex &index);
+    TreeItem* getItem(const QModelIndex &index) const;
+
 private:
-    void setupModelData(const QStringList &lines, TreeItem *parent);
+    void setupModelData();
     void addSessions(const QJsonArray &sessions, TreeItem *parent);
+    QModelIndex findParentToInsert(const QModelIndex &index) const;
+    QModelIndex createItem();
 
     TreeItem *rootItem;
 };

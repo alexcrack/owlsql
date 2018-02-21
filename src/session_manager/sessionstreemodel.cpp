@@ -8,7 +8,7 @@
 #include "foldertreeitem.h"
 #include "sessiontreeitem.h"
 
-SessionsTreeModel::SessionsTreeModel(const QString &data, QObject *parent)
+SessionsTreeModel::SessionsTreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
     QList<QVariant> rootData;
@@ -18,7 +18,7 @@ SessionsTreeModel::SessionsTreeModel(const QString &data, QObject *parent)
 
     rootItem = new TreeItem(rootData);
 
-    setupModelData(data.split(QString("\n")), rootItem);
+    setupModelData();
 }
 
 SessionsTreeModel::~SessionsTreeModel()
@@ -180,7 +180,7 @@ bool SessionsTreeModel::removeColumns(int column, int count, const QModelIndex &
     endRemoveColumns();
 }
 
-void SessionsTreeModel::setupModelData(const QStringList &lines, TreeItem *parent)
+void SessionsTreeModel::setupModelData()
 {
     QFile sessionsFile;
     sessionsFile.setFileName("sessions.json");
@@ -206,7 +206,7 @@ void SessionsTreeModel::addSessions(const QJsonArray &sessions, TreeItem *parent
         QString sessionName = sessionObject.value("name").toString();
 
         if (type == 1) {
-            SessionTreeItem *sessionItem = new SessionTreeItem(sessionName, parent);
+            SessionTreeItem *sessionItem = new SessionTreeItem(sessionObject, parent);
 
             parent->appendChild(sessionItem);
 
@@ -220,4 +220,53 @@ void SessionsTreeModel::addSessions(const QJsonArray &sessions, TreeItem *parent
             }
         }
     }
+}
+
+TreeItem* SessionsTreeModel::getItem(const QModelIndex &index) const
+{
+    if (index.isValid()) {
+        TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+        if (item)
+            return item;
+    }
+
+    return rootItem;
+}
+
+QModelIndex SessionsTreeModel::findParentToInsert(const QModelIndex &index) const
+{
+    QModelIndex parentIndex = index;
+
+    while (!getItem(parentIndex)->canInsertChild())
+        parentIndex = parentIndex.parent();
+
+    return parentIndex;
+}
+
+QModelIndex SessionsTreeModel::createFolder(const QString &name, const QModelIndex &index)
+{
+    QModelIndex parent = findParentToInsert(index);
+
+    TreeItem *item = getItem(parent);
+
+    bool success;
+    int row = index.row();
+    if (parent == index)
+        row = item->childCount();
+
+    beginInsertRows(parent, row, row);
+
+    success = item->insertChild(row, new FolderTreeItem(name, item));
+
+    endInsertRows();
+
+    if (success)
+        return this->index(row, 0, parent);
+
+    return QModelIndex();
+}
+
+void SessionsTreeModel::createServer(const QString &name, const QModelIndex &index)
+{
+
 }
