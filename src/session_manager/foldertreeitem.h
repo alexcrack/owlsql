@@ -11,6 +11,8 @@ public:
     QVariant data(int column) const;
     QVariant icon(int column) const;
 
+    bool canInsertChild() const;
+
 private:
     QString m_folderName;
 };

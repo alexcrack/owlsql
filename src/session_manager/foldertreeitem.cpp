@@ -19,3 +19,8 @@ QVariant FolderTreeItem::icon(int column) const
     if (column == 0)
         return QIcon(":/icons/folder.svg");
 }
+
+bool FolderTreeItem::canInsertChild() const
+{
+    return true;
+}
