@@ -13,7 +13,7 @@ public:
     explicit TreeItem(TreeItem *parentItem = 0);
     ~TreeItem();
 
-    virtual void appendChild(TreeItem *child);
+    void appendChild(TreeItem *child);
 
     virtual TreeItem *child(int row);
     virtual int childCount() const;
@@ -22,6 +22,9 @@ public:
     virtual int row() const;
     virtual TreeItem *parentItem();
     virtual QVariant icon(int column) const;
+
+    virtual bool canInsertChild() const;
+    bool insertChild(int position, TreeItem *item);
 
 private:
     TreeItem *m_parentItem;

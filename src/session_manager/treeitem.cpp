@@ -58,3 +58,18 @@ QVariant TreeItem::icon(int column) const
 {
     return QVariant();
 }
+
+bool TreeItem::canInsertChild() const
+{
+    return true;
+}
+
+bool TreeItem::insertChild(int position, TreeItem *item)
+{
+    if (position < 0 || position > m_childItems.count())
+        return false;
+
+    m_childItems.insert(position, item);
+
+    return true;
+}
