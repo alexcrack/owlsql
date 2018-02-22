@@ -314,31 +314,6 @@
                   <string>MySQL (SSH tunnel)</string>
                  </property>
                 </item>
-                <item>
-                 <property name="text">
-                  <string>Microsoft SQL Server (named pipe, experimental)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Microsoft SQL Server (TCP/IP, experimental)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Microsoft SQL Server (SPX)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Microsoft SQL Server (Banyan VINES, experimental)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Microsoft SQL Server (Windows RPC, experimental)</string>
-                 </property>
-                </item>
                </widget>
               </item>
               <item row="4" column="0">

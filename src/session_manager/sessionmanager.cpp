@@ -191,3 +191,12 @@ void SessionManager::on_actionNew_folder_triggered()
 
     selectForRename(created);
 }
+
+void SessionManager::on_actionNew_session_triggered()
+{
+    QModelIndex selectedIndex = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+
+    QModelIndex created = sessionsModel->createSession(QString("New Session"), selectedIndex);
+
+    selectForRename(created);
+}

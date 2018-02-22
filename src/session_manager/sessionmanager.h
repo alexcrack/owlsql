@@ -32,6 +32,8 @@ private slots:
 
     void on_actionNew_folder_triggered();
 
+    void on_actionNew_session_triggered();
+
 private:
     Ui::SessionManager *ui;
 
