@@ -129,11 +129,17 @@ QVariant SessionsTreeModel::data(const QModelIndex &index, int role) const
 
 bool SessionsTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (data(index, role) != value) {
-        // FIXME: Implement me!
-        emit dataChanged(index, index, QVector<int>() << role);
+    if (role == Qt::EditRole && data(index, role) != value) {
+        TreeItem *item = getItem(index);
+
+        bool result = item->setData(index.column(), value);
+
+        if (result)
+            emit dataChanged(index, index, QVector<int>() << role);
+
         return true;
     }
+
     return false;
 }
 
@@ -243,6 +249,11 @@ QModelIndex SessionsTreeModel::findParentToInsert(const QModelIndex &index) cons
     return parentIndex;
 }
 
+QModelIndex SessionsTreeModel::createItem(const TreeItem *item, const QModelIndex &index)
+{
+
+}
+
 QModelIndex SessionsTreeModel::createFolder(const QString &name, const QModelIndex &index)
 {
     QModelIndex parent = findParentToInsert(index);
@@ -266,7 +277,25 @@ QModelIndex SessionsTreeModel::createFolder(const QString &name, const QModelInd
     return QModelIndex();
 }
 
-void SessionsTreeModel::createServer(const QString &name, const QModelIndex &index)
+QModelIndex SessionsTreeModel::createSession(const QString &name, const QModelIndex &index)
 {
+    QModelIndex parent = findParentToInsert(index);
 
+    TreeItem *item = getItem(parent);
+
+    bool success;
+    int row = index.row();
+    if (parent == index)
+        row = item->childCount();
+
+    beginInsertRows(parent, row, row);
+
+    success = item->insertChild(row, new SessionTreeItem(name, item));
+
+    endInsertRows();
+
+    if (success)
+        return this->index(row, 0, parent);
+
+    return QModelIndex();
 }

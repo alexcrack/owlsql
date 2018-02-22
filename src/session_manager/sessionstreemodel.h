@@ -39,8 +39,9 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
 
+    QModelIndex createItem(const TreeItem *item, const QModelIndex &index);
     QModelIndex createFolder(const QString &name, const QModelIndex &index);
-    void createServer(const QString &name, const QModelIndex &index);
+    QModelIndex createSession(const QString &name, const QModelIndex &index);
     TreeItem* getItem(const QModelIndex &index) const;
 
 private:
