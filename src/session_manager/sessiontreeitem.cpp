@@ -21,19 +21,30 @@ SessionTreeItem::SessionTreeItem(const QJsonObject &sessionObject, TreeItem *par
 QVariant SessionTreeItem::data(int column) const
 {
     switch(column) {
-    case 0:
+    case Field::SessionName:
         return m_sessionName;
-    case 1:
+    case Field::HostName:
         return m_hostName;
-    case 2:
+    case Field::ServerVersion:
         return m_serverFullVersion;
-    case 3:
+    case Field::UserName:
         return m_user;
-    case 6:
+    case Field::SessionComment:
         return m_comment;
     }
 
     return QVariant();
+}
+
+bool SessionTreeItem::setData(int column, const QVariant &data)
+{
+    switch (column) {
+    case Field::SessionName:
+        m_sessionName = data.toString();
+        return true;
+    default:
+        return false;
+    }
 }
 
 QVariant SessionTreeItem::icon(int column) const
