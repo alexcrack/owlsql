@@ -4,6 +4,7 @@
 #
 #-------------------------------------------------
 
+CONFIG   += c++14
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -32,7 +33,8 @@ SOURCES += \
     session_manager/sessionstreemodel.cpp \
     session_manager/treeitem.cpp \
     session_manager/foldertreeitem.cpp \
-    session_manager/sessiontreeitem.cpp
+    session_manager/sessiontreeitem.cpp \
+    session_manager/isdirtydatawidgetmapper.cpp
 
 HEADERS += \
         mainwindow/mainwindow.h \
@@ -43,7 +45,8 @@ HEADERS += \
     session_manager/sessionstreemodel.h \
     session_manager/treeitem.h \
     session_manager/foldertreeitem.h \
-    session_manager/sessiontreeitem.h
+    session_manager/sessiontreeitem.h \
+    session_manager/isdirtydatawidgetmapper.h
 
 FORMS += \
         mainwindow/mainwindow.ui \
