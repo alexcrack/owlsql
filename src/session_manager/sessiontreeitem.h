@@ -2,7 +2,6 @@
 #define SESSIONTREEITEM_H
 
 #include "treeitem.h"
-#include <QJsonObject>
 
 class SessionTreeItem : public TreeItem
 {
@@ -54,6 +53,9 @@ public:
     QVariant icon(int column) const;
 
     bool canInsertChild() const;
+    bool canEdit() const override;
+
+    QJsonObject toJson() override;
 
 private:
     QString m_sessionName;

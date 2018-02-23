@@ -40,9 +40,14 @@ public:
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
 
     QModelIndex createItem(const TreeItem *item, const QModelIndex &index);
+    bool deleteSession(const QModelIndex &index);
     QModelIndex createFolder(const QString &name, const QModelIndex &index);
     QModelIndex createSession(const QString &name, const QModelIndex &index);
-    TreeItem* getItem(const QModelIndex &index) const;
+
+    TreeItem* getItem(const QModelIndex &indiex) const;
+    void setDirty(const QModelIndex &index, bool isDirty);
+
+    bool saveModelData();
 
 private:
     void setupModelData();

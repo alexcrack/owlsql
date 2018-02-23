@@ -26,6 +26,11 @@ TreeItem *TreeItem::child(int row)
     return m_childItems.value(row);
 }
 
+QList<TreeItem*> TreeItem::children()
+{
+    return m_childItems;
+}
+
 int TreeItem::childCount() const
 {
     return m_childItems.count();
@@ -77,4 +82,36 @@ bool TreeItem::insertChild(int position, TreeItem *item)
     m_childItems.insert(position, item);
 
     return true;
+}
+
+bool TreeItem::removeChild(int position)
+{
+    if (position < 0 || position > m_childItems.count())
+        return false;
+
+    m_childItems.removeAt(position);
+
+    return true;
+}
+
+void TreeItem::setDirty(bool isDirty)
+{
+    m_isDirty = isDirty;
+}
+
+bool TreeItem::isDirty()
+{
+    return m_isDirty;
+}
+
+bool TreeItem::canEdit() const
+{
+    return false;
+}
+
+QJsonObject TreeItem::toJson()
+{
+    QJsonObject object;
+
+    return object;
 }

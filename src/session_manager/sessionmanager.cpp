@@ -1,5 +1,9 @@
 #include "sessionmanager.h"
 #include "ui_sessionmanager.h"
+#include "sessiontreeitem.h"
+
+#include <QDebug>
+
 
 SessionManager::SessionManager(QWidget *parent) :
     QMainWindow(parent),
@@ -11,6 +15,7 @@ SessionManager::SessionManager(QWidget *parent) :
     setSessionsActions();
     setSignalSlots();
     setSessionsModel();
+    setSessionMappings();
 }
 
 SessionManager::~SessionManager()
@@ -47,6 +52,11 @@ void SessionManager::loadWindowParameters()
     ui->sessionsTreeView->header()->restoreState(settings.value("sessionsTreeHeader").toByteArray());
 
     settings.endGroup();
+}
+
+void SessionManager::setUpElements()
+{
+
 }
 
 void SessionManager::setSignalSlots()
@@ -166,6 +176,115 @@ void SessionManager::showHideSessionsListColumn(int column)
     header->setSectionHidden(column, !header->isSectionHidden(column));
 }
 
+void SessionManager::setSessionMappings()
+{
+    sessionMapper = new IsDirtyDataWidgetMapper(this);
+    sessionMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
+    sessionMapper->setModel(sessionsModel);
+    sessionMapper->setItemDelegate(new SessionDelegate());
+
+    // Settings tab
+    //sessionMapper->addMapping(ui->cmbNetworkType, netType, "currentIndex");
+    sessionMapper->addMapping(ui->editHostname, SessionTreeItem::HostName);
+    //sessionMapper->addMapping(ui->chkCredentials, SessionTreeItem::);
+    sessionMapper->addMapping(ui->editSessionComment, SessionTreeItem::SessionComment);
+#if (defined (_WIN32) || defined (_WIN64))
+    sessionMapper->addMapping(ui->chkWinAuth, windowsAuth);
+#else
+    ui->chkWinAuth->hide();
+#endif
+    sessionMapper->addMapping(ui->editUsername, SessionTreeItem::UserName);
+    sessionMapper->addMapping(ui->editPassword, SessionTreeItem::Password);
+    sessionMapper->addMapping(ui->spinPort, SessionTreeItem::Port);
+    //sessionMapper->addMapping(ui->chkCompressed, compressed);
+    //sessionMapper->addMapping(ui->cmbDatabase, allDatabaseStr, "currentText");
+    //sessionMapper->addMapping(ui->editSessionComment, sessionComment);
+
+    // SSH settings tab
+    //sessionMapper->addMapping(ui->editSshHost, sshHost);
+    //sessionMapper->addMapping(ui->spinSshPort, sshPort);
+    //sessionMapper->addMapping(ui->editSshUser, sshUser);
+    //sessionMapper->addMapping(ui->editSshPassword, sshPassword);
+    //sessionMapper->addMapping(ui->editSshKeyPath, sshPrivateKey);
+    //sessionMapper->addMapping(ui->spinSshLocalPort, sshLocalPort);
+#if (defined (_WIN32) || defined (_WIN64))
+    sessionMapper->addMapping(ui->editSshPlinkPath, sshPlinkExe);
+    sessionMapper->addMapping(ui->spinPlinkTimeout, sshPlinkTimeout);
+#endif
+
+    // Advances settings tab
+    //sessionMapper->addMapping(ui->grpBoxSsl, wantSsl);
+    //sessionMapper->addMapping(ui->editSslPrivateKeyPath, sslPrivateKey);
+    //sessionMapper->addMapping(ui->editCaCertificatePath, sslCaCertificate);
+    //sessionMapper->addMapping(ui->editCertificatePath, sslCertificate);
+    //sessionMapper->addMapping(ui->editSslCipher, sslCipher);
+
+    //sessionMapper->addMapping(ui->editStartupScriptPath, startupScriptFilename);
+    //sessionMapper->addMapping(ui->spinQueryTimeout, queryTimeOut);
+    //sessionMapper->addMapping(ui->spinPingTimeout, pingTimeOut);
+    //sessionMapper->addMapping(ui->chkClientTimeZone, clientTimeZone);
+    //sessionMapper->addMapping(ui->chkFullTableStatus, fullTableStatus);
+
+    // Statistics tab
+    //sessionMapper->addMapping(ui->lblCreated, sessionCreated);
+    //sessionMapper->addMapping(ui->lblLastConnect, lastConnect);
+    //sessionMapper->addMapping(ui->lblSuccessConnects, connectCount, "text");
+    //sessionMapper->addMapping(ui->lblUnsuccessConnects, refusedCount, "text");
+
+//    for (int i = netType; i < SL_NO_MORE_COLUMNS; i++) {
+//        ui->connectionsList->hideColumn(i);
+//    }
+    connect(ui->sessionsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &SessionManager::sessionSelectionChanged);
+
+    connect(sessionMapper, &IsDirtyDataWidgetMapper::dirtyStateChanged, this, [=](const bool isDirty) {
+        qDebug() << "Is Dirty" << isDirty;
+
+        ui->actionSave->setEnabled(isDirty);
+
+        sessionsModel->setDirty(sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex()), isDirty);
+    });
+}
+
+void SessionManager::sessionSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    // Remove tabs and add only needed for selected item
+    while (ui->tabWidget->count() > 0)
+        ui->tabWidget->removeTab(0);
+
+    QModelIndex index = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+    sessionMapper->setRootIndex(index.parent());
+    sessionMapper->setCurrentModelIndex(index);
+
+    TreeItem *item = sessionsModel->getItem(index);
+
+    if (index.isValid() && item->canEdit()) {
+        ui->btnOpenConnection->setEnabled(true);
+        ui->btnTestConnection->setEnabled(true);
+
+        ui->tabWidget->addTab(ui->tabSettings, QIcon(":/icons/wrench.png"), QString(tr("Settings")));
+
+        //        if (item->server().netType == ntMySQL_SSHtunnel)
+        //            ui->tabWidget->addTab(ui->tabSshTunnel, QIcon(":/icons/lock_blue.png"), QString(tr("SSH Tunnel")));
+
+        ui->tabWidget->addTab(ui->tabAdvancedOptions, QIcon(":/icons/wrench_orange.png"), QString(tr("Advanced")));
+        ui->tabWidget->addTab(ui->tabStatistics, QIcon(":/icons/chart_bar.png"), QString(tr("Statistics")));
+    } else {
+        ui->btnOpenConnection->setEnabled(false);
+        ui->btnTestConnection->setEnabled(false);
+
+        ui->tabWidget->addTab(ui->tabStart, QIcon(":/icons/star.png"), QString(tr("Start")));
+    }
+
+    // Actions enabled
+//    if (item->isServer()) {
+//        ui->actionSave_as->setEnabled(true);
+//    } else {
+//        ui->actionSave->setEnabled(false);
+//        ui->actionSave_as->setEnabled(false);
+//    }
+}
+
 void SessionManager::on_btnOpenConnection_clicked()
 {
 
@@ -199,4 +318,36 @@ void SessionManager::on_actionNew_session_triggered()
     QModelIndex created = sessionsModel->createSession(QString("New Session"), selectedIndex);
 
     selectForRename(created);
+}
+
+void SessionManager::on_actionRename_triggered()
+{
+    QModelIndex selectedIndex = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+
+    ui->sessionsTreeView->edit(sortedSessionsModel->mapFromSource(selectedIndex));
+}
+
+void SessionManager::on_actionSave_triggered()
+{
+    sessionsModel->saveModelData();
+}
+
+void SessionManager::on_actionDelete_triggered()
+{
+    QModelIndex index = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+    //TreeItem *item = sessionsModel->getItem(index);
+
+    QMessageBox confirm;
+    confirm.setWindowTitle(QString(tr("Confirm")));
+    confirm.setText(QString(tr("Are really want to delete session \"%1\"?").arg("")));
+    confirm.setIcon(QMessageBox::Question);
+    confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    confirm.setDefaultButton(QMessageBox::Yes);
+
+    if (confirm.exec() == QMessageBox::Yes) {
+        // Delete session
+        sessionsModel->deleteSession(index);
+    } else {
+        confirm.close();
+    };
 }

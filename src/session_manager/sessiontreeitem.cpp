@@ -3,7 +3,11 @@
 SessionTreeItem::SessionTreeItem(const QString &name, TreeItem *parentItem)
     : TreeItem(parentItem), m_sessionName(name)
 {
-
+    m_hostName = QString("127.0.0.1");
+    m_port = 3306;
+    m_user = QString("root");
+    m_password = QString("");
+    m_comment = QString("");
 }
 
 SessionTreeItem::SessionTreeItem(const QJsonObject &sessionObject, TreeItem *parentItem)
@@ -41,10 +45,21 @@ bool SessionTreeItem::setData(int column, const QVariant &data)
     switch (column) {
     case Field::SessionName:
         m_sessionName = data.toString();
-        return true;
+        break;
+    case Field::HostName:
+        m_hostName = data.toString();
+        break;
+    case Field::UserName:
+        m_user = data.toString();
+        break;
+    case Field::SessionComment:
+        m_comment = data.toString();
+        break;
     default:
         return false;
     }
+
+    return true;
 }
 
 QVariant SessionTreeItem::icon(int column) const
@@ -67,4 +82,29 @@ QVariant SessionTreeItem::icon(int column) const
 bool SessionTreeItem::canInsertChild() const
 {
     return false;
+}
+
+bool SessionTreeItem::canEdit() const
+{
+    return true;
+}
+
+QJsonObject SessionTreeItem::toJson()
+{
+    QJsonObject session;
+
+    session.insert("type", QJsonValue::fromVariant(1));
+    session.insert("name", QJsonValue::fromVariant(m_sessionName));
+    session.insert("comment", QJsonValue::fromVariant(m_comment));
+    session.insert("hostName", QJsonValue::fromVariant(m_hostName));
+    session.insert("port", QJsonValue::fromVariant(m_port));
+    session.insert("user", QJsonValue::fromVariant(m_user));
+    session.insert("password", QJsonValue::fromVariant(m_password));
+    session.insert("created", QJsonValue::fromVariant(QString("")));
+    session.insert("connectionsCount", QJsonValue::fromVariant(0));
+    session.insert("lastConnection", QJsonValue::fromVariant(QString("")));
+    session.insert("refusedCount", QJsonValue::fromVariant(0));
+    session.insert("serverFullVersion", QJsonValue::fromVariant(m_serverFullVersion));
+
+    return session;
 }

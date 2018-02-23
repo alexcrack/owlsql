@@ -17,6 +17,7 @@ public:
     QVariant icon(int column) const;
 
     bool canInsertChild() const;
+    QJsonObject toJson() override;
 
 private:
     QString m_folderName;

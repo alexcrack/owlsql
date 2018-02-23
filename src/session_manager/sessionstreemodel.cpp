@@ -186,6 +186,29 @@ bool SessionsTreeModel::removeColumns(int column, int count, const QModelIndex &
     endRemoveColumns();
 }
 
+bool SessionsTreeModel::saveModelData()
+{
+    QFile sessionsFile;
+
+    sessionsFile.setFileName("sessions.json");
+    sessionsFile.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    QJsonObject object;
+    QJsonArray sessions;
+
+    foreach (auto session, rootItem->children()) {
+        sessions.push_back(session->toJson());
+    }
+
+    object.insert("sessions", sessions);
+
+    QJsonDocument document(object);
+
+    sessionsFile.write(document.toJson());
+
+    sessionsFile.close();
+}
+
 void SessionsTreeModel::setupModelData()
 {
     QFile sessionsFile;
@@ -237,6 +260,15 @@ TreeItem* SessionsTreeModel::getItem(const QModelIndex &index) const
     }
 
     return rootItem;
+}
+
+void SessionsTreeModel::setDirty(const QModelIndex &index, bool isDirty)
+{
+    TreeItem *item = getItem(index);
+
+    item->setDirty(isDirty);
+
+    emit dataChanged(index, index);
 }
 
 QModelIndex SessionsTreeModel::findParentToInsert(const QModelIndex &index) const
@@ -298,4 +330,20 @@ QModelIndex SessionsTreeModel::createSession(const QString &name, const QModelIn
         return this->index(row, 0, parent);
 
     return QModelIndex();
+}
+
+bool SessionsTreeModel::deleteSession(const QModelIndex &index)
+{
+    QModelIndex parent = index.parent();
+    TreeItem *item = getItem(index);
+    TreeItem *parentItem = getItem(parent);
+    int row = parentItem->children().indexOf(item);
+
+    beginRemoveRows(parent, row, row);
+
+    bool result = parentItem->removeChild(row);
+
+    endRemoveRows();
+
+    return result;
 }

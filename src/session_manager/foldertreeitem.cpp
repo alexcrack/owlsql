@@ -37,3 +37,23 @@ bool FolderTreeItem::canInsertChild() const
 {
     return true;
 }
+
+QJsonObject FolderTreeItem::toJson()
+{
+    QJsonObject folder;
+
+    folder.insert("type", QJsonValue::fromVariant(2));
+    folder.insert("name", QJsonValue::fromVariant(m_folderName));
+
+    if (childCount() > 0) {
+        QJsonArray sessions;
+
+        foreach(auto child, children()) {
+            sessions.push_back(child->toJson());
+        }
+
+        folder.insert("sessions", sessions);
+    }
+
+    return folder;
+}

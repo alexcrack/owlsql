@@ -4,6 +4,8 @@
 #include <QList>
 #include <QVariant>
 #include <QIcon>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class TreeItem
 {
@@ -15,6 +17,7 @@ public:
     void appendChild(TreeItem *child);
 
     virtual TreeItem *child(int row);
+    virtual QList<TreeItem*> children();
     virtual int childCount() const;
     int columnCount() const;
     virtual QVariant data(int column) const;
@@ -25,11 +28,18 @@ public:
 
     virtual bool canInsertChild() const;
     bool insertChild(int position, TreeItem *item);
+    bool removeChild(int position);
+
+    void setDirty(bool isDirty);
+    bool isDirty();
+    virtual bool canEdit() const;
+    virtual QJsonObject toJson();
 
 private:
     TreeItem *m_parentItem;
     QList<TreeItem *> m_childItems;
     QList<QVariant> m_itemData;
+    bool m_isDirty;
 };
 
 #endif // TREEITEM_H

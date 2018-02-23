@@ -1,4 +1,4 @@
-#include "lib/isdirtydatawidgetmapper.h"
+#include "isdirtydatawidgetmapper.h"
 #include <QComboBox>
 
 IsDirtyDataWidgetMapper::IsDirtyDataWidgetMapper(QObject *parent) : QDataWidgetMapper(parent) {}
