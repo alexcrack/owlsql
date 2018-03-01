@@ -1,6 +1,5 @@
 #include "sessionmanager.h"
 #include "ui_sessionmanager.h"
-#include "sessiontreeitem.h"
 
 #include <QDebug>
 
@@ -12,6 +11,7 @@ SessionManager::SessionManager(QWidget *parent) :
     ui->setupUi(this);
 
     loadWindowParameters();
+    setUpElements();
     setSessionsActions();
     setSignalSlots();
     setSessionsModel();
@@ -56,15 +56,27 @@ void SessionManager::loadWindowParameters()
 
 void SessionManager::setUpElements()
 {
+    QWidget *spacer = new QWidget(ui->toolBar);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacer->setVisible(true);
+    ui->toolBar->insertWidget(ui->actionCheck_for_updates, spacer);
 
+    // Remove tabs and add only needed for selected item
+    while (ui->tabWidget->count() > 0)
+        ui->tabWidget->removeTab(0);
+
+    ui->tabWidget->addTab(ui->tabStart, QIcon(":/icons/star.png"), QString(tr("Start")));
+
+    for (int i = SessionTreeItem::LISTED_BEFORE; i < SessionTreeItem::NO_MORE_COLUMNS; i++) {
+        ui->sessionsTreeView->hideColumn(i);
+    }
 }
 
 void SessionManager::setSignalSlots()
 {
     ui->sessionsTreeView->header()->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->sessionsTreeView->header(),
-            SIGNAL(customContextMenuRequested(QPoint)),
-            SLOT(popupConnectionsListHeaderMenu(QPoint)));
+    connect(ui->sessionsTreeView->header(), &QHeaderView::customContextMenuRequested,
+            this, &SessionManager::popupConnectionsListHeaderMenu);
 
     // Set up open file buttons
     QSignalMapper *openFileMapper = new QSignalMapper(this);
@@ -122,10 +134,30 @@ void SessionManager::setSessionsModel()
 {
     sessionsModel = new SessionsTreeModel();
 
+    sessionProxyModel = new SessionsProxyModel();
+    sessionProxyModel->setSourceModel(sessionsModel);
+
     sortedSessionsModel = new QSortFilterProxyModel();
-    sortedSessionsModel->setSourceModel(sessionsModel);
+    sortedSessionsModel->setSourceModel(sessionProxyModel);
 
     ui->sessionsTreeView->setModel(sortedSessionsModel);
+}
+
+QModelIndex SessionManager::mapToSource(const QModelIndex &index)
+{
+    return sessionProxyModel->mapToSource(sortedSessionsModel->mapToSource(index));
+}
+
+QModelIndex SessionManager::mapFromSource(const QModelIndex &index)
+{
+    return sortedSessionsModel->mapFromSource(sessionProxyModel->mapFromSource(index));
+}
+
+TreeItem* SessionManager::selectedItem()
+{
+    QModelIndex index = ui->sessionsTreeView->selectionModel()->currentIndex();
+
+    return sessionsModel->getItem(mapToSource(index));
 }
 
 void SessionManager::setSessionsActions()
@@ -137,11 +169,6 @@ void SessionManager::setSessionsActions()
     ui->sessionsTreeView->addAction(ui->actionNew_session);
     ui->sessionsTreeView->addAction(ui->actionNew_folder);
     ui->sessionsTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
-
-    QWidget *spacer = new QWidget(ui->toolBar);
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    spacer->setVisible(true);
-    ui->toolBar->insertWidget(ui->actionCheck_for_updates, spacer);
 }
 
 void SessionManager::popupConnectionsListHeaderMenu(QPoint position)
@@ -150,14 +177,12 @@ void SessionManager::popupConnectionsListHeaderMenu(QPoint position)
     QMenu *menu = new QMenu(header);
     QSignalMapper *mapper = new QSignalMapper(header);
 
-    int columnsCount = sessionsModel->columnCount(QModelIndex());
-
-    for (int i = 0; i <= columnsCount - 1; ++i) {
+    for (int i = 0; i < SessionTreeItem::LISTED_BEFORE; ++i) {
         QAction *action = new QAction(menu);
         action->setText(sessionsModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
         action->setCheckable(true);
         action->setChecked(!header->isSectionHidden(i));
-        action->setDisabled(action->isChecked() && header->hiddenSectionCount() == columnsCount - 1);
+        action->setDisabled(action->isChecked() && header->hiddenSectionCount() == SessionTreeItem::LISTED_BEFORE - 1);
 
         connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
         mapper->setMapping(action, i);
@@ -184,56 +209,52 @@ void SessionManager::setSessionMappings()
     sessionMapper->setItemDelegate(new SessionDelegate());
 
     // Settings tab
-    //sessionMapper->addMapping(ui->cmbNetworkType, netType, "currentIndex");
+    sessionMapper->addMapping(ui->cmbNetworkType, SessionTreeItem::NetType, "currentIndex");
     sessionMapper->addMapping(ui->editHostname, SessionTreeItem::HostName);
-    //sessionMapper->addMapping(ui->chkCredentials, SessionTreeItem::);
+    sessionMapper->addMapping(ui->chkCredentials, SessionTreeItem::LoginPromt);
     sessionMapper->addMapping(ui->editSessionComment, SessionTreeItem::SessionComment);
 #if (defined (_WIN32) || defined (_WIN64))
-    sessionMapper->addMapping(ui->chkWinAuth, windowsAuth);
+    sessionMapper->addMapping(ui->chkWinAuth, SessionTreeItem::WindowsAuth);
 #else
     ui->chkWinAuth->hide();
 #endif
     sessionMapper->addMapping(ui->editUsername, SessionTreeItem::UserName);
     sessionMapper->addMapping(ui->editPassword, SessionTreeItem::Password);
     sessionMapper->addMapping(ui->spinPort, SessionTreeItem::Port);
-    //sessionMapper->addMapping(ui->chkCompressed, compressed);
-    //sessionMapper->addMapping(ui->cmbDatabase, allDatabaseStr, "currentText");
-    //sessionMapper->addMapping(ui->editSessionComment, sessionComment);
+    sessionMapper->addMapping(ui->chkCompressed, SessionTreeItem::Compressed);
+    sessionMapper->addMapping(ui->cmbDatabase, SessionTreeItem::AllDatabaseStr, "currentText");
 
     // SSH settings tab
-    //sessionMapper->addMapping(ui->editSshHost, sshHost);
-    //sessionMapper->addMapping(ui->spinSshPort, sshPort);
-    //sessionMapper->addMapping(ui->editSshUser, sshUser);
-    //sessionMapper->addMapping(ui->editSshPassword, sshPassword);
-    //sessionMapper->addMapping(ui->editSshKeyPath, sshPrivateKey);
-    //sessionMapper->addMapping(ui->spinSshLocalPort, sshLocalPort);
+    sessionMapper->addMapping(ui->editSshHost, SessionTreeItem::SshHost);
+    sessionMapper->addMapping(ui->spinSshPort, SessionTreeItem::SshPort);
+    sessionMapper->addMapping(ui->editSshUser, SessionTreeItem::SshUser);
+    sessionMapper->addMapping(ui->editSshPassword, SessionTreeItem::SshPassword);
+    sessionMapper->addMapping(ui->editSshKeyPath, SessionTreeItem::SshPrivateKey);
+    sessionMapper->addMapping(ui->spinSshLocalPort, SessionTreeItem::SshLocalPort);
 #if (defined (_WIN32) || defined (_WIN64))
-    sessionMapper->addMapping(ui->editSshPlinkPath, sshPlinkExe);
-    sessionMapper->addMapping(ui->spinPlinkTimeout, sshPlinkTimeout);
+    sessionMapper->addMapping(ui->editSshPlinkPath, SessionTreeItem::SshPlinkExe);
+    sessionMapper->addMapping(ui->spinPlinkTimeout, SessionTreeItem::SshPlinkTimeout);
 #endif
 
     // Advances settings tab
-    //sessionMapper->addMapping(ui->grpBoxSsl, wantSsl);
-    //sessionMapper->addMapping(ui->editSslPrivateKeyPath, sslPrivateKey);
-    //sessionMapper->addMapping(ui->editCaCertificatePath, sslCaCertificate);
-    //sessionMapper->addMapping(ui->editCertificatePath, sslCertificate);
-    //sessionMapper->addMapping(ui->editSslCipher, sslCipher);
+    sessionMapper->addMapping(ui->grpBoxSsl, SessionTreeItem::WantSsl);
+    sessionMapper->addMapping(ui->editSslPrivateKeyPath, SessionTreeItem::SslPrivateKey);
+    sessionMapper->addMapping(ui->editCaCertificatePath, SessionTreeItem::SslCaCertificate);
+    sessionMapper->addMapping(ui->editCertificatePath, SessionTreeItem::SslCertificate);
+    sessionMapper->addMapping(ui->editSslCipher, SessionTreeItem::SslCipher);
 
-    //sessionMapper->addMapping(ui->editStartupScriptPath, startupScriptFilename);
-    //sessionMapper->addMapping(ui->spinQueryTimeout, queryTimeOut);
-    //sessionMapper->addMapping(ui->spinPingTimeout, pingTimeOut);
-    //sessionMapper->addMapping(ui->chkClientTimeZone, clientTimeZone);
-    //sessionMapper->addMapping(ui->chkFullTableStatus, fullTableStatus);
+    sessionMapper->addMapping(ui->editStartupScriptPath, SessionTreeItem::StartupScriptFilename);
+    sessionMapper->addMapping(ui->spinQueryTimeout, SessionTreeItem::QueryTimeOut);
+    sessionMapper->addMapping(ui->spinPingTimeout, SessionTreeItem::PingTimeOut);
+    sessionMapper->addMapping(ui->chkClientTimeZone, SessionTreeItem::ClientTimeZone);
+    sessionMapper->addMapping(ui->chkFullTableStatus, SessionTreeItem::FullTableStatus);
 
     // Statistics tab
-    //sessionMapper->addMapping(ui->lblCreated, sessionCreated);
-    //sessionMapper->addMapping(ui->lblLastConnect, lastConnect);
-    //sessionMapper->addMapping(ui->lblSuccessConnects, connectCount, "text");
-    //sessionMapper->addMapping(ui->lblUnsuccessConnects, refusedCount, "text");
+    sessionMapper->addMapping(ui->lblCreated, SessionTreeItem::SessionCreated);
+    sessionMapper->addMapping(ui->lblLastConnect, SessionTreeItem::LastConnect);
+    sessionMapper->addMapping(ui->lblSuccessConnects, SessionTreeItem::ConnectCount, "text");
+    sessionMapper->addMapping(ui->lblUnsuccessConnects, SessionTreeItem::RefusedCount, "text");
 
-//    for (int i = netType; i < SL_NO_MORE_COLUMNS; i++) {
-//        ui->connectionsList->hideColumn(i);
-//    }
     connect(ui->sessionsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &SessionManager::sessionSelectionChanged);
 
@@ -242,7 +263,7 @@ void SessionManager::setSessionMappings()
 
         ui->actionSave->setEnabled(isDirty);
 
-        sessionsModel->setDirty(sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex()), isDirty);
+        sessionsModel->setDirty(mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex()), isDirty);
     });
 }
 
@@ -252,7 +273,7 @@ void SessionManager::sessionSelectionChanged(const QItemSelection &selected, con
     while (ui->tabWidget->count() > 0)
         ui->tabWidget->removeTab(0);
 
-    QModelIndex index = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+    QModelIndex index = mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
     sessionMapper->setRootIndex(index.parent());
     sessionMapper->setCurrentModelIndex(index);
 
@@ -265,7 +286,7 @@ void SessionManager::sessionSelectionChanged(const QItemSelection &selected, con
         ui->tabWidget->addTab(ui->tabSettings, QIcon(":/icons/wrench.png"), QString(tr("Settings")));
 
         //        if (item->server().netType == ntMySQL_SSHtunnel)
-        //            ui->tabWidget->addTab(ui->tabSshTunnel, QIcon(":/icons/lock_blue.png"), QString(tr("SSH Tunnel")));
+                    ui->tabWidget->addTab(ui->tabSshTunnel, QIcon(":/icons/lock_blue.png"), QString(tr("SSH Tunnel")));
 
         ui->tabWidget->addTab(ui->tabAdvancedOptions, QIcon(":/icons/wrench_orange.png"), QString(tr("Advanced")));
         ui->tabWidget->addTab(ui->tabStatistics, QIcon(":/icons/chart_bar.png"), QString(tr("Statistics")));
@@ -277,17 +298,12 @@ void SessionManager::sessionSelectionChanged(const QItemSelection &selected, con
     }
 
     // Actions enabled
-//    if (item->isServer()) {
-//        ui->actionSave_as->setEnabled(true);
-//    } else {
-//        ui->actionSave->setEnabled(false);
-//        ui->actionSave_as->setEnabled(false);
-//    }
-}
-
-void SessionManager::on_btnOpenConnection_clicked()
-{
-
+    if (item->canEdit()) {
+        ui->actionSave_as->setEnabled(true);
+    } else {
+        ui->actionSave->setEnabled(false);
+        ui->actionSave_as->setEnabled(false);
+    }
 }
 
 void SessionManager::on_btnCancel_clicked()
@@ -297,49 +313,48 @@ void SessionManager::on_btnCancel_clicked()
 
 void SessionManager::selectForRename(const QModelIndex &index)
 {
-    ui->sessionsTreeView->setCurrentIndex(sortedSessionsModel->mapFromSource(index));
-    ui->sessionsTreeView->selectionModel()->select(sortedSessionsModel->mapFromSource(index), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
-    ui->sessionsTreeView->edit(sortedSessionsModel->mapFromSource(index));
+    ui->sessionsTreeView->setCurrentIndex(mapFromSource(index));
+    ui->sessionsTreeView->selectionModel()->select(mapFromSource(index), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+    ui->sessionsTreeView->edit(mapFromSource(index));
 }
 
 void SessionManager::on_actionNew_folder_triggered()
 {
-    QModelIndex selectedIndex = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+    QModelIndex selectedIndex = mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
 
-    QModelIndex created = sessionsModel->createFolder(QString("New Folder"), selectedIndex);
+    QModelIndex created = sessionsModel->createFolder(QString(tr("New Unnamed Folder")), selectedIndex);
 
     selectForRename(created);
 }
 
 void SessionManager::on_actionNew_session_triggered()
 {
-    QModelIndex selectedIndex = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+    QModelIndex selectedIndex = mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
 
-    QModelIndex created = sessionsModel->createSession(QString("New Session"), selectedIndex);
+    QModelIndex created = sessionsModel->createSession(QString(tr("New Unnamed Session")), selectedIndex);
 
     selectForRename(created);
 }
 
 void SessionManager::on_actionRename_triggered()
 {
-    QModelIndex selectedIndex = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
-
-    ui->sessionsTreeView->edit(sortedSessionsModel->mapFromSource(selectedIndex));
+    ui->sessionsTreeView->edit(ui->sessionsTreeView->selectionModel()->currentIndex());
 }
 
 void SessionManager::on_actionSave_triggered()
 {
+    sessionMapper->submit();
     sessionsModel->saveModelData();
 }
 
 void SessionManager::on_actionDelete_triggered()
 {
-    QModelIndex index = sortedSessionsModel->mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
-    //TreeItem *item = sessionsModel->getItem(index);
+    QModelIndex index = mapToSource(ui->sessionsTreeView->selectionModel()->currentIndex());
+    TreeItem *item = sessionsModel->getItem(index);
 
     QMessageBox confirm;
     confirm.setWindowTitle(QString(tr("Confirm")));
-    confirm.setText(QString(tr("Are really want to delete session \"%1\"?").arg("")));
+    confirm.setText(QString(tr("Are really want to delete session \"%1\"?").arg(item->name())));
     confirm.setIcon(QMessageBox::Question);
     confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     confirm.setDefaultButton(QMessageBox::Yes);
@@ -350,4 +365,68 @@ void SessionManager::on_actionDelete_triggered()
     } else {
         confirm.close();
     };
+}
+
+QSqlDatabase SessionManager::connectDb(SessionTreeItem *item)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "test");
+
+    db.setHostName(item->hostName());
+    db.setUserName(item->userName());
+    db.setPassword(item->password());
+
+    return db;
+}
+
+void SessionManager::on_btnTestConnection_clicked()
+{
+    SessionTreeItem *item = static_cast<SessionTreeItem*>(selectedItem());
+
+    QSqlDatabase db = connectDb(item);
+
+    QMessageBox result;
+    result.setWindowTitle(QString(tr("Connection testing")));
+    result.setStandardButtons(QMessageBox::Ok);
+    result.setDefaultButton(QMessageBox::Ok);
+
+    QString connectionInfo = QString(tr("Connection parameters:\nHost: %1\nPort: %2\nUser: %3\nDatabase: %4"))
+            .arg(db.hostName())
+            .arg(db.port())
+            .arg(db.userName())
+            .arg(db.databaseName());
+
+    if (db.open()) {
+        result.setIcon(QMessageBox::Information);
+        result.setText(QString(tr("Successfull connected to server\n\n%1"))
+                       .arg(connectionInfo));
+    } else {
+        result.setIcon(QMessageBox::Critical);
+
+        QSqlError error = db.lastError();
+
+        result.setText(QString(tr("Error connection to server:\n\n(%1): %2.\n\n%3"))
+                       .arg(error.nativeErrorCode())
+                       .arg(error.databaseText())
+                       .arg(connectionInfo));
+    }
+
+    db.close();
+    //QSqlDatabase::removeDatabase("test");
+
+    result.exec();
+}
+
+void SessionManager::on_btnOpenConnection_clicked()
+{
+    SessionTreeItem *item = static_cast<SessionTreeItem*>(selectedItem());
+
+    QSqlDatabase db = connectDb(item);
+
+    if (db.open()) {
+        emit connected(item, "test");
+
+        close();
+    } else {
+        qWarning() << "Error connecting database";
+    }
 }
