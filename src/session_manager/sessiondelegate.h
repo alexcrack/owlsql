@@ -10,6 +10,7 @@ class SessionDelegate : public QItemDelegate
 public:
     SessionDelegate();
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 };
 
 #endif // SESSIONDELEGATE_H

@@ -27,3 +27,10 @@ void SessionDelegate::setEditorData(QWidget *editor, const QModelIndex &index) c
         QItemDelegate::setEditorData(editor, index);
     }
 }
+
+void SessionDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if (editor->metaObject()->className() != QString("QLabel")) {
+        QItemDelegate::setModelData(editor, model, index);
+    }
+}
