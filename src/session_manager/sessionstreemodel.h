@@ -48,7 +48,6 @@ public:
     void setDirty(const QModelIndex &index, bool isDirty);
 
     bool saveModelData();
-
 private:
     void setupModelData();
     void addSessions(const QJsonArray &sessions, TreeItem *parent);

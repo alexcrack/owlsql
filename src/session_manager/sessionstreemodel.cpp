@@ -98,7 +98,7 @@ int SessionsTreeModel::rowCount(const QModelIndex &parent) const
 
 int SessionsTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return rootItem->columnCount();
+    return SessionTreeItem::NO_MORE_COLUMNS;
 }
 
 QVariant SessionsTreeModel::data(const QModelIndex &index, int role) const
