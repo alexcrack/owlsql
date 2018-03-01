@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "consts.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,6 +12,14 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(QString(APP_NAME).append(" - v").append(APP_VERSION));
     loadWindowParameters();
     makeToolbarsAndMenues();
+
+    connect(&sessionManager, &SessionManager::connected, this, &MainWindow::on_serverSession_connected);
+
+    connectionsModel = new ConnectionsTreeModel();
+    ui->connectionsTreeView->setModel(connectionsModel);
+
+    connect(ui->connectionsTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &MainWindow::connectionSelected);
 }
 
 MainWindow::~MainWindow()
@@ -119,4 +128,46 @@ void MainWindow::makeRunButtons()
 void MainWindow::on_actionSession_manager_triggered()
 {
     sessionManager.show();
+}
+
+void MainWindow::on_serverSession_connected(SessionTreeItem *item, QString connectionName)
+{
+    qWarning() << "Connected to database" << connectionName << item->name();
+
+    QModelIndex connected = connectionsModel->addConnection(connectionName, item, ui->connectionsTreeView->selectionModel()->currentIndex());
+
+    ui->connectionsTreeView->setCurrentIndex(connected);
+    ui->connectionsTreeView->selectionModel()->select(connected, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+
+//    QSqlDatabase db = QSqlDatabase::database(connectionName);
+
+//    QSqlQueryModel *model = new QSqlQueryModel();
+//    model->setQuery("SHOW VARIABLES;", db);
+//    model->setHeaderData(0, Qt::Horizontal, tr("Variable"));
+//    model->setHeaderData(1, Qt::Horizontal, tr("Session"));
+//    model->setHeaderData(2, Qt::Horizontal, tr("Global"));
+//    ui->tblViewVariables->setModel(model);
+
+
+
+//    QSqlQueryModel *statusModel = new QSqlQueryModel();
+//    statusModel->setQuery("SHOW STATUS;", db);
+//    ui->tblViewStatus->setModel(statusModel);
+
+//    QSqlQueryModel *processesModel = new QSqlQueryModel();
+//    processesModel->setQuery("SELECT `ID`, `USER`, `HOST`, `DB`, `COMMAND`, `TIME`, `STATE`, LEFT(`INFO`, 51200) AS `Info`, `TIME_MS`, `ROWS_SENT`, `ROWS_EXAMINED` FROM `information_schema`.`PROCESSLIST`;", db);
+//    ui->tblViewProcesses->setModel(processesModel);
+
+}
+
+void MainWindow::connectionSelected(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    QModelIndex index = ui->connectionsTreeView->selectionModel()->currentIndex();
+    TreeItem *item = connectionsModel->getItem(index);
+
+    QSqlDatabase db = QSqlDatabase::database(item->name());
+
+    QSqlQueryModel *databases = new QSqlQueryModel();
+    databases->setQuery("SHOW DATABASES;", db);
+    ui->tblViewDatabases->setModel(databases);
 }
