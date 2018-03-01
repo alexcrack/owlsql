@@ -57,3 +57,8 @@ QJsonObject FolderTreeItem::toJson()
 
     return folder;
 }
+
+QString FolderTreeItem::name() const
+{
+    return m_folderName;
+}

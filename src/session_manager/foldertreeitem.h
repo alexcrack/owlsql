@@ -18,6 +18,7 @@ public:
 
     bool canInsertChild() const;
     QJsonObject toJson() override;
+    QString name() const override;
 
 private:
     QString m_folderName;

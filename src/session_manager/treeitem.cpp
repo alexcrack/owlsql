@@ -115,3 +115,8 @@ QJsonObject TreeItem::toJson()
 
     return object;
 }
+
+QString TreeItem::name() const
+{
+    return QString();
+}

@@ -34,12 +34,13 @@ public:
     bool isDirty();
     virtual bool canEdit() const;
     virtual QJsonObject toJson();
+    virtual QString name() const;
 
 private:
     TreeItem *m_parentItem;
     QList<TreeItem *> m_childItems;
     QList<QVariant> m_itemData;
-    bool m_isDirty;
+    bool m_isDirty = false;
 };
 
 #endif // TREEITEM_H
