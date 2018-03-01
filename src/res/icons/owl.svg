@@ -35,11 +35,11 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:lockguides="true"
-     inkscape:window-width="2074"
-     inkscape:window-height="1590"
-     inkscape:window-x="285"
-     inkscape:window-y="423"
-     inkscape:window-maximized="0"
+     inkscape:window-width="3840"
+     inkscape:window-height="2077"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="false">
     <inkscape:grid
        type="xygrid"
@@ -189,7 +189,7 @@
      id="layer1"
      transform="translate(0,-136.99999)">
     <g
-       transform="translate(-2.1625865e-4,62.672602)"
+       transform="matrix(0.8007009,0,0,1,22.919223,67.608062)"
        id="g4626-5"
        style="fill:#958e5e;fill-opacity:1">
       <path
@@ -207,7 +207,7 @@
          style="fill:#958e5e;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(-0.06369109,31.888726)"
+       transform="matrix(0.79997539,0,0,1,23.002657,38.579848)"
        id="g4626-7"
        style="fill:#f3d500;fill-opacity:1">
       <path
@@ -226,19 +226,35 @@
     </g>
     <g
        id="g4626"
-       style="fill:#958e5e;fill-opacity:1">
+       style="fill:#958e5e;fill-opacity:1"
+       transform="matrix(0.80012211,0,0,1,22.985784,9.1562728)">
       <path
          transform="matrix(0.26458333,0,0,0.26458333,0,136.99999)"
          id="path3739-6"
-         d="M 103.9375 103.9375 L 103.9375 181.83789 L 104.17773 181.83789 A 165.35433 66.141739 0 0 0 269.49219 247.51172 A 165.35433 66.141739 0 0 0 434.8457 181.37109 A 165.35433 66.141739 0 0 0 434.64648 179.11914 L 434.64648 103.9375 L 103.9375 103.9375 z "
-         style="fill:#958e5e;fill-opacity:1;stroke:#000000;stroke-width:0.99999994;stroke-opacity:1" />
+         d="m 103.9375,103.9375 v 77.90039 h 0.24023 a 165.35433,66.141739 0 0 0 165.31446,65.67383 165.35433,66.141739 0 0 0 165.35351,-66.14063 165.35433,66.141739 0 0 0 -0.19922,-2.25195 V 103.9375 Z"
+         style="fill:#958e5e;fill-opacity:1;stroke:#000000;stroke-width:0.99999994;stroke-opacity:1"
+         inkscape:connector-curvature="0" />
       <ellipse
          ry="17.500002"
          rx="43.749996"
          cy="164.5"
          cx="71.249992"
          id="path3739"
-         style="fill:#958e5e;stroke-width:0.26458332;stroke:#000000;stroke-opacity:1;fill-opacity:1" />
+         style="fill:#958e5e;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1" />
     </g>
+    <ellipse
+       style="fill:#fffe2b;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+       id="path848"
+       cx="68.143799"
+       cy="173.17113"
+       rx="6.6324282"
+       ry="6.3233676" />
+    <ellipse
+       style="fill:#fffe2b;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+       id="path848-3"
+       cx="91.32795"
+       cy="173.15552"
+       rx="6.6324282"
+       ry="6.3233676" />
   </g>
 </svg>
