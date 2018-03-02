@@ -38,3 +38,5 @@ Makefile*
 CMakeLists.txt.user*
 
 sessions.json
+
+3rdparty/syntax-highlighting/build
