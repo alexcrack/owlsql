@@ -37,7 +37,4 @@ Makefile*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
-# Source files
 sessions.json
-
-src/3rdparty/*
