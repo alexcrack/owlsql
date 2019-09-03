@@ -98,7 +98,7 @@ int SessionsTreeModel::rowCount(const QModelIndex &parent) const
 
 int SessionsTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return SessionTreeItem::NO_MORE_COLUMNS;
+    return SessionTreeItem::FullTableStatus + 1;
 }
 
 QVariant SessionsTreeModel::data(const QModelIndex &index, int role) const
@@ -130,6 +130,8 @@ QVariant SessionsTreeModel::data(const QModelIndex &index, int role) const
 bool SessionsTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (role == Qt::EditRole && data(index, role) != value) {
+        qDebug() << "Set data " << value;
+
         TreeItem *item = getItem(index);
 
         bool result = item->setData(index.column(), value);
@@ -177,6 +179,8 @@ bool SessionsTreeModel::removeRows(int row, int count, const QModelIndex &parent
     beginRemoveRows(parent, row, row + count - 1);
     // FIXME: Implement me!
     endRemoveRows();
+
+    return true;
 }
 
 bool SessionsTreeModel::removeColumns(int column, int count, const QModelIndex &parent)
@@ -184,6 +188,13 @@ bool SessionsTreeModel::removeColumns(int column, int count, const QModelIndex &
     beginRemoveColumns(parent, column, column + count - 1);
     // FIXME: Implement me!
     endRemoveColumns();
+
+    return true;
+}
+
+bool SessionsTreeModel::submit()
+{
+    return true;
 }
 
 bool SessionsTreeModel::saveModelData()
@@ -207,6 +218,14 @@ bool SessionsTreeModel::saveModelData()
     sessionsFile.write(document.toJson());
 
     sessionsFile.close();
+
+    QSettings settings;
+
+    settings.beginGroup("Sessions");
+
+    settings.setValue("SessionsTree", document.toJson(QJsonDocument::Compact));
+
+    settings.endGroup();
 }
 
 void SessionsTreeModel::setupModelData()

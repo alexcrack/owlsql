@@ -25,8 +25,7 @@ bool IsDirtyDataWidgetMapper::isDirty() const
 //            // Special case of null original variant
 //            if (orig.isNull() && current.toString().isEmpty())
 //                continue;
-//            if (current != orig) {
-//                qWarning() << "DIRTY row found:"
+//            if (current != orig) {//                qWarning() << "DIRTY row found:"
 //                           << "orig" << orig
 //                           << "current" << current;
 //                return true;
@@ -42,8 +41,9 @@ bool IsDirtyDataWidgetMapper::isDirty() const
             QByteArray p = mappedPropertyName(mapWidget);
             QModelIndex idx = model()->index(currentIndex(), i, rootIndex());
             if (idx.data(Qt::EditRole) != mapWidget->property(p)) {
-                qDebug() << "Widget" << mapWidget->metaObject()->className() << ":" << mapWidget->objectName() << p;
+                //qDebug() << "Widget" << mapWidget->metaObject()->className() << ":" << mapWidget->objectName() << p;
                 qWarning() << "DIRTY found:" << "oring" << idx.data(Qt::EditRole) << "edited" << mapWidget->property(p);
+
                 return true;
             }
         }
@@ -94,6 +94,8 @@ void IsDirtyDataWidgetMapper::setChangesListener(QWidget *widget)
 
     if (name == "QComboBox") {
         connect(widget, SIGNAL(currentIndexChanged(int)), this, SLOT(s_widgetIndexChanged(int)));
+    } else if (name == "DriverComboBox") {
+        connect(widget, SIGNAL(currentIndexChanged(int)), this, SLOT(s_widgetIndexChanged(int)));
     } else if (name == "QLineEdit") {
         connect(widget, SIGNAL(textChanged(QString)), this, SLOT(s_widgetTextChanged(QString)));
     } else if (name == "QCheckBox") {
@@ -121,6 +123,8 @@ void IsDirtyDataWidgetMapper::s_widgetIndexChanged(int index)
 
 void IsDirtyDataWidgetMapper::s_widgetTextChanged(QString text)
 {
+    //qWarning() << "Changed" << text;
+
     if (sendSignalChanged)
         emit dirtyStateChanged(isDirty());
 }

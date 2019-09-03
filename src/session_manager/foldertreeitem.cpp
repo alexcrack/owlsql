@@ -28,10 +28,10 @@ bool FolderTreeItem::setData(int column, const QVariant &data)
 QVariant FolderTreeItem::icon(int column) const
 {
     if (column == 0)
-        return QIcon(":/icons/folder.svg");
+        return QIcon(":/icons/interface/icons8-folder-64");
+
+    return QIcon();
 }
-
-
 
 bool FolderTreeItem::canInsertChild() const
 {

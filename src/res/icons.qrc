@@ -192,6 +192,26 @@
         <file>icons/folder_add.png</file>
         <file>icons/main/chloe.svg</file>
         <file>icons/folder.svg</file>
+        <file>icons/interface/icons8-about-64.png</file>
+        <file>icons/interface/icons8-doughnut-chart-64.png</file>
+        <file>icons/interface/icons8-edit-64.png</file>
+        <file>icons/interface/icons8-folder-64.png</file>
+        <file>icons/interface/icons8-folder-add-64.png</file>
+        <file>icons/interface/icons8-folder-search-64.png</file>
+        <file>icons/interface/icons8-help-64.png</file>
+        <file>icons/interface/icons8-remove-64.png</file>
+        <file>icons/interface/icons8-save-64.png</file>
+        <file>icons/interface/icons8-server-add-64.png</file>
+        <file>icons/interface/icons8-settings-64.png</file>
+        <file>icons/interface/icons8-settings-export-64.png</file>
+        <file>icons/interface/icons8-settings-import-64.png</file>
+        <file>icons/interface/icons8-update-64.png</file>
+        <file>icons/interface/icons8-wrench-64.png</file>
+        <file>icons/interface/icons8-wrench-green-64.png</file>
+        <file>icons/interface/icons8-wrench-yellow-64.png</file>
+        <file>icons/interface/icons8-save-as-64.png</file>
+        <file>icons/interface/icons8-star-64.png</file>
+        <file>icons/interface/icons8-about-24.png</file>
     </qresource>
     <qresource prefix="/qt">
         <file>icons/qt/qt_icon.png</file>

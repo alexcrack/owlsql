@@ -11,6 +11,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(APP_DEVELOPER);
     QCoreApplication::setOrganizationDomain(APP_DOMAIN);
 
+//    QFile f(":/qdarkstyle/style.qss");
+//    if (!f.exists()) {
+//        printf("Unable to set stylesheet, file not found\n");
+//    } else {
+//        f.open(QFile::ReadOnly | QFile::Text);
+//        QTextStream ts(&f);
+//        a.setStyleSheet(ts.readAll());
+//    }
+
     MainWindow w;
     w.show();
 

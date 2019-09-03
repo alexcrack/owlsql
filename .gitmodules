@@ -1,3 +1,6 @@
 [submodule "src/3rdparty/syntax-highlighting"]
 	path = src/3rdparty/syntax-highlighting
 	url = git@github.com:KDE/syntax-highlighting.git
+[submodule "src/3rdparty/qdarkstylesheet"]
+	path = src/3rdparty/qdarkstylesheet
+	url = https://github.com/ColinDuquesnoy/QDarkStyleSheet.git

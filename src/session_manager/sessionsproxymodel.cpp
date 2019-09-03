@@ -1,6 +1,7 @@
 #include "sessionsproxymodel.h"
 
 SessionsProxyModel::SessionsProxyModel()
+    : QIdentityProxyModel()
 {
 
 }
