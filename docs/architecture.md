@@ -26,9 +26,9 @@
 
 ## Key principles
 
-1. **No QtSql.** Native client libraries behind our own Driver API: real async I/O, cancellation,
+1. **No QtSql.** Native client libraries behind our own Driver API (see `specs/driver-api.md`): cancellation,
    rich type info, server messages/notices.
-2. **One worker thread per connection.** UI never blocks. Results stream to the UI in chunks
+2. **Blocking drivers, one worker thread per connection.** UI never blocks. Results stream to the UI in chunks
    (default fetch page 1000 rows, "load more" / "fetch all").
 3. **Catalog + Dialect per driver.** The UI is generic: it asks the catalog for object
    categories/children and the dialect for quoting, type lists and DDL generation.

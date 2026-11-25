@@ -46,3 +46,15 @@ superseded ones are marked, never deleted.
 | 039 | Update check via GitHub Releases; auto-updater for Win/macOS builds | |
 | 040 | Placeholder owl logo now | |
 | 041 | No deadline — quality first | |
+| 042 | Drivers are **blocking**, one worker thread per physical connection; cancel is the only cross-thread call | Supersedes the "libpq async API" idea in the first proposal |
+| 043 | Connections: `meta` + one per query tab (lazy) + one per browsed PG database; "single connection" session option | |
+| 044 | Async facade: `QueryJob` QObjects with signals | |
+| 045 | Ad-hoc "load more" keeps the result stream open (paused) on the tab's connection | |
+| 046 | Own `Value` type (lossless, keeps native type, CBOR-encodable) | |
+| 047 | Large values truncated at 64 KB (configurable), full value fetched by PK on open | |
+| 048 | Minimum servers: PostgreSQL 13, MySQL 5.7, MariaDB 10.6, SQLite 3.35 | |
+| 049 | Drivers are shared plugins (QPluginLoader), internal ABI | |
+| 050 | Catalog cache: lazy + targeted invalidation + manual F5, no polling | |
+| 051 | Reconnect: silent when idle (retry reads once), never retry writes, report rolled-back transactions | |
+| 052 | Placeholders → prompt dialog → real bound parameters | |
+| 053 | Log panel shows all statements (user, internal, browse, notices), filterable | |
