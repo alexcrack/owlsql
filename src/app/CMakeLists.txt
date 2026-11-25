@@ -6,6 +6,7 @@ target_link_libraries(owlsql PRIVATE
     Owl::Core
     owlsql_theme
     owlsql_themeplugin
+    owlsql_styleplugin
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick

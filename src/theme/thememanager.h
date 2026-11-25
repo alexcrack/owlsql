@@ -71,6 +71,9 @@ public:
     ThemeRadius *radius() const { return m_radius; }
     ThemeMotion *motion() const { return m_motion; }
 
+    // Names of all bundled icons (for the component gallery and pickers), sorted.
+    Q_INVOKABLE QStringList iconNames() const;
+
     // Problems found while loading token files (missing/unknown/invalid tokens). Empty when OK.
     QStringList loadErrors() const { return m_errors; }
 

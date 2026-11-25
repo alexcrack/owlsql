@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "thememanager.h"
 
+#include <QDir>
 #include <QFile>
 #include <QFontDatabase>
 #include <QGuiApplication>
@@ -198,6 +199,15 @@ void ThemeManager::setReduceMotion(bool reduce)
     m_motion->m_reduced = reduce;
     emit m_motion->changed();
     emit reduceMotionChanged();
+}
+
+QStringList ThemeManager::iconNames() const
+{
+    QStringList names = QDir(QStringLiteral(":/owlsql/icons/tabler"))
+                            .entryList({QStringLiteral("*.svg")}, QDir::Files, QDir::Name);
+    for (QString &name : names)
+        name.chop(4); // ".svg"
+    return names;
 }
 
 QString ThemeManager::tokenKeyToName(const QString &key)

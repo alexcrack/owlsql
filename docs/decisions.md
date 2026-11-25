@@ -114,3 +114,7 @@ superseded ones are marked, never deleted.
 | 107 | `OwlSql.Theme` module: C++ `Theme` singleton with typed token groups loaded from JSON; System mode follows `QStyleHints::colorScheme`, explicit modes are passed to the platform | |
 | 108 | Reduced motion is an app setting (`Theme.reduceMotion`); Qt exposes no OS reduced-motion hint | |
 | 109 | Icons via `image://owlicon/<name>?color=…` provider (Tabler SVG tinted at render time); bundled Tabler 3.50.0, Inter 4.1, JetBrains Mono 2.304 | |
+| 110 | `OwlSql.Style`: app QML imports it directly (compile-time style selection) and it is also the runtime style, so attached ToolTips and Qt's QML dialogs match; Basic is the fallback | |
+| 111 | Button API: `variant` (primary/secondary/ghost/danger), `small`, `icon.name` = Tabler icon; disabled controls fade via opacity | |
+| 112 | Popup shadows are drawn behind the surface (MultiEffect), never as a layer effect, so surfaces survive the software renderer | |
+| 113 | SpinBox shows plain integers (no locale digit grouping) — ports, limits, row counts | |

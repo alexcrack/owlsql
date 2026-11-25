@@ -2,7 +2,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
+import OwlSql.Style
 import QtQuick.Layouts
 import OwlSql.Theme
 
