@@ -58,3 +58,19 @@ superseded ones are marked, never deleted.
 | 051 | Reconnect: silent when idle (retry reads once), never retry writes, report rolled-back transactions | |
 | 052 | Placeholders → prompt dialog → real bound parameters | |
 | 053 | Log panel shows all statements (user, internal, browse, notices), filterable | |
+| 054 | Accent: owl amber (`#E8A33D` dark / `#C7801A` light line) | |
+| 055 | Warm neutral greys | |
+| 056 | Native title bar; macOS global menu bar | Custom unified title bar not planned |
+| 057 | Subtle motion (100–150 ms), honour reduced motion | |
+| 058 | Compact density: Inter 13 px, 24 px rows, 28 px controls | |
+| 059 | Grid: dimmed italic NULL by default; per-type value colours as a toggle; zebra + vertical lines configurable | |
+| 060 | Radius 4 px controls, 8 px popups | |
+| 061 | Underline-style workspace tabs | |
+| 062 | Own Owl Light/Dark editor highlighting themes; other KSyntaxHighlighting themes selectable | |
+| 063 | Safety levels: session colour tag everywhere; prod adds red workspace frame + PROD badge | |
+| 064 | Accessibility target: basic (keyboard reachable, focus visible) | |
+| 065 | Session manager lives in a Welcome tab | |
+| 066 | Object tab with inner tabs (Data, Structure, Indexes, FKs, DDL, Stats) | |
+| 067 | Status bar: session + level, transaction state, query metrics, cursor/selection info | |
+| 068 | Bottom panel collapsed by default, auto-opens on errors/notices, Ctrl+J | |
+| 069 | Theme tokens in JSON files loaded by a C++ `ThemeManager` QML singleton; dev-only Component Gallery | |
