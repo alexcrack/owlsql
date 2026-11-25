@@ -33,6 +33,9 @@ jobs:
           - name: Windows
             os: windows-2022
             qt_arch: win64_msvc2022_64
+            # aqtinstall 3.3.0 can't find Qt 6.12's per-compiler Windows repository layout.
+            # TODO: drop once an aqtinstall release (> 3.3.0) supports it.
+            aqtsource: git+https://github.com/miurahr/aqtinstall.git@4c759852b1108cc801d8e24979136b895b5155d4
           - name: macOS
             os: macos-15
             qt_arch: clang_64
@@ -55,6 +58,7 @@ jobs:
         with:
           version: ${{ env.QT_VERSION }}
           arch: ${{ matrix.qt_arch }}
+          aqtsource: ${{ matrix.aqtsource || '' }}
           cache: true
 
       - name: Set up MSVC environment
