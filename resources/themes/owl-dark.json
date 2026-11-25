@@ -1,0 +1,59 @@
+{
+  "format": "owlsql-theme",
+  "version": 1,
+  "name": "Owl Dark",
+  "dark": true,
+  "editorTheme": "Owl Dark",
+  "color": {
+    "bg.canvas": "#161514",
+    "bg.surface": "#1C1B19",
+    "bg.raised": "#242320",
+    "bg.sunken": "#131211",
+    "bg.hover": "#2B2926",
+    "bg.selected": "#3A2E1B",
+    "bg.selectedInactive": "#2E2C29",
+
+    "border.subtle": "#2A2825",
+    "border.default": "#38352F",
+    "border.strong": "#4D4943",
+
+    "text.primary": "#ECE8E2",
+    "text.secondary": "#B3ADA4",
+    "text.muted": "#857F76",
+    "text.disabled": "#5A5650",
+
+    "accent.fill": "#E8A33D",
+    "accent.fillHover": "#F0B356",
+    "accent.fillPressed": "#D08F2A",
+    "accent.onFill": "#1C1300",
+    "accent.line": "#E8A33D",
+    "accent.text": "#F0B356",
+    "accent.subtle": "#3A2E1B",
+
+    "danger": "#EF5B5B",
+    "danger.subtle": "#26EF5B5B",
+    "warning": "#E6C34A",
+    "warning.subtle": "#26E6C34A",
+    "success": "#5BBE83",
+    "success.subtle": "#265BBE83",
+    "info": "#6AA7E8",
+    "info.subtle": "#266AA7E8",
+
+    "tag.red": "#EF5B5B",
+    "tag.orange": "#F08A4B",
+    "tag.amber": "#E8A33D",
+    "tag.green": "#5BBE83",
+    "tag.teal": "#3CC2B3",
+    "tag.blue": "#6AA7E8",
+    "tag.violet": "#A08CF0",
+    "tag.pink": "#EC7AB0",
+
+    "grid.number": "#7FB6F0",
+    "grid.date": "#8CCB8F",
+    "grid.boolean": "#D7A2E8",
+    "grid.json": "#E6C34A",
+    "grid.binary": "#C9A27A",
+
+    "shadow": "#66000000"
+  }
+}
