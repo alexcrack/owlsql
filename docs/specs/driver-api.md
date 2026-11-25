@@ -462,11 +462,10 @@ The UI hides or disables features from capabilities, never from `driverId` check
 
 ---
 
-## 13. Open questions
+## 13. Resolved / open questions
 
-- `std::expected` needs C++23; for C++20 use `tl::expected` (vcpkg) or a tiny own `Result<T>`.
-- Should CBOR serialization land in M1 already, or only when the Gateway starts? (Proposed: types
-  get `toCbor/fromCbor` from day one, plus round-trip tests; no transport yet.)
-- Notifications (`LISTEN/NOTIFY`) — post-1.0 feature or part of the API now?
-- Exact `ConnectionFormSchema` format (fields, types, groups, validation) — to be specified with the
+- ✅ `Result<T>` = `tl::expected` (vcpkg) while on C++20; switch to `std::expected` with C++23 (decision 078).
+- ✅ Value types get `toCbor/fromCbor` + round-trip tests from M1; no transport until the Gateway (decision 079).
+- ✅ `LISTEN/NOTIFY` is post-1.0 entirely — not part of the v1 API (decision 080).
+- ⏳ Exact `ConnectionFormSchema` format (fields, types, groups, validation) — to be specified with the
   session manager UI.

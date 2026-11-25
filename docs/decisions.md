@@ -74,3 +74,16 @@ superseded ones are marked, never deleted.
 | 067 | Status bar: session + level, transaction state, query metrics, cursor/selection info | |
 | 068 | Bottom panel collapsed by default, auto-opens on errors/notices, Ctrl+J | |
 | 069 | Theme tokens in JSON files loaded by a C++ `ThemeManager` QML singleton; dev-only Component Gallery | |
+| 070 | Crash reporting library: decide before 1.0; only the opt-in hook now | |
+| 071 | Snap: strict confinement + network, ssh-keys, password-manager-service, personal-files, home; TCP fallback for local sockets | |
+| 072 | Portable mode: later; keep data paths abstracted | |
+| 073 | Minimum OS = Qt 6.12's supported platforms; Linux packages for Ubuntu 24.04+, Debian 12+, Fedora 41+, RHEL/Rocky 9+ | |
+| 074 | Auto-updater: Sparkle (macOS) + WinSparkle (Windows) | |
+| 075 | Linux .deb/.rpm bundle a private Qt under /opt/owlsql | |
+| 076 | Code style: Qt-like clang-format, clang-tidy, qmllint/qmlformat — enforced in CI + pre-commit | |
+| 077 | Windows installer: MSI via WiX | macOS: notarized DMG |
+| 078 | `Result<T>` = `tl::expected` on C++20 | |
+| 079 | CBOR encoding on value types from M1 (no transport yet) | |
+| 080 | LISTEN/NOTIFY: post-1.0 entirely | |
+| 081 | Shortcuts: platform-native (QKeySequence standard keys), all actions remappable via the command registry | Registry from M0, remap UI after M3 |
+| 082 | Single main window; dialogs/editors as popups | |
