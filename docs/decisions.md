@@ -103,3 +103,11 @@ superseded ones are marked, never deleted.
 | 096 | Diagnostics: server error positions only, no live lint in v1 | |
 | 097 | Editor v1: folding, regex find/replace, bracket match + auto-close; no multi-cursor/minimap | |
 | 098 | Editor modes: Sql, ReadOnlySql, Json, routine body; M1 starts with a TextArea feasibility spike | |
+| 099 | Grid editing is spreadsheet-like (type to edit, Enter/Tab commit), changes staged until Apply; optional per-session "apply rows immediately" | |
+| 100 | Query results editable only when columns map to a base table whose row key is in the result | |
+| 101 | Row key = primary key, else unique non-null index, else read-only | No ctid/rowid/all-columns matching |
+| 102 | Apply = one transaction with SQL preview; first error rolls back and keeps changes staged | |
+| 103 | Columns: hide/reorder/resize (persisted), multi-column sort, record view; no frozen columns in v1 | |
+| 104 | Cell editors: date/time pickers, enum/set/bool, BLOB hex/image/file, large text popup, JSON editor, FK lookup | |
+| 105 | Grid ops: Copy as (TSV/CSV/JSON/Markdown/INSERT/IN), paste from spreadsheets, bulk set, insert/duplicate rows | |
+| 106 | Table browsing uses pages of 1000 with a footer pager; query results stream with load more | |
