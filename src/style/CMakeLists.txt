@@ -31,6 +31,8 @@ qt_add_qml_module(owlsql_style
         qml/ItemDelegate.qml
         qml/Label.qml
         qml/Menu.qml
+        qml/MenuBar.qml
+        qml/MenuBarItem.qml
         qml/MenuItem.qml
         qml/MenuSeparator.qml
         qml/Pane.qml

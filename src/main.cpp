@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "commandregistry.h"
 #include "iconprovider.h"
 #include "owl/core/version.h"
 #include "thememanager.h"
 
 #include <QCommandLineParser>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QtQml/qqmlextensionplugin.h>
 
 Q_IMPORT_QML_PLUGIN(OwlSql_ThemePlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_StylePlugin)
+Q_IMPORT_QML_PLUGIN(OwlSql_AppPlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_UiPlugin)
 
 int main(int argc, char *argv[])
@@ -20,6 +23,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setOrganizationDomain(QStringLiteral("owlsql.org"));
     QGuiApplication::setApplicationName(QStringLiteral("OwlSql"));
     QGuiApplication::setApplicationVersion(owl::core::versionString());
+    QGuiApplication::setWindowIcon(QIcon(QStringLiteral(":/owlsql/logo/owlsql.svg")));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QStringLiteral("OwlSql database client"));
@@ -30,7 +34,8 @@ int main(int argc, char *argv[])
     parser.addOption(galleryOption);
     parser.process(app);
 
-    // Loads fonts and tokens before any QML is created.
+    // Create the shared singletons before any QML: fonts, tokens and commands.
+    owl::app::CommandRegistry::instance();
     QGuiApplication::setFont(owl::theme::ThemeManager::instance()->font()->ui());
 
     // Our QML imports OwlSql.Style directly (compile-time selection). Setting it as the runtime

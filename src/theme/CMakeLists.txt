@@ -32,6 +32,7 @@ qt_add_resources(owlsql_theme "owlsql_theme_assets"
         "${owl_resources_dir}/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf"
         "${owl_resources_dir}/fonts/jetbrains-mono/JetBrainsMono-Bold.ttf"
         "${owl_resources_dir}/fonts/jetbrains-mono/JetBrainsMono-Italic.ttf"
+        "${owl_resources_dir}/logo/owlsql.svg"
         ${owl_icon_files}
 )
 

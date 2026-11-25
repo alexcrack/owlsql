@@ -118,3 +118,7 @@ superseded ones are marked, never deleted.
 | 111 | Button API: `variant` (primary/secondary/ghost/danger), `small`, `icon.name` = Tabler icon; disabled controls fade via opacity | |
 | 112 | Popup shadows are drawn behind the surface (MultiEffect), never as a layer effect, so surfaces survive the software renderer | |
 | 113 | SpinBox shows plain integers (no locale digit grouping) — ports, limits, row counts | |
+| 114 | `OwlSql.App` QML module = C++ app layer; executable entry point is `src/main.cpp` | Matches architecture.md layout |
+| 115 | Command registry: stable ids `area.action`; menus and shortcuts use `CommandAction`; QML binds to `Commands.titles` / `shortcuts` / `shortcutTexts` maps so keybinding overrides apply live | |
+| 116 | Close Tab = Ctrl+W (⌘W), not `QKeySequence::Close` (Ctrl+F4 on Linux) | |
+| 117 | Style strips `&` mnemonic markers when drawing text (Alt-key underlines not shown yet) | |

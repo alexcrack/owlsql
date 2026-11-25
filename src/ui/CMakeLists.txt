@@ -6,11 +6,19 @@ qt_add_library(owlsql_ui STATIC)
 qt_add_qml_module(owlsql_ui
     URI OwlSql.Ui
     VERSION 1.0
-    IMPORTS OwlSql.Theme OwlSql.Style
+    IMPORTS OwlSql.Theme OwlSql.Style OwlSql.App
     QML_FILES
         qml/Main.qml
         qml/Gallery.qml
+        qml/AboutDialog.qml
+        qml/BottomPanel.qml
+        qml/EmptyState.qml
+        qml/KeyChip.qml
+        qml/Sidebar.qml
+        qml/StatusBar.qml
+        qml/WelcomePage.qml
+        qml/WorkspaceTabBar.qml
 )
 
-target_link_libraries(owlsql_ui PRIVATE Qt6::Quick Qt6::QuickControls2 owlsql_theme owlsql_style)
+target_link_libraries(owlsql_ui PRIVATE Qt6::Quick Qt6::QuickControls2 owlsql_theme owlsql_style owlsql_app)
 owl_set_target_options(owlsql_ui)
