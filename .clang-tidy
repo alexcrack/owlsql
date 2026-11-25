@@ -1,0 +1,18 @@
+# Static analysis (decision 076). Run via the "debug" preset's compile_commands.json.
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  performance-*,
+  readability-container-size-empty,
+  readability-make-member-function-const,
+  readability-redundant-*,
+  readability-simplify-boolean-expr,
+  cppcoreguidelines-virtual-class-destructor,
+  cppcoreguidelines-slicing
+WarningsAsErrors: ''
+HeaderFilterRegex: '(src|tests)/.*'
+FormatStyle: file
