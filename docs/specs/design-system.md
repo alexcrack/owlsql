@@ -188,8 +188,10 @@ ColorTag dot · Banner (inline error/warning in a pane) · Toast · EmptyState (
 action) · FormRow (label, control, hint, error) · SegmentedControl (`Code | Constructor`) ·
 CommandPalette.
 
-Every component gets a gallery page in a dev-only **Component Gallery** window
-(`--gallery` flag) showing both themes side by side.
+Every component appears in a dev-only **Component Gallery** window (`owlsql --gallery`) with a
+theme switch (one global `Theme`, so themes are shown one at a time; the UI smoke test
+screenshots both). Button variants: `variant: "primary" | "secondary" | "ghost" | "danger"`,
+`small: true`, icons via `icon.name: "<tabler-name>"`.
 
 ---
 

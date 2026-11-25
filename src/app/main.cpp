@@ -3,12 +3,14 @@
 #include "owl/core/version.h"
 #include "thememanager.h"
 
+#include <QCommandLineParser>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QtQml/qqmlextensionplugin.h>
 
 Q_IMPORT_QML_PLUGIN(OwlSql_ThemePlugin)
+Q_IMPORT_QML_PLUGIN(OwlSql_StylePlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_UiPlugin)
 
 int main(int argc, char *argv[])
@@ -19,18 +21,28 @@ int main(int argc, char *argv[])
     QGuiApplication::setApplicationName(QStringLiteral("OwlSql"));
     QGuiApplication::setApplicationVersion(owl::core::versionString());
 
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QStringLiteral("OwlSql database client"));
+    parser.addHelpOption();
+    parser.addVersionOption();
+    const QCommandLineOption galleryOption(
+        QStringLiteral("gallery"), QStringLiteral("Show the component gallery (development)."));
+    parser.addOption(galleryOption);
+    parser.process(app);
+
     // Loads fonts and tokens before any QML is created.
     QGuiApplication::setFont(owl::theme::ThemeManager::instance()->font()->ui());
 
-    // Until OwlSql.Style exists (later in M0) use the Basic style, which our style will build on.
-    QQuickStyle::setStyle(QStringLiteral("Basic"));
+    // Our QML imports OwlSql.Style directly (compile-time selection). Setting it as the runtime
+    // style too makes attached ToolTips and Qt's own QML dialogs use it.
+    QQuickStyle::setStyle(QStringLiteral("OwlSql.Style"));
 
     QQmlApplicationEngine engine;
     owl::theme::IconProvider::install(engine);
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
         [] { QCoreApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
-    engine.loadFromModule("OwlSql.Ui", "Main");
+    engine.loadFromModule("OwlSql.Ui", parser.isSet(galleryOption) ? "Gallery" : "Main");
 
     return QGuiApplication::exec();
 }

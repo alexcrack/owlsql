@@ -3,7 +3,10 @@
 
 function(owl_set_target_options target)
     if(MSVC)
-        target_compile_options(${target} PRIVATE /W4 /permissive- /utf-8)
+        # /wd4702: "unreachable code" is emitted by the optimizer after inlining, so /external:W0
+        # does not silence it in Qt headers; it fires on qmlsc-generated code (qmetatype.h,
+        # qvariant.h, qjsengine.h) and is a known false-positive source.
+        target_compile_options(${target} PRIVATE /W4 /permissive- /utf-8 /wd4702)
         if(OWL_WARNINGS_AS_ERRORS)
             target_compile_options(${target} PRIVATE /WX)
         endif()
