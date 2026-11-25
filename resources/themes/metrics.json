@@ -1,0 +1,20 @@
+{
+  "format": "owlsql-metrics",
+  "version": 1,
+  "font": {
+    "ui":      { "family": "Inter", "pixelSize": 13, "weight": 400, "tabular": true },
+    "uiSmall": { "family": "Inter", "pixelSize": 12, "weight": 400, "tabular": true },
+    "uiTiny":  { "family": "Inter", "pixelSize": 11, "weight": 400, "tabular": true },
+    "title":   { "family": "Inter", "pixelSize": 15, "weight": 600, "tabular": true },
+    "heading": { "family": "Inter", "pixelSize": 20, "weight": 600, "tabular": true },
+    "code":    { "family": "JetBrains Mono", "pixelSize": 13, "weight": 400 },
+    "grid":    { "family": "JetBrains Mono", "pixelSize": 12, "weight": 400 }
+  },
+  "size": {
+    "row": 24, "control": 28, "controlSmall": 22, "tabBar": 34, "toolbar": 36,
+    "statusBar": 24, "icon": 16, "iconSmall": 14, "treeIndent": 16, "splitterHit": 6
+  },
+  "space": { "xxs": 2, "xs": 4, "s": 6, "m": 8, "l": 12, "xl": 16, "xxl": 24, "xxxl": 32 },
+  "radius": { "control": 4, "popup": 8, "pill": 999 },
+  "motion": { "fast": 100, "normal": 150 }
+}

@@ -111,3 +111,6 @@ superseded ones are marked, never deleted.
 | 104 | Cell editors: date/time pickers, enum/set/bool, BLOB hex/image/file, large text popup, JSON editor, FK lookup | |
 | 105 | Grid ops: Copy as (TSV/CSV/JSON/Markdown/INSERT/IN), paste from spreadsheets, bulk set, insert/duplicate rows | |
 | 106 | Table browsing uses pages of 1000 with a footer pager; query results stream with load more | |
+| 107 | `OwlSql.Theme` module: C++ `Theme` singleton with typed token groups loaded from JSON; System mode follows `QStyleHints::colorScheme`, explicit modes are passed to the platform | |
+| 108 | Reduced motion is an app setting (`Theme.reduceMotion`); Qt exposes no OS reduced-motion hint | |
+| 109 | Icons via `image://owlicon/<name>?color=…` provider (Tabler SVG tinted at render time); bundled Tabler 3.50.0, Inter 4.1, JetBrains Mono 2.304 | |

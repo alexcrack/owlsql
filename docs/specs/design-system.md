@@ -330,6 +330,8 @@ Every component gets a gallery page in a dev-only **Component Gallery** window
 ## 10. Open questions
 
 - Logo: placeholder owl mark — monochrome line owl in amber; final logo later.
-- Exact Qt mechanism for following the OS colour scheme and reduced-motion on each platform
-  (verify against Qt 6.12 docs when implementing `ThemeManager`).
+- ✅ OS colour scheme: `QStyleHints::colorScheme` / `colorSchemeChanged`; explicit Light/Dark is
+  passed back with `setColorScheme()` so native title bars match (decision 107).
+- ✅ Reduced motion: Qt 6.12 exposes no OS hint, so it is an OwlSql setting
+  (`Theme.reduceMotion`, zeroes `Theme.motion.*`) (decision 108).
 - Comfortable density preset (post-1.0) — tokens already allow it.

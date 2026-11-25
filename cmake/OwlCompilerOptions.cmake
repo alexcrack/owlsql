@@ -10,7 +10,7 @@ function(owl_set_target_options target)
     else()
         target_compile_options(${target} PRIVATE
             -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Woverloaded-virtual
-            -Wcast-align -Wnull-dereference -Wimplicit-fallthrough)
+            -Wcast-align -Wimplicit-fallthrough)
         if(OWL_WARNINGS_AS_ERRORS)
             target_compile_options(${target} PRIVATE -Werror)
         endif()

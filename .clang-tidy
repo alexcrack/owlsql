@@ -15,4 +15,5 @@ Checks: >
   cppcoreguidelines-slicing
 WarningsAsErrors: ''
 HeaderFilterRegex: '(src|tests)/.*'
+ExcludeHeaderFilterRegex: '.*_autogen/.*'
 FormatStyle: file
