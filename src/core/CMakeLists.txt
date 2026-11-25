@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# OwlCore: GUI-free core library (driver API, catalog, dialects...). QtCore only.
+
+configure_file(include/owl/core/version.h.in "${CMAKE_CURRENT_BINARY_DIR}/include/owl/core/version.h" @ONLY)
+
+qt_add_library(owlcore STATIC
+    include/owl/core/version.h.in
+    src/version.cpp
+)
+add_library(Owl::Core ALIAS owlcore)
+
+target_include_directories(owlcore PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_BINARY_DIR}/include")
+
+target_link_libraries(owlcore PUBLIC Qt6::Core)
+owl_set_target_options(owlcore)

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Checks formatting of staged C++ and QML files. Enable with: tools/setup-dev.sh
+set -euo pipefail
+
+CLANG_FORMAT="${CLANG_FORMAT:-clang-format}"
+QMLFORMAT="${QMLFORMAT:-qmlformat}"
+
+mapfile -t cpp_files < <(git diff --cached --name-only --diff-filter=ACMR -- '*.cpp' '*.h' '*.hpp')
+mapfile -t qml_files < <(git diff --cached --name-only --diff-filter=ACMR -- '*.qml')
+
+failed=0
+
+if ((${#cpp_files[@]})); then
+    if command -v "$CLANG_FORMAT" >/dev/null; then
+        for f in "${cpp_files[@]}"; do
+            if ! git show ":$f" | "$CLANG_FORMAT" --assume-filename="$f" --dry-run -Werror >/dev/null 2>&1; then
+                echo "clang-format: $f is not formatted"
+                failed=1
+            fi
+        done
+    else
+        echo "pre-commit: $CLANG_FORMAT not found, skipping C++ format check" >&2
+    fi
+fi
+
+if ((${#qml_files[@]})); then
+    if command -v "$QMLFORMAT" >/dev/null; then
+        tmp=$(mktemp -d)
+        trap 'rm -rf "$tmp"' EXIT
+        cp .qmlformat.ini "$tmp/" 2>/dev/null || true
+        for f in "${qml_files[@]}"; do
+            staged="$tmp/$(basename "$f")"
+            git show ":$f" >"$staged"
+            if ! diff -q <("$QMLFORMAT" "$staged") "$staged" >/dev/null; then
+                echo "qmlformat: $f is not formatted"
+                failed=1
+            fi
+        done
+    else
+        echo "pre-commit: $QMLFORMAT not found, skipping QML format check" >&2
+    fi
+fi
+
+if ((failed)); then
+    echo
+    echo "Run tools/format.sh to fix formatting, then stage the changes again."
+    exit 1
+fi
