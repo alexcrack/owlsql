@@ -87,3 +87,11 @@ superseded ones are marked, never deleted.
 | 080 | LISTEN/NOTIFY: post-1.0 entirely | |
 | 081 | Shortcuts: platform-native (QKeySequence standard keys), all actions remappable via the command registry | Registry from M0, remap UI after M3 |
 | 082 | Single main window; dialogs/editors as popups | |
+| 083 | App data in `owlsql.db` (sessions, workspace, snippets) + separate `history.db` (FTS5) | |
+| 084 | Preferences in human-editable `settings.json` (non-defaults only, schema-driven) + `keybindings.json` | |
+| 085 | Team sharing via `*.owlsql-sessions.json` export/import, never secrets; importers reuse the same pipeline | |
+| 086 | Single instance via QLocalServer; second launch forwards arguments | |
+| 087 | Query tabs: autosaved scratch buffers in owlsql.db, optionally linked to .sql files | |
+| 088 | Session options: startup script, default db/schema + visible databases, query defaults, notes | |
+| 089 | Forward-only embedded migrations, `PRAGMA user_version`, automatic backup (keep 3) | |
+| 090 | Restore tabs immediately, connect lazily; prod never auto-connects | |
