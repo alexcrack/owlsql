@@ -95,3 +95,11 @@ superseded ones are marked, never deleted.
 | 088 | Session options: startup script, default db/schema + visible databases, query defaults, notes | |
 | 089 | Forward-only embedded migrations, `PRAGMA user_version`, automatic backup (keep 3) | |
 | 090 | Restore tabs immediately, connect lazily; prod never auto-connects | |
+| 091 | Own token-based SQL formatter (keyword case, clause newlines, indents) | |
+| 092 | Current statement via dialect splitter, visibly tinted with a gutter ▶ marker | |
+| 093 | Completion: auto after `.` and 2 chars in object/column contexts, Ctrl+Space anywhere | |
+| 094 | Completion covers tables, columns, keywords, functions (with signatures), FK-based JOIN conditions | No snippets or `*` expansion in v1 |
+| 095 | Editor target ~5 MB; bigger files via streaming "Run SQL file…" | |
+| 096 | Diagnostics: server error positions only, no live lint in v1 | |
+| 097 | Editor v1: folding, regex find/replace, bracket match + auto-close; no multi-cursor/minimap | |
+| 098 | Editor modes: Sql, ReadOnlySql, Json, routine body; M1 starts with a TextArea feasibility spike | |
