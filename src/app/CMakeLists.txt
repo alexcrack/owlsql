@@ -4,6 +4,8 @@ qt_add_executable(owlsql main.cpp)
 
 target_link_libraries(owlsql PRIVATE
     Owl::Core
+    owlsql_theme
+    owlsql_themeplugin
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick

@@ -6,10 +6,10 @@ qt_add_library(owlsql_ui STATIC)
 qt_add_qml_module(owlsql_ui
     URI OwlSql.Ui
     VERSION 1.0
-    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/OwlSql/Ui
+    IMPORTS OwlSql.Theme
     QML_FILES
         qml/Main.qml
 )
 
-target_link_libraries(owlsql_ui PRIVATE Qt6::Quick Qt6::QuickControls2)
+target_link_libraries(owlsql_ui PRIVATE Qt6::Quick Qt6::QuickControls2 owlsql_theme)
 owl_set_target_options(owlsql_ui)
