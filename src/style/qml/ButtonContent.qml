@@ -20,6 +20,10 @@ Item {
     property int display: T.AbstractButton.TextBesideIcon
     property int alignment: Qt.AlignCenter
 
+    // "&File" -> "File", "&&" -> "&" (mnemonic markers are not drawn).
+    readonly property string _plainText: text.replace(/&&/g, "\u0001").replace(/&/g, "").replace(
+                                             /\u0001/g, "&")
+
     readonly property bool _showIcon: iconName.length > 0 && display !== T.AbstractButton.TextOnly
     readonly property bool _showText: text.length > 0 && display !== T.AbstractButton.IconOnly
     readonly property real _iconPart: _showIcon ? iconSize + (_showText ? spacing : 0) : 0

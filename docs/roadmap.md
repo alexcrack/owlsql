@@ -9,6 +9,9 @@ No dates — a milestone ships when its exit criteria are met.
 - App shell: fixed panes (tree / tabs / bottom panel), menus, status bar, settings dialog skeleton.
 - Local SQLite app store; i18n plumbing; placeholder logo.
 - **Exit:** themed empty shell runs on all 3 OSes with CI green.
+- Status (2026-11-25): scaffold (#1), CI (#2), theme (#3), style + gallery (#4), shell + command
+  registry (#5) done. Remaining: local SQLite app store + `settings.json` (UI state persistence),
+  i18n plumbing (PR 6).
 
 ## M1 — Read-only client
 - OwlCore: Driver API, worker threads, async query + cancel, result streaming, Catalog, Dialect.

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Loads the QML windows offscreen in both themes and fails on any QML warning.
 // Set OWL_SCREENSHOT_DIR to also save <window>-<theme>.png screenshots there.
+#include "commandregistry.h"
 #include "iconprovider.h"
 #include "thememanager.h"
 
@@ -14,6 +15,7 @@
 
 Q_IMPORT_QML_PLUGIN(OwlSql_ThemePlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_StylePlugin)
+Q_IMPORT_QML_PLUGIN(OwlSql_AppPlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_UiPlugin)
 
 using owl::theme::ThemeManager;
@@ -100,6 +102,46 @@ private slots:
         }
 
         QVERIFY2(warnings.isEmpty(), qPrintable(warnings.join(u'\n')));
+    }
+
+    // The shell reacts to real key presses and to commands triggered through the registry.
+    void shellShortcutsAndCommands()
+    {
+        ThemeManager::instance()->setMode(ThemeManager::Mode::Dark);
+        QQmlApplicationEngine engine;
+        owl::theme::IconProvider::install(engine);
+        engine.loadFromModule("OwlSql.Ui", "Main");
+        auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().value(0));
+        QVERIFY(window);
+        QVERIFY(QTest::qWaitForWindowExposed(window));
+        window->requestActivate();
+        QVERIFY(QTest::qWaitForWindowActive(window));
+
+        QCOMPARE(window->property("bottomPanelVisible").toBool(), false);
+        QTest::keyClick(window, Qt::Key_J, Qt::ControlModifier);
+        QTRY_COMPARE(window->property("bottomPanelVisible").toBool(), true);
+        QTest::keyClick(window, Qt::Key_J, Qt::ControlModifier);
+        QTRY_COMPARE(window->property("bottomPanelVisible").toBool(), false);
+
+        QCOMPARE(window->property("sidebarVisible").toBool(), true);
+        QTest::keyClick(window, Qt::Key_B, Qt::ControlModifier);
+        QTRY_COMPARE(window->property("sidebarVisible").toBool(), false);
+
+        auto *commands = owl::app::CommandRegistry::instance();
+        commands->trigger(QStringLiteral("view.toggleSidebar"));
+        QCOMPARE(window->property("sidebarVisible").toBool(), true);
+
+        QCOMPARE(window->property("tabCount").toInt(), 1);
+        commands->trigger(QStringLiteral("workspace.closeTab"));
+        QCOMPARE(window->property("tabCount").toInt(), 0);
+        commands->trigger(QStringLiteral("workspace.showWelcome"));
+        QCOMPARE(window->property("tabCount").toInt(), 1);
+        commands->trigger(QStringLiteral("workspace.showWelcome")); // no duplicate tab
+        QCOMPARE(window->property("tabCount").toInt(), 1);
+
+        commands->trigger(QStringLiteral("view.toggleBottomPanel"));
+        QTest::qWait(150);
+        saveShot(window, QStringLiteral("main-dark-panel"));
     }
 
     void cleanupTestCase() { ThemeManager::instance()->setMode(ThemeManager::Mode::System); }
