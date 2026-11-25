@@ -1,5 +1,7 @@
 # OwlSql
 
+[![CI](https://github.com/alexcrack/owlsql/actions/workflows/ci.yml/badge.svg)](https://github.com/alexcrack/owlsql/actions/workflows/ci.yml)
+
 A fast, modern database client for **PostgreSQL**, **MySQL / MariaDB** and **SQLite** —
 HeidiSQL's speed and directness with pgAdmin's depth. Built with Qt 6 and QML.
 
