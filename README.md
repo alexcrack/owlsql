@@ -51,13 +51,20 @@ Qt Creator: open `CMakeLists.txt` and pick a preset or your Qt 6.12 kit.
 
 ### Integration tests
 
-Tests against real servers skip themselves unless a server URL is set (CI runs them on Linux):
+Tests against real servers skip themselves unless a server URL is set (CI runs them on Linux,
+against PostgreSQL 18 and 13):
 
 ```sh
-docker run -d --rm --name owl-pg -e POSTGRES_PASSWORD=owlsql -p 55432:5432 postgres:18
-OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:55432/postgres ctest --preset debug -L integration
-docker stop owl-pg
+docker run -d --rm --name owl-pg18 -e POSTGRES_PASSWORD=owlsql -p 55432:5432 postgres:18
+docker run -d --rm --name owl-pg13 -e POSTGRES_PASSWORD=owlsql -p 55433:5432 postgres:13
+export OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:55432/postgres
+export OWL_TEST_PG13_URL=postgresql://postgres:owlsql@localhost:55433/postgres
+ctest --preset debug -L integration
+docker stop owl-pg18 owl-pg13
 ```
+
+Each server-backed test runs once per URL variable (`tst_pg_driver`, `tst_pg_driver13`, …); a
+missing URL skips it, unless `OWL_REQUIRE_INTEGRATION_TESTS` is set (CI), which makes it fail.
 
 ## Development
 

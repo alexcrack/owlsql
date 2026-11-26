@@ -73,9 +73,10 @@ key, agent; jump hosts later via libssh2), connection URL parsing, `.pgpass` / `
   own CMake process against our Qt, as static libraries (`cmake/OwlExternal.cmake`,
   decision 126). Crash reporting: decided before 1.0.
 - Tests (done): Qt Test unit suites + an offscreen UI smoke test that fails on QML warnings and can
-  save screenshots (`OWL_SCREENSHOT_DIR`); `tests/integration/` against real servers, skipped
-  unless `OWL_TEST_PG_URL` is set — CI starts PostgreSQL 18 in Docker on the Linux job
-  (decision 125). MariaDB/MySQL join in M2.
+  save screenshots (`OWL_SCREENSHOT_DIR`); `tests/integration/` and the server-backed
+  conformance runs against real servers, skipped unless `OWL_TEST_PG_URL` / `OWL_TEST_PG13_URL`
+  are set — CI starts PostgreSQL 18 and 13 in Docker on the Linux job (decisions 125, 151).
+  MariaDB/MySQL join in M2.
 - GitHub Actions (done): build + test on Linux/GCC, Windows/MSVC, macOS; format (clang-format 21,
   qmlformat), clang-tidy, qmllint. Planned: packaging and release artifacts (M4).
 

@@ -17,6 +17,8 @@ struct Fixtures
     ConnectionParams params;
     // Unless empty, connecting is required; otherwise every test is skipped with this reason.
     QString skipReason;
+    // A test environment problem (e.g. a required server is not configured): every test fails.
+    QString setupError;
 
     // One row: 42, 4611686018427387904, -7, 2.5, 'Ωmega 🦉', NULL, '', bytes 00 ff 10
     QString selectScalars;

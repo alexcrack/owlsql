@@ -131,23 +131,34 @@ StatementClass classifyFrom(QStringView sql, const QList<Significant> &tokens, q
     if (is(w, L("WITH")))
         return withStatement(sql, tokens, index);
     if (is(w, L("EXPLAIN"))) {
-        // EXPLAIN ANALYZE executes the statement.
-        for (qsizetype i = index + 1; i < tokens.size(); ++i) {
+        // Plain EXPLAIN only plans; EXPLAIN ANALYZE (also inside an option list) executes.
+        const int depth = tokens.at(index).depth;
+        bool analyze = false;
+        qsizetype i = index + 1;
+        for (; i < tokens.size(); ++i) {
             const Significant &s = tokens.at(i);
-            if (s.token.type != SqlToken::Type::Word)
+            const bool word = s.token.type == SqlToken::Type::Word;
+            const QStringView text = s.token.text(sql);
+            if (word && isAnyOf(text, {L("ANALYZE"), L("ANALYSE")})) {
+                analyze = true;
                 continue;
-            const QStringView next = s.token.text(sql);
-            if (isAnyOf(next,
-                        {L("ANALYZE"), L("ANALYSE"), L("QUERY"), L("PLAN"), L("VERBOSE"),
-                         L("FORMAT"), L("JSON"), L("TEXT"), L("XML"), L("YAML"), L("COSTS"),
-                         L("BUFFERS")}))
+            }
+            if (s.depth > depth || s.token.type == SqlToken::Type::OpenParen
+                || s.token.type == SqlToken::Type::CloseParen)
+                continue; // PostgreSQL option list: (ANALYZE, BUFFERS, FORMAT JSON)
+            if (word
+                && isAnyOf(text,
+                           {L("QUERY"), L("PLAN"), L("VERBOSE"), L("FORMAT"), L("JSON"), L("TEXT"),
+                            L("XML"), L("YAML"), L("TREE"), L("TRADITIONAL"), L("EXTENDED"),
+                            L("PARTITIONS")}))
                 continue;
-            const StatementClass inner = classifyFrom(sql, tokens, i);
-            const bool analyze = hasTopLevelWord(sql, tokens.mid(index, i - index), 0, L("ANALYZE"))
-                || hasTopLevelWord(sql, tokens.mid(index, i - index), 0, L("ANALYSE"));
-            return analyze ? inner : StatementClass::Read;
+            if (s.token.type == SqlToken::Type::Symbol && text == u"=")
+                continue; // MySQL FORMAT=JSON
+            break;
         }
-        return StatementClass::Read;
+        if (i >= tokens.size())
+            return StatementClass::Read;
+        return analyze ? classifyFrom(sql, tokens, i) : StatementClass::Read;
     }
     if (isAnyOf(w,
                 {L("INSERT"), L("REPLACE"), L("UPSERT"), L("MERGE"), L("CALL"), L("DO"), L("EXEC"),
@@ -339,9 +350,13 @@ QList<StatementSpan> SqlDialect::split(QStringView script) const
             if (!compound && opensCompoundBody(leadingWords))
                 compound = true;
         }
-        if (is(word, QLatin1StringView("ATOMIC")) && atomicSeen)
-            compound = true; // BEGIN ATOMIC (SQL-standard function body)
+        const bool beginAtomic = atomicSeen && is(word, QLatin1StringView("ATOMIC"));
         atomicSeen = is(word, QLatin1StringView("BEGIN"));
+        if (beginAtomic && !compound) {
+            compound = true; // BEGIN ATOMIC … END (SQL-standard function body)
+            ++blockDepth; // for the BEGIN just before, which was not counted
+            continue;
+        }
         if (!compound)
             continue;
         if (is(word, QLatin1StringView("BEGIN")) || is(word, QLatin1StringView("CASE")))

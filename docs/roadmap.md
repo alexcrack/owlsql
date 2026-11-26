@@ -38,8 +38,9 @@ the PRs that must land first.
 - [x] **1.5 SQLite driver** — sqlite3 plugin (types, bound parameters, truncation, error positions,
   cancel, read-only guard), dialect layer (tokenizer, split, classify, placeholders, quoting),
   driver conformance suite (decisions 141–145). — #13
-- [ ] **1.6 PostgreSQL driver** — libpq plugin: chunked rows, cancel, notices, type mapping, SSL,
-  sockets; integration tests vs PG 13 + latest. _needs: 1.4, 1.1_
+- [x] **1.6 PostgreSQL driver** — libpq plugin: chunked rows, cancel, notices, type mapping, SSL,
+  sockets; dialect (dollar quotes, nested comments, `$n`, SELECT INTO, EXPLAIN (ANALYZE)); conformance
+  + integration tests vs PG 13 and 18 (decisions 146–153). — #14
 - [ ] **1.7 Catalog** — `ICatalog` for PG / SQLite (tree nodes, TableDef, DDL text), `CatalogCache`
   with invalidation. _needs: 1.5, 1.6_
 - [ ] **1.8 Sessions** — migration 0002 (`folder`, `session`), keychain secrets, session manager in
