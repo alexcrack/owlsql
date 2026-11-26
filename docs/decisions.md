@@ -128,3 +128,5 @@ superseded ones are marked, never deleted.
 | 121 | Theme choice is a setting (`theme.mode`); theme commands write settings, `AppContext` applies them to `Theme` | |
 | 122 | Window size/maximized state, panel visibility, splitter sizes and open tabs are restored; window position is not (multi-monitor safety) | |
 | 123 | i18n: `qt_add_translations` with English source; `i18n/owlsql_en.ts` (plurals only); `.qm` embedded under `:/i18n`, loaded for the system locale | |
+| 124 | vcpkg only for C libraries (libpq, sqlite3, libmariadb, libssh2); Qt-based libraries (QtKeychain, KSyntaxHighlighting) built from pinned tags via CMake FetchContent against our Qt | Amends 006: vcpkg has no KSyntaxHighlighting port and `qtkeychain-qt6` pulls vcpkg's own qtbase |
+| 125 | Server integration tests on the Linux CI job only (Docker service containers); SQLite + unit tests on all OSes | macOS runners have no Docker |
