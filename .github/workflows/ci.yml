@@ -48,7 +48,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libgl-dev libegl-dev libxkbcommon-dev libxkbcommon-x11-0 \
-            libfontconfig1-dev libvulkan-dev libdbus-1-3
+            libfontconfig1-dev libvulkan-dev libdbus-1-3 libsecret-1-dev
 
       - name: Install Ninja
         run: pip install ninja
@@ -64,6 +64,18 @@ jobs:
       - name: Set up MSVC environment
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Set up dependencies (vcpkg, Qt-based libraries)
+        uses: ./.github/actions/setup-deps
+
+      # Integration tests run against real servers on Linux only (decision 125).
+      - name: Start PostgreSQL
+        if: runner.os == 'Linux'
+        run: |
+          docker run -d --name owl-pg -e POSTGRES_PASSWORD=owlsql -p 5432:5432 postgres:18
+          for i in $(seq 1 30); do docker exec owl-pg pg_isready -U postgres && break; sleep 1; done
+          echo "OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:5432/postgres" >> "$GITHUB_ENV"
+          echo "OWL_REQUIRE_INTEGRATION_TESTS=1" >> "$GITHUB_ENV"
 
       - name: Configure
         run: cmake --preset ci
@@ -84,7 +96,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            libgl-dev libegl-dev libxkbcommon-dev libfontconfig1-dev libvulkan-dev
+            libgl-dev libegl-dev libxkbcommon-dev libfontconfig1-dev libvulkan-dev libsecret-1-dev
           pip install ninja clang-format==${{ env.CLANG_FORMAT_VERSION }} clang-tidy==${{ env.CLANG_TIDY_VERSION }}
 
       - name: Install Qt
@@ -96,6 +108,9 @@ jobs:
 
       - name: Check formatting (clang-format, qmlformat)
         run: QMLFORMAT="$QT_ROOT_DIR/bin/qmlformat" tools/check-format.sh
+
+      - name: Set up dependencies (vcpkg, Qt-based libraries)
+        uses: ./.github/actions/setup-deps
 
       - name: Configure & build (generates moc and compile_commands.json)
         run: |

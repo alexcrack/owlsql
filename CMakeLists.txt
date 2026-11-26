@@ -1,9 +1,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.30) # KSyntaxHighlighting (built at configure time) needs 3.30
 
-# Use vcpkg automatically when available (decision 006). M0 has no vcpkg dependencies yet.
+# C libraries (libpq, sqlite3) come from the vcpkg manifest when VCPKG_ROOT is set (decision 124).
+# Its builtin-baseline in vcpkg.json pins the versions; the checkout only needs to contain it.
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VCPKG_ROOT})
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
+endif()
+# Windows: static vcpkg libraries with the dynamic CRT (/MD) that Qt uses — no extra DLLs to ship.
+if(CMAKE_HOST_WIN32 AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+    set(VCPKG_TARGET_TRIPLET "x64-windows-static-md" CACHE STRING "")
 endif()
 
 project(OwlSql
@@ -25,6 +30,8 @@ include(OwlCompilerOptions)
 find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Svg Sql Network LinguistTools)
 qt_standard_project_setup(REQUIRES 6.12 I18N_SOURCE_LANGUAGE en)
 set(QT_QML_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml")
+
+include(OwlDependencies)
 
 add_subdirectory(src)
 

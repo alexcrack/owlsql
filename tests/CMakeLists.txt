@@ -14,3 +14,4 @@ function(owl_add_unit_test name)
 endfunction()
 
 add_subdirectory(unit)
+add_subdirectory(integration)
