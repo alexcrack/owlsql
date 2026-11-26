@@ -137,3 +137,7 @@ superseded ones are marked, never deleted.
 | 130 | Own `EditorHighlighter` on `KSyntaxHighlighting::AbstractHighlighter` with batched `QTextLayout::setFormats` and one dirty mark per pass — not `QSyntaxHighlighter` | M1.2: `QSyntaxHighlighter` full re-highlight of 1 MB took ~80 s; batched 0.52 s |
 | 131 | Code folding via `QTextBlock::setVisible(false)` + one `markContentsDirty` — works in `QQuickTextEdit` | M1.2 |
 | 132 | Editor experiments live on `spike/*` branches and are never merged; findings are recorded in the specs and this log | |
+| 133 | `owl::Value` = `std::variant` with one alternative per kind (index identifies the kind); temporal/interval/array payloads shared and immutable; 40 bytes, enforced by a test | Grid memory budget (`specs/data-grid.md` §11) |
+| 134 | CBOR wire format v1 for `Value`, `RowBatch`, `ColumnInfo`, `DbError`, `ServerMessage` as in `specs/driver-api.md` §2.1; enum numbers are wire codes (append only) | |
+| 135 | Display formatting of values lives in the app layer (grid, M1.10), not in `owl::Value` | Keeps OwlCore free of UI/locale concerns |
+| 136 | `CMAKE_CXX_SCAN_FOR_MODULES OFF`: no C++20 modules; avoids per-file scanning and module flags clang-tidy rejects (GCC 14+) | |

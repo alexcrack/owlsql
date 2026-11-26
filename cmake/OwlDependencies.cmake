@@ -9,6 +9,8 @@ if(PostgreSQL_VERSION_STRING VERSION_LESS 17)
 endif()
 # SQLite >= 3.35 for RETURNING and DROP COLUMN (decision 048).
 find_package(SQLite3 3.35 REQUIRED)
+# Result<T> (decision 078); header-only.
+find_package(tl-expected CONFIG REQUIRED)
 
 # --- Qt-based libraries: pinned source tags, built against our Qt --------------------------------
 include(OwlExternal)

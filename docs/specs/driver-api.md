@@ -64,7 +64,7 @@ public:
     QDate / QTime / QDateTime ...    // + original text kept for tz/precision fidelity
     QList<Value> toArray() const;
 
-    QString displayText(const DisplayOptions&) const;   // UI formatting lives here, not in drivers
+    // (displayText moved out of Value: formatting for the grid lives in the app layer — decision 135)
     QCborValue toCbor() const;
     static Value fromCbor(const QCborValue&);
 };
@@ -99,6 +99,28 @@ struct RowBatch {
 ```
 
 ---
+
+### 2.1 Implementation and CBOR wire format (M1.3)
+
+Implemented in `src/core/include/owl/core/{value,resultset,dberror,result}.h`.
+
+- `Value` is a `std::variant` with **one alternative per kind** (e.g. `DecimalText` vs `QString`),
+  so the variant index identifies the kind; temporal, interval and array payloads sit behind a
+  shared immutable pointer. `sizeof(Value)` is **40 bytes** (enforced by a test) — decision 133.
+- Temporal kinds store parsed parts *and* the server's original text: `QDate date`,
+  `timeMicros` (µs since midnight), optional `offsetSeconds`, `special` (±infinity), `original`.
+- **CBOR wire format v1** (decision 134). `ValueKind` and `DbError::Category` numbers are wire
+  codes: never renumber, only append.
+
+| Type | Encoding |
+|---|---|
+| `Value` | array `[kind, payload…, fullSize?]` — trailing `fullSize` only when truncated |
+| scalar / text / bytes / uuid | `[k, value]`; uint above INT64_MAX as a decimal string; uuid as 16-byte string |
+| temporal kinds | `[k, original, julianDay\|null, timeMicros\|null, offsetSeconds\|null, special]` |
+| interval | `[k, original, months, days, micros]` |
+| array | `[k, [element…]]` |
+| `RowBatch` | `[firstRow, columnCount, [cell…]]` |
+| `ColumnInfo`, `DbError`, `ServerMessage` | maps with short keys; absent keys keep defaults (forward compatible), wrong types are rejected |
 
 ## 3. Driver plugin interfaces
 

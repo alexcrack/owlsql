@@ -28,8 +28,9 @@ the PRs that must land first.
 - [x] **1.2 Editor spike** — TextArea + KSyntaxHighlighting on Qt 6.12 measured
   (`specs/sql-editor.md` §10): v1 stays on TextArea with a 2 MB smooth-editing target, own batch
   highlighter instead of QSyntaxHighlighter, folding works (decisions 129–132). — #10
-- [ ] **1.3 OwlCore values** — `Value`, `ColumnInfo`, `RowBatch`, `DbError`, `Result<T>`
-  (tl::expected), CBOR round-trips. _needs: —_
+- [x] **1.3 OwlCore values** — `Value` (18 kinds, 40 bytes), `ColumnInfo`, `RowBatch`, `DbError`,
+  `ServerMessage`, `Result<T>` (tl::expected), CBOR wire format v1 with round-trip tests
+  (decisions 133–136). — #11
 - [ ] **1.4 Driver API + execution** — `IDriver` / `IConnection` / `IResultCursor` /
   `ICancelHandle`, plugin loading, `ConnectionWorker` threads, `QueryJob` facade
   (pause / fetchMore / cancel), fake driver for tests. _needs: 1.3_

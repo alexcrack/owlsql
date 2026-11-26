@@ -9,3 +9,4 @@ owl_add_unit_test(tst_settings SOURCES tst_settings.cpp LIBS owlsql_app)
 owl_add_unit_test(tst_singleinstance SOURCES tst_singleinstance.cpp LIBS owlsql_app Qt6::Network)
 owl_add_unit_test(tst_dependencies SOURCES tst_dependencies.cpp
     LIBS PostgreSQL::PostgreSQL SQLite::SQLite3 Qt6Keychain::Qt6Keychain KF6::SyntaxHighlighting)
+owl_add_unit_test(tst_core_types SOURCES tst_core_types.cpp LIBS Owl::Core)
