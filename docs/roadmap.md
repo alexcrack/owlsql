@@ -25,9 +25,9 @@ the PRs that must land first.
   3.54; QtKeychain 0.18 + KSyntaxHighlighting 6.32 built against our Qt (decisions 124, 126–128);
   PostgreSQL 18 in Docker on the Linux CI job (decision 125); our own vcpkg checkout in CI
   (Visual Studio's `VCPKG_ROOT` is overridden). — #9
-- [ ] **1.2 Editor spike** — throwaway branch: TextArea + KSyntaxHighlighting on Qt 6.12:
-  highlighting, folding, overlays, 5 MB typing latency, IME/undo (`specs/sql-editor.md` §10).
-  Outcome recorded as a decision; decides the editor approach. _needs: 1.1_
+- [x] **1.2 Editor spike** — TextArea + KSyntaxHighlighting on Qt 6.12 measured
+  (`specs/sql-editor.md` §10): v1 stays on TextArea with a 2 MB smooth-editing target, own batch
+  highlighter instead of QSyntaxHighlighter, folding works (decisions 129–132). — #10
 - [ ] **1.3 OwlCore values** — `Value`, `ColumnInfo`, `RowBatch`, `DbError`, `Result<T>`
   (tl::expected), CBOR round-trips. _needs: —_
 - [ ] **1.4 Driver API + execution** — `IDriver` / `IConnection` / `IResultCursor` /
@@ -46,7 +46,7 @@ the PRs that must land first.
   full PG depth, icons, refresh. _needs: 1.7, 1.8_
 - [ ] **1.10 Data grid (read-only)** — `ResultModel`, object tab Data view, browse paging, WHERE box
   + column filters, sorting, keyboard navigation, NULL / truncation display, copy. _needs: 1.7_
-- [ ] **1.11 SQL editor + results** — editor per spike outcome, run keys, statement tint, result
+- [ ] **1.11 SQL editor + results** — TextArea editor with `EditorHighlighter` (decisions 129–131), run keys, statement tint, result
   tabs, Messages, error positions, placeholder prompt, safety guards. _needs: 1.2, 1.10_
 - [ ] **1.12 Log + history** — Log panel (all statements, filters), `history.db` with FTS5 search
   and retention. _needs: 1.4_

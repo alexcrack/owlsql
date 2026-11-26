@@ -133,3 +133,7 @@ superseded ones are marked, never deleted.
 | 126 | Qt-based dependencies are downloaded with `FetchContent` and built + installed at configure time in a separate CMake process (`cmake/OwlExternal.cmake`), static, reused via a stamp file; CI caches the install prefix | Building KDE frameworks as subprojects would leak their global settings (compiler flags, git hooks, install rules) into ours |
 | 127 | vcpkg pinned by `builtin-baseline` (13eb3d1, 2026-11-09); CI uses its own vcpkg checkout at that commit (overriding Visual Studio's `VCPKG_ROOT`); Windows triplet `x64-windows-static-md` | |
 | 128 | Linux keychain: libsecret required in CI and release builds (`OWL_REQUIRE_LIBSECRET`, set by the `ci` preset); local builds without libsecret fall back to KWallet with a warning | |
+| 129 | SQL editor v1 stays on QML `TextArea`; smooth editing target **2 MB** (was 5 MB); 2–5 MB opens with a "large script" banner; > 5 MB only via Run SQL file… | Supersedes 095. M1.2: typing 10 ms at 1 MB, 16 ms at 2 MB, ~40 ms at 5 MB inside `QQuickTextEdit` |
+| 130 | Own `EditorHighlighter` on `KSyntaxHighlighting::AbstractHighlighter` with batched `QTextLayout::setFormats` and one dirty mark per pass — not `QSyntaxHighlighter` | M1.2: `QSyntaxHighlighter` full re-highlight of 1 MB took ~80 s; batched 0.52 s |
+| 131 | Code folding via `QTextBlock::setVisible(false)` + one `markContentsDirty` — works in `QQuickTextEdit` | M1.2 |
+| 132 | Editor experiments live on `spike/*` branches and are never merged; findings are recorded in the specs and this log | |
