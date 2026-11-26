@@ -18,7 +18,8 @@ SqlEditor.qml  (public QML API — the only thing the rest of the UI uses)
  └─ FindBar           find / replace, regex, case, whole word
           │
 EditorController (C++, QML_ELEMENT) — owns all logic, works on the QTextDocument
- ├─ SyntaxHighlighter   KSyntaxHighlighting::SyntaxHighlighter on QQuickTextDocument
+ ├─ EditorHighlighter   own highlighter: KSyntaxHighlighting::AbstractHighlighter tokenizes,
+ │                      formats applied in batches (decision 130) — not QSyntaxHighlighter
  ├─ StatementIndex      dialect.split() results, refreshed off-thread (debounced 150 ms)
  ├─ FoldingModel        foldable ranges: statements, BEGIN…END, $$ bodies, comment blocks
  ├─ BracketMatcher, AutoCloser
@@ -55,7 +56,17 @@ SqlEditor {
 
 - KSyntaxHighlighting definitions: `SQL (PostgreSQL)`, `SQL (MySQL)`, `SQL` (SQLite) and `JSON`.
 - Themes: own `Owl Dark` / `Owl Light` (decision 062); any bundled KSH theme selectable.
-- Highlighting is incremental per text block (QSyntaxHighlighter); no whole-document passes.
+- **Own highlighter, not `QSyntaxHighlighter`** (decision 130). Measured in M1.2: on a laid-out
+  `QQuickTextEdit`, `QSyntaxHighlighter` marks every re-highlighted block dirty separately and each
+  mark relayouts everything below it — a full re-highlight of 1 MB took ~80 s. `EditorHighlighter`
+  tokenizes with `KSyntaxHighlighting::AbstractHighlighter::highlightLine`, keeps the end-of-line
+  `State` per block (`QTextBlockUserData`), sets formats with `QTextLayout::setFormats`, and marks
+  the touched range dirty **once** per pass: ~0.5 s per MB for a full pass, linear.
+- Edits: re-tokenize from the changed block forward until the stored state matches again, then one
+  dirty mark for the touched range. Full passes (theme or dialect change) run as one batch with a
+  busy indicator. Loading a file attaches the highlighter **before** setting the text, so the first
+  pass happens before layout (~0.7 s per MB including load).
+- The highlighter must leave the input-method preedit area alone (`QTextLayout::preeditAreaText`).
 - Optional (post-v1): semantic tint for known table/column names from the catalog.
 
 ---
@@ -86,10 +97,15 @@ safety guard (classification, prod confirmation) and placeholder prompt (Driver 
 
 ### 3.1 Large scripts
 
-- Target: smooth editing up to **~5 MB** (decision 095).
-- Bigger files are not opened in the editor: **Tools → Run SQL file…** streams the file through an
+- Target: smooth editing (< 16 ms per keystroke) up to **2 MB** (decision 129, replaces 095).
+  Measured in M1.2: typing cost grows with document size inside `QQuickTextEdit` itself —
+  10 ms at 1 MB, 16 ms at 2 MB, ~40 ms at 5 MB, independent of highlighting and renderer.
+- **2–5 MB** opens in the editor with a banner: *"Large script — editing may be slow. Run it
+  without opening?"* offering Run SQL file…
+- **Over 5 MB** is not opened in the editor: **Tools → Run SQL file…** streams the file through an
   incremental splitter on a dedicated connection, with progress, stop-on-error / continue, and
-  errors listed with line numbers. Opening a file > 5 MB in the editor offers this instead.
+  errors listed with line numbers.
+- Memory is ~60 MB per MB of text in the editor; another reason to stream large dumps.
 
 ---
 
@@ -178,24 +194,27 @@ string/dollar-quoted bodies untouched. Golden-file tests per dialect.
 
 | Scenario | Target |
 |---|---|
-| Typing in a 5 MB script | no visible latency (< 16 ms per keystroke on main thread) |
-| Statement index refresh, 5 MB | < 100 ms, off main thread |
+| Typing in a 2 MB script | < 16 ms key → frame (measured: 16 ms; 1 MB: 10 ms) |
+| Statement index refresh, 2 MB | < 100 ms, off main thread |
 | Completion popup | < 50 ms with columns cached |
-| Open 1 MB file | < 300 ms to first paint |
+| Open + highlight 1 MB file | < 700 ms (measured: ~0.6 s) |
+| Full re-highlight (theme / dialect change), 1 MB | < 600 ms (measured: 0.52 s) |
 
 ---
 
-## 10. Risks → M1 spike
+## 10. M1.2 feasibility spike — results (2026-11-26)
 
-Before building the full editor, a 1–2 day spike on Qt 6.12 verifies:
+Harness and raw numbers: branch `spike/m1.2-editor`, `spikes/editor/RESULTS.md`
+(Linux, Qt 6.12.0, RelWithDebInfo; GPU and software renderer gave the same typing numbers).
 
-1. KSyntaxHighlighting attached through `QQuickTextDocument::textDocument()` — highlighting and
-   theme switching work live.
-2. **Folding**: whether `QQuickTextEdit` honours hidden `QTextBlock`s. If not → fold by
-   collapsing regions differently (e.g. a filtered display document) or defer folding.
-3. Overlay geometry: `positionToRectangle` / block layout lookups fast enough for decorations on
-   the visible range of a 5 MB document.
-4. Typing latency and memory with a 5 MB document.
-5. IME input and undo grouping with auto-close.
+| Risk | Result |
+|---|---|
+| 1. KSyntaxHighlighting on `QQuickTextDocument` | ✅ works; **`QSyntaxHighlighter` is unusable for full re-highlights** (1 MB: ~80 s, worse than quadratic). Own batch highlighter: 0.52 s per MB, linear → decision 130 |
+| 2. Folding via hidden `QTextBlock`s | ✅ `QQuickTextEdit` collapses hidden blocks (`setVisible(false)` + one `markContentsDirty`) → decision 131 |
+| 3. Overlay geometry | ✅ `positionToRectangle` 4–9 µs per call at 5 MB |
+| 4. Typing latency / memory | ⚠️ 10 ms at 1 MB, 16 ms at 2 MB, ~40 ms at 5 MB (cost inside `QQuickTextEdit`); ~60 MB RAM per MB of text → decision 129 |
+| 5. IME and undo grouping | ✅ auto-closed `()` as one `QTextCursor` edit block undoes in one step via `TextArea.undo()`; preedit / commit / undo work (synthetic events — confirm with a real input method when building the editor) |
 
-The spike's result decides whether v1 stays on TextArea or the custom editor moves earlier.
+**Decision (129): v1 editor stays on `TextArea`**, with the 2 MB smooth-editing target above. The
+editor surface stays behind `EditorController` (§1), so a custom scene-graph editor can replace it
+after 1.0 if large-script editing becomes a real need.
