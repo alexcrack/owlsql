@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QSaveFile>
+#include <QThread>
 
 namespace owl::app {
 
@@ -38,15 +39,26 @@ QByteArray WatchedFile::read() const
 bool WatchedFile::write(const QByteArray &contents, QString *error)
 {
     QDir().mkpath(QFileInfo(m_path).absolutePath());
-    QSaveFile file(m_path);
-    if (!file.open(QIODevice::WriteOnly) || file.write(contents) != contents.size()
-        || !file.commit()) {
-        *error = QStringLiteral("Cannot write %1: %2").arg(m_path, file.errorString());
-        return false;
+
+    // The atomic save replaces the target file. On Windows that fails with "Access is denied"
+    // while another process briefly holds the file open (antivirus, search indexer, cloud sync,
+    // an editor), so retry a few times with a short backoff before giving up (~0.4 s at most).
+    constexpr int attempts = 6;
+    QString lastError;
+    for (int attempt = 1; attempt <= attempts; ++attempt) {
+        QSaveFile file(m_path);
+        if (file.open(QIODevice::WriteOnly) && file.write(contents) == contents.size()
+            && file.commit()) {
+            m_lastKnown = contents;
+            rewatch();
+            return true;
+        }
+        lastError = file.errorString();
+        if (attempt < attempts)
+            QThread::sleep(std::chrono::milliseconds(25 * attempt));
     }
-    m_lastKnown = contents;
-    rewatch();
-    return true;
+    *error = QStringLiteral("Cannot write %1: %2").arg(m_path, lastError);
+    return false;
 }
 
 void WatchedFile::rewatch()
