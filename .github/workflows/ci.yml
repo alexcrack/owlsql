@@ -141,7 +141,9 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           QT_FORCE_STDERR_LOGGING: "1"
         run: |
-          $exe = (Resolve-Path "build/ci/tests/unit/tst_settings.exe").Path
+          # qt_standard_project_setup() puts Windows executables directly in the build dir.
+          $exe = (Get-ChildItem -Recurse -Path build/ci -Filter tst_settings.exe | Select-Object -First 1).FullName
+          Write-Host "Running $exe"
           $fails = 0
           for ($i = 1; $i -le 60; $i++) {
             Remove-Item -ErrorAction SilentlyContinue qtest.log
