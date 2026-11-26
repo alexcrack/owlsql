@@ -141,3 +141,7 @@ superseded ones are marked, never deleted.
 | 134 | CBOR wire format v1 for `Value`, `RowBatch`, `ColumnInfo`, `DbError`, `ServerMessage` as in `specs/driver-api.md` §2.1; enum numbers are wire codes (append only) | |
 | 135 | Display formatting of values lives in the app layer (grid, M1.10), not in `owl::Value` | Keeps OwlCore free of UI/locale concerns |
 | 136 | `CMAKE_CXX_SCAN_FOR_MODULES OFF`: no C++20 modules; avoids per-file scanning and module flags clang-tidy rejects (GCC 14+) | |
+| 137 | `ConnectionWorker` and `QueryJob` live in OwlCore (QtCore only), not the app layer | Testable without UI; reusable by the Gateway |
+| 138 | Driver plugins: `coreApi` read from metadata before loading, mismatches rejected; plugins link OwlCore statically → OwlCore keeps no global mutable state | |
+| 139 | Worker → main thread updates go through queued calls on the `ConnectionWorker` and reach jobs via `QPointer`, so deleting a job or worker mid-run only drops updates | |
+| 140 | Rows are delivered in batches of 256; `RowBatch::firstRow` restarts at 0 for each result set | |

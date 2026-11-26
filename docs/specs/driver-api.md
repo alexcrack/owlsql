@@ -124,6 +124,14 @@ Implemented in `src/core/include/owl/core/{value,resultset,dberror,result}.h`.
 
 ## 3. Driver plugin interfaces
 
+> **Implemented (M1.4)** in `owl/core/driver.h` and `driverregistry.h`: `IDriver`, `IConnection`,
+> `IResultCursor`, `ICancelHandle`, `ConnectionParams`, `Statement`, `ExecOptions`, `ServerInfo`,
+> `Capabilities`. `IDriver::dialect()`/`connectionForm()`/`parseUrl()` arrive with the dialect (M1.5)
+> and sessions (M1.8); `IConnection::catalog()` with the catalog (M1.7).
+> Plugin rules (decision 138): the registry reads `coreApi` from the plugin metadata **before
+> loading** and rejects mismatches; plugins link OwlCore statically, so OwlCore must not keep global
+> mutable state (each plugin has its own copy).
+
 Packaged as **shared plugins** loaded with `QPluginLoader` (decision 049).
 The ABI is internal: plugins are built in the same tree with the same compiler and Qt;
 the core refuses plugins whose `coreApi` differs.
@@ -322,7 +330,14 @@ public:
 
 ---
 
-## 6. Async facade (app layer)
+## 6. Async facade (OwlCore)
+
+> **Implemented (M1.4)** in `owl/core/connectionworker.h` / `queryjob.h` — in OwlCore rather than the
+> app layer (decision 137): QtCore only, testable without UI, reusable by the Gateway. `Session`
+> (roles `meta` / `tab:<id>` / `meta:<db>`) comes with sessions (M1.8). Details as built:
+> `columnsReady(columns, resultIndex)`, `resultFinished(resultIndex, affectedRows)`, rows arrive in
+> batches of 256 with `firstRow` restarting per result set, `isComplete()` is false when a paused
+> job was closed by the next statement, cancelling a *queued* job reports immediately.
 
 ### 6.1 Session and workers
 
