@@ -139,7 +139,7 @@ the core refuses plugins whose `coreApi` differs.
 ```cpp
 #define OWL_DRIVER_IID "org.owlsql.Driver/1"
 
-// plugin metadata JSON: { "id": "postgres", "name": "PostgreSQL", "coreApi": 1 }
+// plugin metadata JSON: { "id": "postgres", "name": "PostgreSQL", "coreApi": 2 }
 
 class IDriver {
 public:
@@ -492,6 +492,21 @@ The UI hides or disables features from capabilities, never from `driverId` check
 > no `SQLITE_ENABLE_COLUMN_METADATA` option, so column origins are empty (follow-up for editable query
 > results, M2). `setAutocommit(false)` → Unsupported until transactions (M2).
 
+> **PostgreSQL (M1.6):** driver id `postgres`; `ConnectionParams` → libpq keywords (`socketPath` is
+> passed as `host` for Unix sockets; any other libpq keyword via `driverOptions`, unknown keys fail).
+> Results in text format, session `DateStyle = 'ISO, YMD'`, `IntervalStyle = 'postgres'` (decision 146);
+> parameters as text with unspecified types, bytea typed (decision 147); one statement per
+> `execute()` over the extended protocol, chunked rows (256) (decision 148). Closing a partly read
+> result cancels a read outside a transaction, drains anything else (decision 149); cancel runs on a
+> pool thread with `PQcancelBlocking`. Types from `pg_type` at connect, unknown OIDs looked up before the
+> next statement (decision 150). Errors: SQLSTATE → category (`23` Constraint, `28` Auth, `42` Syntax
+> except `42501` Permission, `25006` Permission, `57014` Cancelled/Timeout, `57P*` Lost, `0A000`
+> Unsupported), detail/hint, position (code points → UTF-16); `CONNECTION_BAD` → Lost. Notices via
+> the notice receiver (severity, text + DETAIL/HINT, SQLSTATE). Read-only: `default_transaction_read_only`
+> between transactions (decision 153). `affectedRows()`: DML tags only (in chunked mode the tag arrives
+> with the last chunk). `lastInsertId()`: none (use RETURNING). Column origins (`PQftable`) are resolved
+> with the catalog (M1.7/M2). `setAutocommit(false)` → Unsupported until transactions (M2).
+
 | | PostgreSQL | MySQL / MariaDB | SQLite |
 |---|---|---|---|
 | Client lib | libpq (vcpkg) | MariaDB Connector/C (talks to both) | sqlite3 |
@@ -514,6 +529,11 @@ The UI hides or disables features from capabilities, never from `driverId` check
 > count mismatch, syntax error category + position, constraint violation, affected rows, transaction
 > state, large-value truncation, read-only guard, empty statement, streaming 10 000 rows with pause /
 > fetchAll through the worker, cancelling a runaway query. ctest label `conformance`.
+>
+> **PostgreSQL (M1.6):** the suite runs against PostgreSQL 18 and 13 (`tst_conformance_pg`,
+> `tst_conformance_pg13`), plus `tests/integration/tst_pg_driver.cpp` for engine specifics (notices,
+> type matrix, parameter round trips, error details, failed transactions, user-defined types,
+> closing paused results, lost connections, auth errors). Server URLs: `tests/support/pgtestserver.h`.
 
 - **Unit (no server):** Value/CBOR round-trips, dialect split/classify/quote/placeholders, DDL diff
   generation (golden files per engine), browse query generation.

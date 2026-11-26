@@ -68,13 +68,18 @@ jobs:
       - name: Set up dependencies (vcpkg, Qt-based libraries)
         uses: ./.github/actions/setup-deps
 
-      # Integration tests run against real servers on Linux only (decision 125).
-      - name: Start PostgreSQL
+      # Integration tests run against real servers on Linux only (decision 125): the latest
+      # PostgreSQL and the oldest supported one (decision 048).
+      - name: Start PostgreSQL 18 and 13
         if: runner.os == 'Linux'
         run: |
-          docker run -d --name owl-pg -e POSTGRES_PASSWORD=owlsql -p 5432:5432 postgres:18
-          for i in $(seq 1 30); do docker exec owl-pg pg_isready -U postgres && break; sleep 1; done
+          docker run -d --name owl-pg18 -e POSTGRES_PASSWORD=owlsql -p 5432:5432 postgres:18
+          docker run -d --name owl-pg13 -e POSTGRES_PASSWORD=owlsql -p 5433:5432 postgres:13
+          for pg in owl-pg18 owl-pg13; do
+            for i in $(seq 1 60); do docker exec $pg pg_isready -U postgres -h 127.0.0.1 && break; sleep 1; done
+          done
           echo "OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:5432/postgres" >> "$GITHUB_ENV"
+          echo "OWL_TEST_PG13_URL=postgresql://postgres:owlsql@localhost:5433/postgres" >> "$GITHUB_ENV"
           echo "OWL_REQUIRE_INTEGRATION_TESTS=1" >> "$GITHUB_ENV"
 
       - name: Configure

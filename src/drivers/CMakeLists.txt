@@ -15,3 +15,4 @@ function(owl_add_driver_plugin target)
 endfunction()
 
 add_subdirectory(sqlite)
+add_subdirectory(postgres)

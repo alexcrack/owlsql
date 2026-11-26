@@ -19,3 +19,8 @@ endfunction()
 
 owl_add_fake_plugin(owl_fake_driver_plugin fakeplugin.cpp)
 owl_add_fake_plugin(owl_fake_driver_plugin_badapi fakeplugin_badapi.cpp)
+
+# PostgreSQL test server settings from the environment (header-only).
+add_library(owl_test_pgserver INTERFACE pgtestserver.h)
+target_include_directories(owl_test_pgserver INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(owl_test_pgserver INTERFACE Owl::Core)

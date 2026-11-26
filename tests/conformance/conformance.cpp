@@ -90,6 +90,8 @@ public:
 private slots:
     void initTestCase()
     {
+        if (!m_f.setupError.isEmpty())
+            QFAIL(qPrintable(m_f.setupError));
         if (!m_f.skipReason.isEmpty())
             QSKIP(qPrintable(m_f.skipReason));
         const QStringList problems = m_registry.loadPlugins(m_f.pluginDirectory);
