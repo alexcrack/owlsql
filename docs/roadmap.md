@@ -31,9 +31,10 @@ the PRs that must land first.
 - [x] **1.3 OwlCore values** — `Value` (18 kinds, 40 bytes), `ColumnInfo`, `RowBatch`, `DbError`,
   `ServerMessage`, `Result<T>` (tl::expected), CBOR wire format v1 with round-trip tests
   (decisions 133–136). — #11
-- [ ] **1.4 Driver API + execution** — `IDriver` / `IConnection` / `IResultCursor` /
-  `ICancelHandle`, plugin loading, `ConnectionWorker` threads, `QueryJob` facade
-  (pause / fetchMore / cancel), fake driver for tests. _needs: 1.3_
+- [x] **1.4 Driver API + execution** — `IDriver` / `IConnection` / `IResultCursor` /
+  `ICancelHandle`, `DriverRegistry` (plugins, core API check), `ConnectionWorker` threads,
+  `QueryJob` (pause / fetchMore / fetchAll / cancel), scriptable fake driver incl. real plugin
+  files (decisions 137–140). — #12
 - [ ] **1.5 SQLite driver** — sqlite3 plugin, dialect basics (quote, split, classify,
   placeholders), conformance suite v1. _needs: 1.4_
 - [ ] **1.6 PostgreSQL driver** — libpq plugin: chunked rows, cancel, notices, type mapping, SSL,

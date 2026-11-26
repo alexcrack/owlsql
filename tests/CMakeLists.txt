@@ -13,5 +13,6 @@ function(owl_add_unit_test name)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
+add_subdirectory(support)
 add_subdirectory(unit)
 add_subdirectory(integration)

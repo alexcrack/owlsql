@@ -10,3 +10,7 @@ owl_add_unit_test(tst_singleinstance SOURCES tst_singleinstance.cpp LIBS owlsql_
 owl_add_unit_test(tst_dependencies SOURCES tst_dependencies.cpp
     LIBS PostgreSQL::PostgreSQL SQLite::SQLite3 Qt6Keychain::Qt6Keychain KF6::SyntaxHighlighting)
 owl_add_unit_test(tst_core_types SOURCES tst_core_types.cpp LIBS Owl::Core)
+owl_add_unit_test(tst_execution SOURCES tst_execution.cpp LIBS owl_test_fakedriver)
+owl_add_unit_test(tst_driver_registry SOURCES tst_driver_registry.cpp LIBS owl_test_fakedriver)
+target_compile_definitions(tst_driver_registry PRIVATE "OWL_TEST_DRIVER_DIR=\"${OWL_TEST_DRIVER_DIR}\"")
+add_dependencies(tst_driver_registry owl_fake_driver_plugin owl_fake_driver_plugin_badapi)

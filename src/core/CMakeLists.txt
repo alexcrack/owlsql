@@ -9,11 +9,18 @@ qt_add_library(owlcore STATIC
     include/owl/core/resultset.h
     include/owl/core/dberror.h
     include/owl/core/result.h
+    include/owl/core/driver.h
+    include/owl/core/driverregistry.h
+    include/owl/core/queryjob.h
+    include/owl/core/connectionworker.h
     src/cborutil.h
     src/version.cpp
     src/value.cpp
     src/resultset.cpp
     src/dberror.cpp
+    src/driverregistry.cpp
+    src/queryjob.cpp
+    src/connectionworker.cpp
 )
 add_library(Owl::Core ALIAS owlcore)
 
