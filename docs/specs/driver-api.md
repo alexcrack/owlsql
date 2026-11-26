@@ -301,6 +301,15 @@ F5 refreshes the selected node. No background polling.
 
 ## 5. Dialect
 
+> **Implemented (M1.5)** in `owl/core/dialect.h` + `sqltokenizer.h`: `IDialect` with `quoteIdentifier`,
+> `quoteLiteral`, `split`, `classify`, `placeholders`, `tokenize`; `SqlDialect` implements them from
+> lexer options (identifier quotes, dollar quotes, nested comments, placeholder forms) and engines
+> subclass it. `split` keeps `;` inside strings, identifiers, comments and compound bodies
+> (`CREATE TRIGGER … BEGIN … END`, `BEGIN ATOMIC`). `classify` (decision 142): UPDATE/DELETE without a
+> top-level `WHERE` and `TRUNCATE` are `WriteUnbounded`; data-modifying CTEs are `Write`; plain
+> `EXPLAIN` is `Read` (`EXPLAIN ANALYZE` takes the inner class); `CALL`/`DO`/`VACUUM` are `Write`.
+> Type lists, keywords and SQL generation arrive with their consumers (M1.7, M1.10, M2).
+
 ```cpp
 class IDialect {                      // pure, thread-safe
 public:
@@ -475,6 +484,14 @@ The UI hides or disables features from capabilities, never from `driverId` check
 
 ## 11. Engine notes
 
+> **SQLite (M1.5):** `database` = file path, `:memory:` or `file:` URI; `driverOptions` `create`, `readOnly`.
+> One statement per `execute()` (decision 143); the first `sqlite3_step` runs in `execute()` so errors
+> and affected rows are immediate. Values typed per cell from the storage class (`BOOLEAN`/`JSON`
+> declared columns → bool/json). Read-only via `sqlite3_stmt_readonly`; cancel via
+> `sqlite3_interrupt`; error positions from `sqlite3_error_offset` (bytes → UTF-16). vcpkg's sqlite3 has
+> no `SQLITE_ENABLE_COLUMN_METADATA` option, so column origins are empty (follow-up for editable query
+> results, M2). `setAutocommit(false)` → Unsupported until transactions (M2).
+
 | | PostgreSQL | MySQL / MariaDB | SQLite |
 |---|---|---|---|
 | Client lib | libpq (vcpkg) | MariaDB Connector/C (talks to both) | sqlite3 |
@@ -490,6 +507,13 @@ The UI hides or disables features from capabilities, never from `driverId` check
 ---
 
 ## 12. Testing
+
+> **Conformance suite implemented (M1.5):** `tests/conformance/` — `owl_conformance` library + one small
+> executable per driver supplying SQL fixtures. Loads the driver **as a plugin through DriverRegistry**.
+> Checks: server info, scalar types (incl. empty text vs NULL, bytes, 2^62), bound parameters and
+> count mismatch, syntax error category + position, constraint violation, affected rows, transaction
+> state, large-value truncation, read-only guard, empty statement, streaming 10 000 rows with pause /
+> fetchAll through the worker, cancelling a runaway query. ctest label `conformance`.
 
 - **Unit (no server):** Value/CBOR round-trips, dialect split/classify/quote/placeholders, DDL diff
   generation (golden files per engine), browse query generation.

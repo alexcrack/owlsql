@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 add_subdirectory(core)
+add_subdirectory(drivers)
 add_subdirectory(theme)
 add_subdirectory(style)
 add_subdirectory(app)

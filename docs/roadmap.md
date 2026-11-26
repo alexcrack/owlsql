@@ -35,8 +35,9 @@ the PRs that must land first.
   `ICancelHandle`, `DriverRegistry` (plugins, core API check), `ConnectionWorker` threads,
   `QueryJob` (pause / fetchMore / fetchAll / cancel), scriptable fake driver incl. real plugin
   files (decisions 137–140). — #12
-- [ ] **1.5 SQLite driver** — sqlite3 plugin, dialect basics (quote, split, classify,
-  placeholders), conformance suite v1. _needs: 1.4_
+- [x] **1.5 SQLite driver** — sqlite3 plugin (types, bound parameters, truncation, error positions,
+  cancel, read-only guard), dialect layer (tokenizer, split, classify, placeholders, quoting),
+  driver conformance suite (decisions 141–145). — #13
 - [ ] **1.6 PostgreSQL driver** — libpq plugin: chunked rows, cancel, notices, type mapping, SSL,
   sockets; integration tests vs PG 13 + latest. _needs: 1.4, 1.1_
 - [ ] **1.7 Catalog** — `ICatalog` for PG / SQLite (tree nodes, TableDef, DDL text), `CatalogCache`
@@ -76,6 +77,8 @@ the PRs that must land first.
 - [ ] Transactions: auto-commit toggle, open-TX indicator; prod safety guards.
 - [ ] Table structure editor with DDL preview.
 - [ ] MySQL / MariaDB driver.
+- [ ] SQLite column origin metadata (`SQLITE_ENABLE_COLUMN_METADATA` via a vcpkg overlay port) so
+  SQLite query results can be edited (from M1.5).
 - [ ] **Exit:** can safely modify data and schema on all Tier-1 engines.
 
 ## M3 — Productivity

@@ -7,7 +7,20 @@
   "builtin-baseline": "13eb3d17cbd0309c9ac279e62dfd6d98f2ac8784",
   "dependencies": [
     "libpq",
-    "sqlite3",
+    {
+      "name": "sqlite3",
+      "default-features": true,
+      "features": [
+        "fts3",
+        "fts4",
+        "fts5",
+        "rtree",
+        "geopoly",
+        "math",
+        "dbstat",
+        "percentile"
+      ]
+    },
     "tl-expected"
   ]
 }
