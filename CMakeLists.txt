@@ -20,6 +20,9 @@ project(OwlSql
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# We don't use C++20 modules. CMake >= 3.28 would otherwise scan every source for them with GCC 14+
+# (extra build step, and -fmodule-mapper flags in compile_commands.json that clang-tidy rejects).
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 option(OWL_BUILD_TESTS "Build unit tests" ON)
 option(OWL_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
