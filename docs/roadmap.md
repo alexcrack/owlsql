@@ -23,7 +23,9 @@ the PRs that must land first.
 
 - [ ] **1.1 Dependencies + CI** — vcpkg in CI (pinned baseline, binary cache) for libpq, sqlite3;
   QtKeychain + KSyntaxHighlighting via FetchContent (decision 124); PostgreSQL service container on
-  the Linux job (decision 125). _needs: —_
+  the Linux job (decision 125). Note: on Windows CI `ilammy/msvc-dev-cmd` sets `VCPKG_ROOT` to
+  Visual Studio's bundled vcpkg, which our CMakeLists picks up automatically — pin our own vcpkg
+  checkout explicitly. _needs: —_
 - [ ] **1.2 Editor spike** — throwaway branch: TextArea + KSyntaxHighlighting on Qt 6.12:
   highlighting, folding, overlays, 5 MB typing latency, IME/undo (`specs/sql-editor.md` §10).
   Outcome recorded as a decision; decides the editor approach. _needs: 1.1_
