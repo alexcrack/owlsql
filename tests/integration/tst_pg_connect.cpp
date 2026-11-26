@@ -15,8 +15,13 @@ private slots:
     void connectsAndQueriesServerVersion()
     {
         const QByteArray url = qgetenv("OWL_TEST_PG_URL");
-        if (url.isEmpty())
+        if (url.isEmpty()) {
+            // CI sets OWL_REQUIRE_INTEGRATION_TESTS where a server is provided, so a broken setup
+            // fails instead of silently skipping (ctest reports skipped tests as passed).
+            if (qEnvironmentVariableIsSet("OWL_REQUIRE_INTEGRATION_TESTS"))
+                QFAIL("OWL_TEST_PG_URL not set but OWL_REQUIRE_INTEGRATION_TESTS is");
             QSKIP("OWL_TEST_PG_URL not set — no PostgreSQL server to test against");
+        }
 
         const std::unique_ptr<PGconn, decltype(&PQfinish)> conn(PQconnectdb(url.constData()),
                                                                 &PQfinish);
