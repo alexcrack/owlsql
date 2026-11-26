@@ -10,6 +10,11 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
+#include <QThread>
+
+#ifdef Q_OS_WIN
+#include <qt_windows.h>
+#endif
 
 using namespace Qt::StringLiterals;
 using owl::app::CommandRegistry;
@@ -115,6 +120,35 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(settings.value(u"theme.mode"_s).toString(), u"light"_s, 5000);
         QCOMPARE(settings.value(u"ui.reduceMotion"_s).toBool(), false); // removed from file
         QVERIFY(spy.count() >= 2);
+    }
+
+    // Windows: another process holding settings.json open (antivirus, indexer...) makes the atomic
+    // replace fail with "Access is denied" for a moment; saving must retry instead of losing the
+    // value. Reproduced in CI as an intermittent failure of reportsProblemsAndKeepsUnknownKeys.
+    void saveRetriesWhileFileIsLocked()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Exclusive file locks that block replacing a file are Windows-specific");
+#else
+        writeFile(settingsPath(), "{}");
+        Settings settings(settingsPath(), nullptr);
+
+        // Hold the file open without any sharing, like a scanner would, then release it.
+        const std::wstring path = settingsPath().toStdWString();
+        HANDLE handle = CreateFileW(path.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING,
+                                    FILE_ATTRIBUTE_NORMAL, nullptr);
+        QVERIFY(handle != INVALID_HANDLE_VALUE);
+        QThread *releaser = QThread::create([handle] {
+            QThread::msleep(150);
+            CloseHandle(handle);
+        });
+        releaser->start();
+
+        QVERIFY(settings.setValue(u"theme.mode"_s, u"dark"_s));
+        releaser->wait();
+        delete releaser;
+        QCOMPARE(readJson(settingsPath()).value(u"theme.mode"_s).toString(), u"dark"_s);
+#endif
     }
 
     void keybindingOverrides()
