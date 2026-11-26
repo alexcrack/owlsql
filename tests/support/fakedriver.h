@@ -22,7 +22,11 @@ public:
     {
         return {Capability::MultipleResultSets, Capability::ServerSideCancel};
     }
+    const IDialect &dialect() const override { return m_dialect; }
     std::unique_ptr<IConnection> createConnection() const override;
+
+private:
+    SqlDialect m_dialect{SqlLexerOptions{}};
 };
 
 } // namespace owl::test

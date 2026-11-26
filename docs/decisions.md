@@ -145,3 +145,8 @@ superseded ones are marked, never deleted.
 | 138 | Driver plugins: `coreApi` read from metadata before loading, mismatches rejected; plugins link OwlCore statically → OwlCore keeps no global mutable state | |
 | 139 | Worker → main thread updates go through queued calls on the `ConnectionWorker` and reach jobs via `QPointer`, so deleting a job or worker mid-run only drops updates | |
 | 140 | Rows are delivered in batches of 256; `RowBatch::firstRow` restarts at 0 for each result set | |
+| 141 | `coreApiVersion` 2: `IDriver::dialect()` (pure, thread-safe `IDialect`) | Plugins built for API 1 are rejected by the registry |
+| 142 | Statement classification rules: UPDATE/DELETE without top-level WHERE and TRUNCATE → WriteUnbounded; data-modifying CTE → Write; plain EXPLAIN → Read; CALL/DO/VACUUM → Write | Safety guards (decision 015) |
+| 143 | Drivers execute exactly one statement per `execute()`; scripts are split client-side by the dialect | |
+| 144 | SQLite built with json1, FTS3/4/5, R-tree, geopoly, math, dbstat, percentile — any user database must open | Column origin metadata not available from vcpkg; follow-up in M2 |
+| 145 | Driver plugins are built into `<build>/drivers`; a shared conformance suite (`tests/conformance`) must pass for every driver | |

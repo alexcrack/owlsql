@@ -2,6 +2,7 @@
 #pragma once
 
 #include "owl/core/dberror.h"
+#include "owl/core/dialect.h"
 #include "owl/core/result.h"
 #include "owl/core/resultset.h"
 #include "owl/core/value.h"
@@ -19,13 +20,13 @@
 //
 // Threading contract: an IConnection and the cursors it returns are used from exactly one thread
 // (its ConnectionWorker). ICancelHandle::cancel() is the only call allowed from other threads.
-// IDialect (M1.5) and ICatalog (M1.7) join these interfaces with the code that needs them.
+// ICatalog (M1.7) joins these interfaces with the code that needs it.
 
 namespace owl {
 
 // Bumped whenever these interfaces change incompatibly. Plugins declare the version they were
 // built against in their metadata ("coreApi") and are rejected on mismatch (decision 049).
-inline constexpr int coreApiVersion = 1;
+inline constexpr int coreApiVersion = 2; // 2: IDriver::dialect()
 
 struct SslOptions
 {
@@ -163,6 +164,8 @@ public:
     virtual QString id() const = 0; // "postgres", "mysql", "sqlite"
     virtual QString displayName() const = 0; // "PostgreSQL"
     virtual Capabilities capabilities() const = 0;
+    // The engine's SQL knowledge; valid for the driver's lifetime, usable from any thread.
+    virtual const IDialect &dialect() const = 0;
     virtual std::unique_ptr<IConnection> createConnection() const = 0;
 };
 

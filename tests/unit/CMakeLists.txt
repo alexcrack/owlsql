@@ -14,3 +14,4 @@ owl_add_unit_test(tst_execution SOURCES tst_execution.cpp LIBS owl_test_fakedriv
 owl_add_unit_test(tst_driver_registry SOURCES tst_driver_registry.cpp LIBS owl_test_fakedriver)
 target_compile_definitions(tst_driver_registry PRIVATE "OWL_TEST_DRIVER_DIR=\"${OWL_TEST_DRIVER_DIR}\"")
 add_dependencies(tst_driver_registry owl_fake_driver_plugin owl_fake_driver_plugin_badapi)
+owl_add_unit_test(tst_sqlite_dialect SOURCES tst_sqlite_dialect.cpp LIBS owl_sqlite)
