@@ -65,13 +65,17 @@ key, agent; jump hosts later via libssh2), connection URL parsing, `.pgpass` / `
 
 - Qt 6.12, C++20, CMake + committed `CMakePresets.json` (Qt Creator primary IDE; `.user` files ignored).
 - Qt from the Qt installer locally / `install-qt-action` in CI (Qt is **not** taken from vcpkg).
-- C libraries via **vcpkg manifest** (`vcpkg.json`; used automatically when `VCPKG_ROOT` is set):
-  libpq, sqlite3 (M1), libmariadb (M2), libssh2 (M3). Empty after M0.
-- Qt-based libraries — QtKeychain, KSyntaxHighlighting (M1) — from pinned source tags via CMake
-  `FetchContent`, built against our Qt (decision 124). Crash reporting: decided before 1.0.
+- C libraries via **vcpkg manifest** (`vcpkg.json`, pinned `builtin-baseline`; used when
+  `VCPKG_ROOT` is set): libpq 18.4 (+ OpenSSL), sqlite3 3.54 — done (M1.1); libmariadb (M2),
+  libssh2 (M3). Windows uses the `x64-windows-static-md` triplet (static libs, Qt's /MD CRT).
+- Qt-based libraries — QtKeychain 0.18.0, KSyntaxHighlighting 6.32.0 (+ ECM) — done (M1.1):
+  downloaded at pinned tags with `FetchContent` and built + installed at configure time in their
+  own CMake process against our Qt, as static libraries (`cmake/OwlExternal.cmake`,
+  decision 126). Crash reporting: decided before 1.0.
 - Tests (done): Qt Test unit suites + an offscreen UI smoke test that fails on QML warnings and can
-  save screenshots (`OWL_SCREENSHOT_DIR`). Planned: integration tests against real servers
-  (PostgreSQL in M1, MariaDB/MySQL in M2) in Docker on the Linux CI job only (decision 125).
+  save screenshots (`OWL_SCREENSHOT_DIR`); `tests/integration/` against real servers, skipped
+  unless `OWL_TEST_PG_URL` is set — CI starts PostgreSQL 18 in Docker on the Linux job
+  (decision 125). MariaDB/MySQL join in M2.
 - GitHub Actions (done): build + test on Linux/GCC, Windows/MSVC, macOS; format (clang-format 21,
   qmlformat), clang-tidy, qmllint. Planned: packaging and release artifacts (M4).
 

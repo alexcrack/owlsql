@@ -2,7 +2,7 @@
   "version": 6,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 25,
+    "minor": 30,
     "patch": 0
   },
   "configurePresets": [
@@ -38,7 +38,8 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "OWL_WARNINGS_AS_ERRORS": "ON"
+        "OWL_WARNINGS_AS_ERRORS": "ON",
+        "OWL_REQUIRE_LIBSECRET": "ON"
       }
     }
   ],

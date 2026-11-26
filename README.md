@@ -9,10 +9,21 @@ HeidiSQL's speed and directness with pgAdmin's depth. Built with Qt 6 and QML.
 
 ## Building
 
-Requirements: Qt **6.12** (Quick, Quick Controls 2), CMake ≥ 3.25, Ninja, a C++20 compiler
-(GCC 13+, Clang 17+, MSVC 2022).
+Requirements: Qt **6.12** (Quick, Quick Controls 2), CMake ≥ 3.30, Ninja, a C++20 compiler
+(GCC 13+, Clang 17+, MSVC 2022), Git, Perl, and **vcpkg**. On Linux also `libsecret-1-dev`
+(without it passwords can only be stored in KWallet).
+
+Dependencies (decision 124):
+- **libpq, sqlite3** come from the vcpkg manifest (`vcpkg.json`, pinned `builtin-baseline`).
+- **QtKeychain, KSyntaxHighlighting** (and KDE's ECM) are downloaded at pinned tags and built
+  against your Qt during the **first configure**, which therefore takes a few minutes; later
+  configures reuse them (`<build>/_owl_deps`, or `$OWL_DEPS_DIR`).
 
 ```sh
+# One-time: vcpkg (any checkout that contains the baseline commit in vcpkg.json)
+git clone https://github.com/microsoft/vcpkg ~/vcpkg && ~/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+export VCPKG_ROOT=~/vcpkg
+
 # Point CMake at Qt (or create a CMakeUserPresets.json, see below)
 export QT_ROOT_DIR=~/Qt/6.12.0/gcc_64
 
@@ -38,8 +49,15 @@ ctest --preset debug
 
 Qt Creator: open `CMakeLists.txt` and pick a preset or your Qt 6.12 kit.
 
-Dependencies beyond Qt are managed with a **vcpkg** manifest (`vcpkg.json`); the build uses vcpkg
-automatically when `VCPKG_ROOT` is set. (M0 needs none.)
+### Integration tests
+
+Tests against real servers skip themselves unless a server URL is set (CI runs them on Linux):
+
+```sh
+docker run -d --rm --name owl-pg -e POSTGRES_PASSWORD=owlsql -p 55432:5432 postgres:18
+OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:55432/postgres ctest --preset debug -L integration
+docker stop owl-pg
+```
 
 ## Development
 

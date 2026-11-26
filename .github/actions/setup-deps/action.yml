@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Pinned vcpkg (C libraries) + cached Qt-based dependencies (decision 124).
+# Run AFTER ilammy/msvc-dev-cmd on Windows: it sets VCPKG_ROOT to Visual Studio's bundled vcpkg,
+# which this action replaces with our own checkout at vcpkg.json's builtin-baseline.
+name: Set up OwlSql dependencies
+description: vcpkg at the pinned baseline with binary caching, and the OWL_DEPS_DIR cache
+runs:
+  using: composite
+  steps:
+    - name: Read vcpkg baseline
+      id: baseline
+      shell: bash
+      run: echo "sha=$(python3 -c 'import json;print(json.load(open("vcpkg.json"))["builtin-baseline"])')" >> "$GITHUB_OUTPUT"
+
+    - name: Restore vcpkg binary cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.vcpkg-cache
+        key: vcpkg-${{ runner.os }}-${{ steps.baseline.outputs.sha }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: vcpkg-${{ runner.os }}-${{ steps.baseline.outputs.sha }}-
+
+    - name: Check out vcpkg at the baseline
+      shell: bash
+      run: |
+        root="${RUNNER_TEMP}/vcpkg"
+        git init -q "$root"
+        git -C "$root" fetch -q --depth 1 https://github.com/microsoft/vcpkg.git "${{ steps.baseline.outputs.sha }}"
+        git -C "$root" checkout -q FETCH_HEAD
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          cmd //c "$(cygpath -w "$root")\\bootstrap-vcpkg.bat" -disableMetrics
+        else
+          "$root/bootstrap-vcpkg.sh" -disableMetrics
+        fi
+        mkdir -p "${GITHUB_WORKSPACE}/.vcpkg-cache"
+        echo "VCPKG_ROOT=$root" >> "$GITHUB_ENV"
+        echo "VCPKG_DEFAULT_BINARY_CACHE=${GITHUB_WORKSPACE}/.vcpkg-cache" >> "$GITHUB_ENV"
+
+    - name: Restore Qt-based dependencies
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.owl-deps/install
+        key: owl-deps-${{ runner.os }}-qt${{ env.QT_VERSION }}-${{ hashFiles('cmake/OwlDependencies.cmake', 'cmake/OwlExternal.cmake') }}
+
+    - name: Use the cached dependency directory
+      shell: bash
+      run: echo "OWL_DEPS_DIR=${GITHUB_WORKSPACE}/.owl-deps" >> "$GITHUB_ENV"
