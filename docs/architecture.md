@@ -65,12 +65,13 @@ key, agent; jump hosts later via libssh2), connection URL parsing, `.pgpass` / `
 
 - Qt 6.12, C++20, CMake + committed `CMakePresets.json` (Qt Creator primary IDE; `.user` files ignored).
 - Qt from the Qt installer locally / `install-qt-action` in CI (Qt is **not** taken from vcpkg).
-- Other dependencies via **vcpkg manifest** (`vcpkg.json`; used automatically when `VCPKG_ROOT` is
-  set). Empty after M0 — first needed in M1: libpq, sqlite3, QtKeychain, KSyntaxHighlighting; later
-  libmariadb (M2), libssh2 (M3), crash reporting (before 1.0).
+- C libraries via **vcpkg manifest** (`vcpkg.json`; used automatically when `VCPKG_ROOT` is set):
+  libpq, sqlite3 (M1), libmariadb (M2), libssh2 (M3). Empty after M0.
+- Qt-based libraries — QtKeychain, KSyntaxHighlighting (M1) — from pinned source tags via CMake
+  `FetchContent`, built against our Qt (decision 124). Crash reporting: decided before 1.0.
 - Tests (done): Qt Test unit suites + an offscreen UI smoke test that fails on QML warnings and can
   save screenshots (`OWL_SCREENSHOT_DIR`). Planned: integration tests against real servers
-  (PostgreSQL in M1, MariaDB/MySQL in M2) in Docker on the Linux CI job.
+  (PostgreSQL in M1, MariaDB/MySQL in M2) in Docker on the Linux CI job only (decision 125).
 - GitHub Actions (done): build + test on Linux/GCC, Windows/MSVC, macOS; format (clang-format 21,
   qmlformat), clang-tidy, qmllint. Planned: packaging and release artifacts (M4).
 

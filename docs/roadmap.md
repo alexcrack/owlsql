@@ -18,7 +18,7 @@ Goal: daily-usable for browsing and querying PostgreSQL and SQLite.
 ### Planned PRs (in order)
 | # | PR | Content | Depends on |
 |---|---|---|---|
-| 1.1 | Dependencies + CI | vcpkg in CI (pinned baseline, binary cache) for libpq, sqlite3; Qt-based deps (QtKeychain, KSyntaxHighlighting) per decision D1 below; PostgreSQL service container for integration tests on the Linux job | — |
+| 1.1 | Dependencies + CI | vcpkg in CI (pinned baseline, binary cache) for libpq, sqlite3; QtKeychain + KSyntaxHighlighting via FetchContent (decision 124); PostgreSQL service container on the Linux job (decision 125) | — |
 | 1.2 | Editor spike | Throwaway branch: TextArea + KSyntaxHighlighting on Qt 6.12 — highlighting, folding, overlays, 5 MB typing latency, IME/undo (`specs/sql-editor.md` §10). Outcome recorded as a decision; decides editor approach | 1.1 |
 | 1.3 | OwlCore values | `Value`, `ColumnInfo`, `RowBatch`, `DbError`, `Result<T>` (tl::expected), CBOR round-trips | — |
 | 1.4 | Driver API + execution | `IDriver`/`IConnection`/`IResultCursor`/`ICancelHandle`, plugin loading, `ConnectionWorker` threads, `QueryJob` facade (pause/fetchMore/cancel), fake driver for tests | 1.3 |
@@ -34,13 +34,12 @@ Goal: daily-usable for browsing and querying PostgreSQL and SQLite.
 **Exit:** browse and query real PostgreSQL and SQLite databases on all 3 OSes; CI runs PostgreSQL
 integration tests; no known crash or data-loss bug.
 
-### Open decisions before 1.1
-- **D1 — Qt-based dependencies.** vcpkg has no KSyntaxHighlighting port, and its `qtkeychain-qt6`
-  pulls vcpkg's own `qtbase` (a second Qt next to our 6.12). Recommended: keep vcpkg for C
-  libraries (libpq, sqlite3, later libmariadb, libssh2) and build QtKeychain + KSyntaxHighlighting
-  from pinned source tags with CMake `FetchContent` against our Qt (decision 006 amended).
-- **D2 — Integration tests on Windows/macOS.** GitHub's macOS runners have no Docker. Recommended:
-  server integration tests on Linux only; SQLite tests everywhere.
+### Decisions made for M1 (2026-11-26)
+- **D1 → decision 124:** vcpkg only for C libraries (libpq, sqlite3, later libmariadb, libssh2).
+  QtKeychain and KSyntaxHighlighting are built from pinned source tags with CMake `FetchContent`
+  against our Qt (KSyntaxHighlighting needs extra-cmake-modules and Perl at build time).
+- **D2 → decision 125:** server integration tests (PostgreSQL now, MariaDB/MySQL in M2) run on the
+  Linux CI job in Docker service containers; SQLite and unit tests run on every OS.
 
 ## Carried over from M0
 - Windows CI pins aqtinstall to an unreleased commit (Qt 6.12 layout) — switch back to a release
