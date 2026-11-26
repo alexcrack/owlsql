@@ -22,11 +22,18 @@ option(OWL_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(OwlCompilerOptions)
 
-find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Svg)
-qt_standard_project_setup(REQUIRES 6.12)
+find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Svg Sql Network LinguistTools)
+qt_standard_project_setup(REQUIRES 6.12 I18N_SOURCE_LANGUAGE en)
 set(QT_QML_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml")
 
 add_subdirectory(src)
+
+# Translations (decision 027): `cmake --build <dir> --target update_translations` runs lupdate.
+# English is the source language, so i18n/owlsql_en.ts only carries plural forms; real
+# translations are added to I18N_TRANSLATED_LANGUAGES above.
+qt_add_translations(TARGETS owlsql
+    TS_FILE_BASE owlsql
+    TS_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/i18n")
 
 if(OWL_BUILD_TESTS)
     enable_testing()

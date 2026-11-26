@@ -24,7 +24,10 @@ Typical paths: Linux `~/.config/OwlSql/`, `~/.local/share/OwlSql/`; Windows `%AP
 macOS `~/Library/Application Support/OwlSql/`. Snap: inside `$SNAP_USER_DATA`.
 
 Both databases: SQLite, `journal_mode=WAL`, `foreign_keys=ON`, opened only by the
-main-thread `AppStore` service (plus a dedicated history writer thread).
+main-thread `AppDatabase` service (plus a dedicated history writer thread). They use QtSql's bundled
+SQLite driver — this is OwlSql's own local storage, not a user-database driver (decision 118).
+
+`--data-dir <dir>` puts everything under `<dir>/config` and `<dir>/data` (development, tests).
 
 ---
 
@@ -40,7 +43,10 @@ main-thread `AppStore` service (plus a dedicated history writer thread).
 
 ---
 
-## 3. `owlsql.db` schema (v1)
+## 3. `owlsql.db` schema
+
+> **Implemented (M0):** migration `0001_init.sql` creates only `ui_state`. The other tables below
+> are the target design; each arrives as a new migration with the feature that uses it (M1+).
 
 ```sql
 CREATE TABLE folder (
@@ -164,8 +170,10 @@ CREATE VIRTUAL TABLE entry_fts USING fts5(sql, content='entry', content_rowid='i
 
 ## 5. `settings.json`
 
-- Only **non-default** values are written; defaults are compiled in (`SettingsSchema`), so the
-  file stays small and readable.
+- Strict JSON (no comments). Only **non-default** values are written; defaults are compiled in
+  (`Settings::schema()`), so the file stays small and readable.
+- Implemented keys (M0): `theme.mode` (`system` | `light` | `dark`), `ui.reduceMotion`. The example
+  below shows the planned set.
 - Schema-driven: each key has type, default, description, allowed values. The Settings UI and
   validation are generated from it; `Help → Open settings.json` opens the file in an OwlSql tab.
 - Unknown keys are kept and reported as warnings; invalid values fall back to defaults with a

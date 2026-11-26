@@ -122,3 +122,9 @@ superseded ones are marked, never deleted.
 | 115 | Command registry: stable ids `area.action`; menus and shortcuts use `CommandAction`; QML binds to `Commands.titles` / `shortcuts` / `shortcutTexts` maps so keybinding overrides apply live | |
 | 116 | Close Tab = Ctrl+W (⌘W), not `QKeySequence::Close` (Ctrl+F4 on Linux) | |
 | 117 | Style strips `&` mnemonic markers when drawing text (Alt-key underlines not shown yet) | |
+| 118 | App store (`owlsql.db`, later `history.db`) uses QtSql's bundled SQLite driver — local app storage, not a user-database driver (decision 008 unaffected) | |
+| 119 | `owlsql.db` v1 contains only `ui_state`; other tables arrive as migrations with their features. Migration files: one statement per `;` at line end | |
+| 120 | `AppContext` owns settings, UI state, keybindings and the app database; QML singletons resolve through it; `--data-dir` isolates everything | |
+| 121 | Theme choice is a setting (`theme.mode`); theme commands write settings, `AppContext` applies them to `Theme` | |
+| 122 | Window size/maximized state, panel visibility, splitter sizes and open tabs are restored; window position is not (multi-monitor safety) | |
+| 123 | i18n: `qt_add_translations` with English source; `i18n/owlsql_en.ts` (plurals only); `.qm` embedded under `:/i18n`, loaded for the system locale | |

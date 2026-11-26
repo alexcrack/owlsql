@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import OwlSql.App
 import OwlSql.Style
 import OwlSql.Theme
 
@@ -76,14 +77,15 @@ ApplicationWindow {
             ComboBox {
                 model: [qsTr("System"), qsTr("Light"), qsTr("Dark")]
                 currentIndex: Theme.mode === Theme.Light ? 1 : Theme.mode === Theme.Dark ? 2 : 0
-                onActivated: index => Theme.mode = index === 1 ? Theme.Light : index === 2
-                                                                 ? Theme.Dark : Theme.System
+                onActivated: index => Settings.setValue("theme.mode", ["system", "light",
+                                                                       "dark"][index]) ? Theme.Dark :
+                                                                                         Theme.System
             }
 
             Switch {
                 text: qsTr("Reduce motion")
                 checked: Theme.reduceMotion
-                onToggled: Theme.reduceMotion = checked
+                onToggled: Settings.setValue("ui.reduceMotion", checked)
             }
         }
     }

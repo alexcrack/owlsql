@@ -12,13 +12,16 @@ import OwlSql.Theme
 ApplicationWindow {
     id: window
 
-    property bool sidebarVisible: true
-    property bool bottomPanelVisible: false // collapsed by default (decision 068)
+    // Initial values come from the remembered UI state; changes are saved back (UiState batches
+    // writes into owlsql.db).
+    property bool sidebarVisible: UiState.value("layout.sidebarVisible", true)
+    property bool bottomPanelVisible: UiState.value("layout.bottomPanelVisible",
+                                                    false) // decision 068
     readonly property int tabCount: tabsModel.count
     property int currentTab: 0
 
-    width: 1280
-    height: 800
+    width: UiState.value("window.width", 1280)
+    height: UiState.value("window.height", 800)
     minimumWidth: 800
     minimumHeight: 500
     visible: true
@@ -36,16 +39,16 @@ ApplicationWindow {
             bottomPanelVisible = !bottomPanelVisible;
             break;
         case "view.toggleTheme":
-            Theme.mode = Theme.dark ? Theme.Light : Theme.Dark;
+            Settings.setValue("theme.mode", Theme.dark ? "light" : "dark");
             break;
         case "view.themeSystem":
-            Theme.mode = Theme.System;
+            Settings.setValue("theme.mode", "system");
             break;
         case "view.themeLight":
-            Theme.mode = Theme.Light;
+            Settings.setValue("theme.mode", "light");
             break;
         case "view.themeDark":
-            Theme.mode = Theme.Dark;
+            Settings.setValue("theme.mode", "dark");
             break;
         case "workspace.showWelcome":
             showWelcome();
@@ -80,6 +83,14 @@ ApplicationWindow {
                              icon: "home"
                          });
         currentTab = 0;
+        saveTabs();
+    }
+
+    function saveTabs() {
+        const kinds = [];
+        for (let i = 0; i < tabsModel.count; ++i)
+            kinds.push(tabsModel.get(i).kind);
+        UiState.setValue("workspace.tabs", kinds);
     }
 
     function closeTab(index: int) {
@@ -87,6 +98,26 @@ ApplicationWindow {
             return;
         tabsModel.remove(index);
         currentTab = Math.min(currentTab, tabsModel.count - 1);
+        saveTabs();
+    }
+
+    onSidebarVisibleChanged: UiState.setValue("layout.sidebarVisible", sidebarVisible)
+    onBottomPanelVisibleChanged: UiState.setValue("layout.bottomPanelVisible", bottomPanelVisible)
+    onWidthChanged: if (visibility === Window.Windowed)
+                        UiState.setValue("window.width", width)
+    onHeightChanged: if (visibility === Window.Windowed)
+                         UiState.setValue("window.height", height)
+    onVisibilityChanged: {
+        if (visibility === Window.Maximized || visibility === Window.Windowed)
+            UiState.setValue("window.maximized", visibility === Window.Maximized);
+    }
+
+    Component.onCompleted: {
+        const tabs = UiState.value("workspace.tabs", ["welcome"]);
+        if (!tabs.includes("welcome"))
+            tabsModel.clear();
+        if (UiState.value("window.maximized", false))
+            showMaximized();
     }
 
     Connections {
@@ -238,10 +269,14 @@ ApplicationWindow {
     SplitView {
         anchors.fill: parent
         orientation: Qt.Horizontal
+        onResizingChanged: if (!resizing)
+                               UiState.setValue("layout.sidebarWidth", sidebar.width)
 
         Sidebar {
+            id: sidebar
+
             visible: window.sidebarVisible
-            SplitView.preferredWidth: 260
+            SplitView.preferredWidth: UiState.value("layout.sidebarWidth", 260)
             SplitView.minimumWidth: 180
             SplitView.maximumWidth: 600
         }
@@ -249,6 +284,8 @@ ApplicationWindow {
         SplitView {
             SplitView.fillWidth: true
             orientation: Qt.Vertical
+            onResizingChanged: if (!resizing)
+                                   UiState.setValue("layout.bottomPanelHeight", bottomPanel.height)
 
             ColumnLayout {
                 SplitView.fillHeight: true
@@ -288,8 +325,10 @@ ApplicationWindow {
             }
 
             BottomPanel {
+                id: bottomPanel
+
                 visible: window.bottomPanelVisible
-                SplitView.preferredHeight: 200
+                SplitView.preferredHeight: UiState.value("layout.bottomPanelHeight", 200)
                 SplitView.minimumHeight: 120
             }
         }
