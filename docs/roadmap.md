@@ -13,14 +13,41 @@ No dates — a milestone ships when its exit criteria are met.
   shell + command registry (#5), app data / settings / keybindings / i18n / single instance (#6).
 
 ## M1 — Read-only client
-- OwlCore: Driver API, worker threads, async query + cancel, result streaming, Catalog, Dialect.
-- Drivers: PostgreSQL, SQLite.
-- Session manager: folders, safety levels, keychain, SSL, sockets, URL import.
-- Object tree (full PG depth, filterable, lazy loading).
-- Data grid (read-only): paging, sorting, WHERE box + column filters, keyboard navigation.
-- SQL editor: highlighting, gutter, HeidiSQL run keys, multiple result tabs, Messages panel.
-- Query log panel; persistent history.
-- **Exit:** daily-usable for browsing and querying PostgreSQL/SQLite.
+Goal: daily-usable for browsing and querying PostgreSQL and SQLite.
+
+### Planned PRs (in order)
+| # | PR | Content | Depends on |
+|---|---|---|---|
+| 1.1 | Dependencies + CI | vcpkg in CI (pinned baseline, binary cache) for libpq, sqlite3; Qt-based deps (QtKeychain, KSyntaxHighlighting) per decision D1 below; PostgreSQL service container for integration tests on the Linux job | — |
+| 1.2 | Editor spike | Throwaway branch: TextArea + KSyntaxHighlighting on Qt 6.12 — highlighting, folding, overlays, 5 MB typing latency, IME/undo (`specs/sql-editor.md` §10). Outcome recorded as a decision; decides editor approach | 1.1 |
+| 1.3 | OwlCore values | `Value`, `ColumnInfo`, `RowBatch`, `DbError`, `Result<T>` (tl::expected), CBOR round-trips | — |
+| 1.4 | Driver API + execution | `IDriver`/`IConnection`/`IResultCursor`/`ICancelHandle`, plugin loading, `ConnectionWorker` threads, `QueryJob` facade (pause/fetchMore/cancel), fake driver for tests | 1.3 |
+| 1.5 | SQLite driver | sqlite3 plugin, dialect basics (quote, split, classify, placeholders), conformance suite v1 | 1.4 |
+| 1.6 | PostgreSQL driver | libpq plugin: chunked rows, cancel, notices, type mapping, SSL, sockets; integration tests vs PG 13 + latest | 1.4, 1.1 |
+| 1.7 | Catalog | `ICatalog` for PG/SQLite (tree nodes, TableDef, DDL text), `CatalogCache` with invalidation | 1.5, 1.6 |
+| 1.8 | Sessions | Migration 0002 (`folder`, `session`), keychain secrets, session manager in the Welcome tab, `ConnectionFormSchema` spec, URL / `.pgpass` import, safety levels | 1.4, 1.1 |
+| 1.9 | Object tree | Sidebar tree over the catalog: lazy loading, filter, full PG depth, icons, refresh | 1.7, 1.8 |
+| 1.10 | Data grid (read-only) | `ResultModel`, object tab Data view, browse paging, WHERE box + column filters, sorting, keyboard navigation, NULL/truncation display, copy | 1.7 |
+| 1.11 | SQL editor + results | Editor per spike outcome, run keys, statement tint, result tabs, Messages, error positions, placeholders prompt, safety guards | 1.2, 1.10 |
+| 1.12 | Log + history | Log panel (all statements, filters), `history.db` with FTS5 search and retention | 1.4 |
+
+**Exit:** browse and query real PostgreSQL and SQLite databases on all 3 OSes; CI runs PostgreSQL
+integration tests; no known crash or data-loss bug.
+
+### Open decisions before 1.1
+- **D1 — Qt-based dependencies.** vcpkg has no KSyntaxHighlighting port, and its `qtkeychain-qt6`
+  pulls vcpkg's own `qtbase` (a second Qt next to our 6.12). Recommended: keep vcpkg for C
+  libraries (libpq, sqlite3, later libmariadb, libssh2) and build QtKeychain + KSyntaxHighlighting
+  from pinned source tags with CMake `FetchContent` against our Qt (decision 006 amended).
+- **D2 — Integration tests on Windows/macOS.** GitHub's macOS runners have no Docker. Recommended:
+  server integration tests on Linux only; SQLite tests everywhere.
+
+## Carried over from M0
+- Windows CI pins aqtinstall to an unreleased commit (Qt 6.12 layout) — switch back to a release
+  (> 3.3.0) when available (`.github/workflows/ci.yml` TODO).
+- Merged feature branches remain on GitHub — delete, or enable "Automatically delete head branches".
+- Crash reporting library — decide before 1.0 (decision 070).
+- `ui_state` is only a key-value table; sessions and workspace tables come as migrations (decision 119).
 
 ## M2 — Editing
 - Grid editing with ChangeSet + preview SQL; type-specific cell editors; JSON editor (code/constructor).

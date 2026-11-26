@@ -1,16 +1,19 @@
-# OwlSql — Architecture (draft)
+# OwlSql — Architecture
+
+_Last reviewed: 2026-11-26, after M0. Sections marked **(planned)** do not exist in code yet._
 
 ## Layers
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ QML UI — module OwlSql.Ui                                   │
-│   Theme tokens · OwlSql.Style (custom Controls style)       │
-│   Shell · ObjectTree · DataGrid · SqlEditor · Dialogs       │
+│ OwlSql.Ui     shell · gallery · (planned) tree, grid, editor│
+│ OwlSql.Style  custom Qt Quick Controls style (Templates)    │
+│ OwlSql.Theme  Theme tokens · fonts · icons (C++ singleton)  │
 ├────────────────────────────────────────────────────────────┤
-│ App layer (C++, QML_ELEMENT / QML_SINGLETON types)          │
-│   SessionStore · Workspace/Tabs · ResultModel · History     │
-│   CommandRegistry (palette) · Settings · Importers          │
+│ OwlSql.App    C++ app layer exposed to QML                  │
+│   done: Commands · Settings · UiState · AppDatabase ·        │
+│         Keybindings · SingleInstance · AppContext           │
+│   planned: SessionStore · Workspace · ResultModel · History │
 ├────────────────────────────────────────────────────────────┤
 │ OwlCore (C++20, QtCore only, no GUI — unit-tested)          │
 │   Driver API · Connection · async Query · ResultStream      │
@@ -19,14 +22,16 @@
 │   Transport  ── local (in-process) | remote (Gateway, later)│
 ├──────────────┬──────────────┬──────────────┬───────────────┤
 │ postgres     │ mysql        │ sqlite       │ (later) mssql, │
-│ libpq async  │ MariaDB C    │ sqlite3      │ duckdb, odbc…  │
+│ libpq        │ MariaDB C    │ sqlite3      │ duckdb, odbc…  │
 └──────────────┴──────────────┴──────────────┴───────────────┘
               driver plugins (QPluginLoader, internal ABI)
 ```
 
 ## Key principles
 
-1. **No QtSql.** Native client libraries behind our own Driver API (see `specs/driver-api.md`): cancellation,
+1. **No QtSql for user databases.** Native client libraries behind our own Driver API (see
+   `specs/driver-api.md`). Exception: OwlSql's own local store (`owlsql.db`) uses QtSql's bundled
+   SQLite (decision 118). Driver API benefits: cancellation,
    rich type info, server messages/notices.
 2. **Blocking drivers, one worker thread per connection.** UI never blocks. Results stream to the UI in chunks
    (default fetch page 1000 rows, "load more" / "fetch all").
@@ -47,7 +52,9 @@
 | What | Where |
 |---|---|
 | Passwords, SSH passphrases | OS keychain via QtKeychain (libsecret/KWallet, Credential Manager, Keychain); fall back to prompting |
-| Sessions, folders, settings, history, workspace state | Local SQLite file in the app data directory |
+| UI state (done), sessions, folders, snippets, workspace (planned) | `owlsql.db` — see `specs/app-store.md` |
+| Query history (planned) | `history.db` |
+| Preferences, shortcut overrides (done) | `settings.json`, `keybindings.json` |
 
 ## Connections
 
@@ -57,27 +64,37 @@ key, agent; jump hosts later via libssh2), connection URL parsing, `.pgpass` / `
 ## Tooling
 
 - Qt 6.12, C++20, CMake + committed `CMakePresets.json` (Qt Creator primary IDE; `.user` files ignored).
-- Dependencies via **vcpkg manifest** (`vcpkg.json`): libpq, libmariadb, sqlite3, KSyntaxHighlighting,
-  QtKeychain, libssh2, (crash reporting lib TBD).
-- Tests: Qt Test for OwlCore; integration tests against PostgreSQL & MariaDB in Docker on CI;
-  a few Qt Quick Test suites.
-- GitHub + Actions: Linux/Windows/macOS matrix; release artifacts (.deb, .rpm, snap; signed Win/macOS builds).
+- Qt from the Qt installer locally / `install-qt-action` in CI (Qt is **not** taken from vcpkg).
+- Other dependencies via **vcpkg manifest** (`vcpkg.json`; used automatically when `VCPKG_ROOT` is
+  set). Empty after M0 — first needed in M1: libpq, sqlite3, QtKeychain, KSyntaxHighlighting; later
+  libmariadb (M2), libssh2 (M3), crash reporting (before 1.0).
+- Tests (done): Qt Test unit suites + an offscreen UI smoke test that fails on QML warnings and can
+  save screenshots (`OWL_SCREENSHOT_DIR`). Planned: integration tests against real servers
+  (PostgreSQL in M1, MariaDB/MySQL in M2) in Docker on the Linux CI job.
+- GitHub Actions (done): build + test on Linux/GCC, Windows/MSVC, macOS; format (clang-format 21,
+  qmlformat), clang-tidy, qmllint. Planned: packaging and release artifacts (M4).
 
-## Proposed repo layout
+## Repo layout
 
 ```
 owlsql/
 ├── CMakeLists.txt  CMakePresets.json  vcpkg.json
+├── .github/workflows/ci.yml
 ├── src/
-│   ├── core/            # OwlCore library
-│   ├── drivers/         # postgres/, mysql/, sqlite/
-│   ├── app/             # C++ app layer exposed to QML
-│   ├── ui/              # QML module OwlSql.Ui
-│   ├── style/           # QML module OwlSql.Style + Theme
-│   └── main.cpp
-├── resources/           # icons (Tabler), fonts, logo
-├── tests/               # unit/, integration/, qml/
-├── tools/               # gateway/ (later), scripts
-├── packaging/           # deb, rpm, snap, windows, macos
+│   ├── main.cpp         # executable: CLI options, single instance, AppContext, QML engine
+│   ├── core/            # OwlCore (QtCore only) — version now; Driver API in M1
+│   ├── theme/           # QML module OwlSql.Theme (Theme singleton, icon provider, OwlIcon)
+│   ├── style/           # QML module OwlSql.Style (controls on QtQuick.Templates)
+│   ├── app/             # QML module OwlSql.App (+ migrations/owlsql/*.sql)
+│   ├── ui/              # QML module OwlSql.Ui (shell, gallery)
+│   └── drivers/         # (planned, M1) postgres/, sqlite/; mysql/ in M2
+├── resources/           # themes/*.json, fonts (Inter, JetBrains Mono), icons (Tabler), logo
+├── i18n/                # owlsql_<lang>.ts (lupdate)
+├── tests/               # unit/ (done); integration/ (planned)
+├── tools/               # format.sh, check-format.sh, setup-dev.sh, git-hooks/
+├── packaging/           # (planned, M4) deb, rpm, snap, windows, macos
 └── docs/
 ```
+
+Module dependencies: `Ui → Style → Theme`, `Ui → App → Theme`, `App → Core` (planned); drivers
+depend only on Core. QML modules are static libraries with static plugins imported in `main.cpp`.
