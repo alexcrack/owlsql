@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Loads the QML windows offscreen in both themes and fails on any QML warning.
 // Set OWL_SCREENSHOT_DIR to also save <window>-<theme>.png screenshots there.
+#include "appcontext.h"
 #include "commandregistry.h"
 #include "iconprovider.h"
+#include "settings.h"
 #include "thememanager.h"
+#include "uistate.h"
 
 #include <QDir>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QQuickWindow>
 #include <QSGRendererInterface>
+#include <QTemporaryDir>
 #include <QTest>
 #include <QtQml/qqmlextensionplugin.h>
 
@@ -37,11 +41,19 @@ class TestUiSmoke : public QObject
 {
     Q_OBJECT
 
+    QTemporaryDir m_dataDir;
+    std::unique_ptr<owl::app::AppContext> m_context;
+
 private slots:
     void initTestCase()
     {
         QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
         QQuickStyle::setStyle(QStringLiteral("OwlSql.Style"));
+        // Isolated settings and owlsql.db for this test run.
+        m_context = std::make_unique<owl::app::AppContext>(
+            owl::app::AppPaths::underRoot(m_dataDir.path()));
+        QString error;
+        QVERIFY2(m_context->initialize(&error), qPrintable(error));
     }
 
     void windowLoadsCleanly_data()
@@ -144,7 +156,58 @@ private slots:
         saveShot(window, QStringLiteral("main-dark-panel"));
     }
 
-    void cleanupTestCase() { ThemeManager::instance()->setMode(ThemeManager::Mode::System); }
+    // Layout survives a restart: UiState writes to owlsql.db and the shell restores from it.
+    void layoutIsRestoredAfterRestart()
+    {
+        {
+            QQmlApplicationEngine engine;
+            owl::theme::IconProvider::install(engine);
+            engine.loadFromModule("OwlSql.Ui", "Main");
+            QObject *window = engine.rootObjects().value(0);
+            QVERIFY(window);
+            window->setProperty("bottomPanelVisible", true);
+            window->setProperty("sidebarVisible", false);
+            owl::app::CommandRegistry::instance()->trigger(QStringLiteral("workspace.closeTab"));
+            QCOMPARE(window->property("tabCount").toInt(), 0);
+        }
+        m_context->uiState()->flush();
+
+        // A fresh UiState reads back from the database, like a new process would.
+        owl::app::UiState reloaded(m_context->database(), nullptr);
+        QCOMPARE(reloaded.value(QStringLiteral("layout.bottomPanelVisible")).toBool(), true);
+        QCOMPARE(reloaded.value(QStringLiteral("layout.sidebarVisible")).toBool(), false);
+        QCOMPARE(reloaded.value(QStringLiteral("workspace.tabs")).toList().size(), 0);
+
+        QQmlApplicationEngine engine;
+        owl::theme::IconProvider::install(engine);
+        engine.loadFromModule("OwlSql.Ui", "Main");
+        QObject *window = engine.rootObjects().value(0);
+        QVERIFY(window);
+        QCOMPARE(window->property("bottomPanelVisible").toBool(), true);
+        QCOMPARE(window->property("sidebarVisible").toBool(), false);
+        QCOMPARE(window->property("tabCount").toInt(), 0);
+    }
+
+    // Theme commands go through settings.json, so the choice is remembered.
+    void themeCommandsPersistToSettings()
+    {
+        auto *commands = owl::app::CommandRegistry::instance();
+        commands->trigger(QStringLiteral("view.themeLight")); // no window needed: handled by QML
+        QQmlApplicationEngine engine;
+        owl::theme::IconProvider::install(engine);
+        engine.loadFromModule("OwlSql.Ui", "Main");
+        QVERIFY(!engine.rootObjects().isEmpty());
+        commands->trigger(QStringLiteral("view.themeDark"));
+        QCOMPARE(ThemeManager::instance()->mode(), ThemeManager::Mode::Dark);
+        QCOMPARE(m_context->settings()->value(QStringLiteral("theme.mode")).toString(),
+                 QStringLiteral("dark"));
+    }
+
+    void cleanupTestCase()
+    {
+        ThemeManager::instance()->setMode(ThemeManager::Mode::System);
+        m_context.reset();
+    }
 };
 
 QTEST_MAIN(TestUiSmoke)

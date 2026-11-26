@@ -46,6 +46,10 @@ automatically when `VCPKG_ROOT` is set. (M0 needs none.)
 ```sh
 tools/setup-dev.sh   # enables the pre-commit format check
 tools/format.sh      # formats all C++ (clang-format) and QML (qmlformat) sources
+
+./build/debug/src/owlsql --gallery                    # component gallery
+./build/debug/src/owlsql --data-dir /tmp/owl --new-instance   # throwaway settings and data
+cmake --build --preset debug --target update_translations      # refresh i18n/*.ts (lupdate)
 ```
 
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/); one PR per feature.
