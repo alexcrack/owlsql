@@ -17,6 +17,8 @@ qt_add_qml_module(owlsql_app
         session.h session.cpp
         sessionimport.h sessionimport.cpp
         sessioninfo.h sessioninfo.cpp
+        sessionlistmodel.h sessionlistmodel.cpp
+        sessionmanager.h sessionmanager.cpp
         sessionstore.h sessionstore.cpp
         settings.h settings.cpp
         singleinstance.h singleinstance.cpp

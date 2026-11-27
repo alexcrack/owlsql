@@ -242,6 +242,11 @@ screenshots both). Button variants: `variant: "primary" | "secondary" | "ghost" 
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
+> **Implemented (M1.9b)** as `WelcomePage.qml` (`SessionList`, `SessionEditor`, `ConnectionField`,
+> `SessionRow`, `SafetyBadge`, `TagDot`, `TagSwatch`) over the `Sessions` QML singleton
+> (decisions 171–174). The editor has Connection / TLS / Advanced tabs (SSH joins with tunnels in M3);
+> "Recent" is not a separate section yet — the list is ordered by folder.
+
 ### 8.3 Query tab
 
 ```

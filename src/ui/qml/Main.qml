@@ -25,7 +25,8 @@ ApplicationWindow {
     minimumWidth: 800
     minimumHeight: 500
     visible: true
-    title: tabCount > 0 ? qsTr("%1 — OwlSql").arg(tabsModel.get(currentTab).title) : "OwlSql"
+    title: tabsModel.get(currentTab)?.title ? qsTr("%1 — OwlSql").arg(tabsModel.get(currentTab).title) :
+                                              "OwlSql"
 
     function handleCommand(id: string) {
         switch (id) {
@@ -52,6 +53,17 @@ ApplicationWindow {
             break;
         case "workspace.showWelcome":
             showWelcome();
+            break;
+        case "session.new":
+            showWelcome();
+            welcomePage.startNew("");
+            break;
+        case "session.import":
+            showWelcome();
+            welcomePage.startImport();
+            break;
+        case "session.disconnect":
+            Sessions.close(Sessions.activeSession);
             break;
         case "workspace.closeTab":
             closeTab(currentTab);
@@ -107,9 +119,9 @@ ApplicationWindow {
                         UiState.setValue("window.width", width)
     onHeightChanged: if (visibility === Window.Windowed)
                          UiState.setValue("window.height", height)
-    onVisibilityChanged: {
-        if (visibility === Window.Maximized || visibility === Window.Windowed)
-            UiState.setValue("window.maximized", visibility === Window.Maximized);
+    onVisibilityChanged: () => {
+        if (window.visibility === Window.Maximized || window.visibility === Window.Windowed)
+            UiState.setValue("window.maximized", window.visibility === Window.Maximized);
     }
 
     Component.onCompleted: {
@@ -190,6 +202,24 @@ ApplicationWindow {
         command: "workspace.showWelcome"
     }
     CommandAction {
+        id: newSessionAction
+
+        command: "session.new"
+        enabled: Sessions.available
+    }
+    CommandAction {
+        id: importSessionsAction
+
+        command: "session.import"
+        enabled: Sessions.available
+    }
+    CommandAction {
+        id: disconnectAction
+
+        command: "session.disconnect"
+        enabled: Sessions.activeSession !== ""
+    }
+    CommandAction {
         id: closeTabAction
 
         command: "workspace.closeTab"
@@ -215,6 +245,16 @@ ApplicationWindow {
         Menu {
             title: qsTr("&File")
 
+            MenuItem {
+                action: newSessionAction
+            }
+            MenuItem {
+                action: importSessionsAction
+            }
+            MenuItem {
+                action: disconnectAction
+            }
+            MenuSeparator {}
             MenuItem {
                 action: closeTabAction
             }
@@ -300,11 +340,12 @@ ApplicationWindow {
                 }
 
                 WelcomePage {
+                    id: welcomePage
+
+                    objectName: "welcomePage"
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    visible: window.tabCount > 0 && tabsModel.get(window.currentTab).kind
-                             === "welcome"
-
+                    visible: tabsModel.get(window.currentTab)?.kind === "welcome"
                 }
 
                 Rectangle {
@@ -336,9 +377,35 @@ ApplicationWindow {
 
     footer: StatusBar {}
 
+    // Prod session active: a 2 px danger frame around the window content (decision 063).
+    Rectangle {
+        anchors.fill: parent
+        z: 1000
+        visible: Sessions.activeInfo.level === "prod" && ["connecting", "connected"].includes(
+                     Sessions.activeInfo.state)
+        color: "transparent"
+        border.width: 2
+        border.color: Theme.color.danger
+        Accessible.ignored: true
+    }
+
     AboutDialog {
         id: aboutDialog
 
         anchors.centerIn: parent
+    }
+
+    PasswordDialog {
+        id: passwordDialog
+
+        anchors.centerIn: parent
+    }
+
+    Connections {
+        target: Sessions
+
+        function onPasswordRequested(sessionId: string, name: string) {
+            passwordDialog.ask(sessionId, name);
+        }
     }
 }
