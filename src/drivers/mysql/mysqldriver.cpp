@@ -3,11 +3,14 @@
 
 #include "mysqlcatalog.h"
 #include "mysqlvalues.h"
+#include "owl/core/formbuilder.h"
 
 #include <QMutex>
 #include <QMutexLocker>
 #include <QRegularExpression>
 #include <QThreadPool>
+#include <QUrl>
+#include <QUrlQuery>
 
 #include <mysql.h>
 #include <mysqld_error.h>
@@ -971,6 +974,65 @@ Capabilities MySqlDriver::capabilities() const
 std::unique_ptr<IConnection> MySqlDriver::createConnection() const
 {
     return std::make_unique<MySqlConnection>();
+}
+
+ConnectionFormSchema MySqlDriver::connectionForm() const
+{
+    ConnectionFormSchema schema;
+    schema.fields = form::serverFields(3306, QString(), false, false,
+                                       QStringLiteral("/var/run/mysqld/mysqld.sock"));
+    FormField init = form::text(QStringLiteral("option.initCommand"),
+                                QStringLiteral("Init command"), QStringLiteral("advanced"));
+    init.placeholder = QStringLiteral("SET sql_mode = 'ANSI'");
+    init.help = QStringLiteral("SQL run by the client library right after connecting");
+    schema.fields << init;
+    return schema;
+}
+
+// mysql://user:password@host:3306/db?ssl-mode=REQUIRED&ssl-ca=…&socket=/path (also mariadb://).
+Result<ConnectionParams> MySqlDriver::parseUrl(const QString &text) const
+{
+    const QUrl url(text.trimmed(), QUrl::StrictMode);
+    if (!url.isValid() || (url.scheme() != u"mysql" && url.scheme() != u"mariadb"))
+        return fail(DbError::Category::Unsupported, QStringLiteral("Not a MySQL URL"));
+    ConnectionParams p;
+    p.driverId = id();
+    p.host = url.host(QUrl::FullyDecoded);
+    if (url.port() > 0)
+        p.port = static_cast<quint16>(url.port());
+    p.user = url.userName(QUrl::FullyDecoded);
+    p.password = url.password(QUrl::FullyDecoded);
+    p.database = url.path(QUrl::FullyDecoded).mid(1);
+    const QUrlQuery query(url);
+    for (const auto &[rawKey, rawValue] : query.queryItems(QUrl::FullyDecoded)) {
+        const QString key = rawKey.toLower().replace(u'_', u'-');
+        if (key == u"ssl-mode" || key == u"sslmode") {
+            const auto mode = sslModeFromName(rawValue);
+            if (!mode) {
+                DbError e;
+                e.message = QStringLiteral("Unknown ssl-mode \"%1\"").arg(rawValue);
+                return fail(e);
+            }
+            p.ssl.mode = *mode;
+        } else if (key == u"ssl-ca") {
+            p.ssl.caFile = rawValue;
+        } else if (key == u"ssl-cert") {
+            p.ssl.certFile = rawValue;
+        } else if (key == u"ssl-key") {
+            p.ssl.keyFile = rawValue;
+        } else if (key == u"socket") {
+            p.transport = ConnectionParams::Transport::Socket;
+            p.socketPath = rawValue;
+        } else if (key == u"connect-timeout") {
+            p.connectTimeout = std::chrono::seconds(qMax(1, rawValue.toInt()));
+        }
+    }
+    if (p.host.startsWith(u'/')) { // mysql://user@%2Fvar%2Frun%2Fmysqld%2Fmysqld.sock/db
+        p.transport = ConnectionParams::Transport::Socket;
+        p.socketPath = p.host;
+        p.host.clear();
+    }
+    return p;
 }
 
 } // namespace owl::mysql

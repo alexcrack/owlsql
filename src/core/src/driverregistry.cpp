@@ -100,4 +100,20 @@ QStringList DriverRegistry::ids() const
     return list;
 }
 
+Result<ConnectionParams> DriverRegistry::parseUrl(const QString &url) const
+{
+    // Drivers accept only what is clearly theirs (a scheme, a libpq keyword string, a .db path).
+    DbError last;
+    last.category = DbError::Category::Unsupported;
+    last.message = QStringLiteral("No driver understands this connection string");
+    for (IDriver *d : drivers()) {
+        Result<ConnectionParams> r = d->parseUrl(url);
+        if (r)
+            return r;
+        if (r.error().category != DbError::Category::Unsupported)
+            last = r.error(); // a driver recognised it but found a problem
+    }
+    return fail(last);
+}
+
 } // namespace owl

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "owl/core/catalog.h"
+#include "owl/core/connectionform.h"
 #include "owl/core/dberror.h"
 #include "owl/core/dialect.h"
 #include "owl/core/result.h"
@@ -27,7 +28,8 @@ namespace owl {
 
 // Bumped whenever these interfaces change incompatibly. Plugins declare the version they were
 // built against in their metadata ("coreApi") and are rejected on mismatch (decision 049).
-inline constexpr int coreApiVersion = 3; // 2: IDriver::dialect(), 3: IConnection::catalog()
+// 2: IDriver::dialect(), 3: IConnection::catalog(), 4: IDriver::connectionForm() / parseUrl()
+inline constexpr int coreApiVersion = 4;
 
 struct SslOptions
 {
@@ -36,7 +38,13 @@ struct SslOptions
     QString caFile;
     QString certFile;
     QString keyFile;
+
+    bool operator==(const SslOptions &) const = default;
 };
+
+// "disable", "prefer", "require", "verify-ca", "verify-full" (libpq's names; URLs, forms, JSON).
+QString sslModeName(SslOptions::Mode mode);
+std::optional<SslOptions::Mode> sslModeFromName(QStringView name);
 
 struct ConnectionParams
 {
@@ -54,6 +62,8 @@ struct ConnectionParams
     QVariantMap driverOptions; // per-driver extras
     QString applicationName = QStringLiteral("OwlSql");
     std::chrono::seconds connectTimeout{15};
+
+    bool operator==(const ConnectionParams &) const = default;
 };
 
 struct ServerInfo
@@ -170,6 +180,12 @@ public:
     virtual Capabilities capabilities() const = 0;
     // The engine's SQL knowledge; valid for the driver's lifetime, usable from any thread.
     virtual const IDialect &dialect() const = 0;
+    // Fields of the connection dialog (connectionform.h, decision 166).
+    virtual ConnectionFormSchema connectionForm() const = 0;
+    // A connection URL or string this driver understands ("postgresql://…", "host=… dbname=…",
+    // "mysql://…", a SQLite file path) as ConnectionParams, including a password if the URL has
+    // one. Unsupported when the text is not for this driver.
+    virtual Result<ConnectionParams> parseUrl(const QString &url) const = 0;
     virtual std::unique_ptr<IConnection> createConnection() const = 0;
 };
 

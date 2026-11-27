@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sqlitedriver.h"
 
+#include "owl/core/formbuilder.h"
 #include "sqlitecatalog.h"
 
+#include <QDir>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QUrl>
 
 #include <limits>
 #include <sqlite3.h>
@@ -432,6 +435,53 @@ Capabilities SqliteDriver::capabilities() const
 std::unique_ptr<IConnection> SqliteDriver::createConnection() const
 {
     return std::make_unique<SqliteConnection>();
+}
+
+ConnectionFormSchema SqliteDriver::connectionForm() const
+{
+    const QString connection = QStringLiteral("connection");
+    ConnectionFormSchema schema;
+    FormField file = form::path(QStringLiteral("database"), QStringLiteral("Database file"),
+                                connection, false, true);
+    file.help = QStringLiteral("A file path, :memory: or a file: URI");
+    schema.fields << file;
+    schema.fields << form::flag(QStringLiteral("option.create"),
+                                QStringLiteral("Create the file if it does not exist"), connection,
+                                false);
+    schema.fields << form::flag(QStringLiteral("option.readOnly"), QStringLiteral("Open read-only"),
+                                connection, false);
+    return schema;
+}
+
+// sqlite:///abs/path.db, sqlite:relative.db, file: URIs, or a path that is clearly a database
+// file (.db, .sqlite, .sqlite3, .db3) — anything else belongs to other drivers.
+Result<ConnectionParams> SqliteDriver::parseUrl(const QString &url) const
+{
+    const QString text = url.trimmed();
+    ConnectionParams p;
+    p.driverId = id();
+    if (text.startsWith(u"sqlite:")) {
+        const QUrl u(text);
+        QString path = u.path(QUrl::FullyDecoded);
+        if (path.isEmpty())
+            path = text.mid(7);
+        p.database = path;
+        return p;
+    }
+    if (text.startsWith(u"file:")) {
+        p.database = text;
+        return p;
+    }
+    static const QStringList extensions{QStringLiteral(".db"), QStringLiteral(".sqlite"),
+                                        QStringLiteral(".sqlite3"), QStringLiteral(".db3")};
+    const bool looksLikeFile
+        = !text.contains(u"://") && std::ranges::any_of(extensions, [&](const QString &e) {
+              return text.endsWith(e, Qt::CaseInsensitive);
+          });
+    if (!looksLikeFile)
+        return fail(DbError::Category::Unsupported, QStringLiteral("Not an SQLite database path"));
+    p.database = text.startsWith(u"~/") ? QDir::homePath() + text.mid(1) : text;
+    return p;
 }
 
 } // namespace owl::sqlite

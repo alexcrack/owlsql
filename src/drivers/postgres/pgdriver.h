@@ -19,6 +19,8 @@ public:
     Capabilities capabilities() const override;
     const IDialect &dialect() const override { return m_dialect; }
     std::unique_ptr<IConnection> createConnection() const override;
+    ConnectionFormSchema connectionForm() const override;
+    Result<ConnectionParams> parseUrl(const QString &url) const override;
 
 private:
     PgDialect m_dialect;

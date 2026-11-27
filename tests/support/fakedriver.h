@@ -26,6 +26,10 @@ public:
     }
     const IDialect &dialect() const override { return m_dialect; }
     std::unique_ptr<IConnection> createConnection() const override;
+    // Host (required) and a "speed" option.
+    ConnectionFormSchema connectionForm() const override;
+    // fake://user:password@host/database
+    Result<ConnectionParams> parseUrl(const QString &url) const override;
 
 private:
     SqlDialect m_dialect{SqlLexerOptions{}};

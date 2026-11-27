@@ -139,7 +139,7 @@ the core refuses plugins whose `coreApi` differs.
 ```cpp
 #define OWL_DRIVER_IID "org.owlsql.Driver/1"
 
-// plugin metadata JSON: { "id": "postgres", "name": "PostgreSQL", "coreApi": 3 }
+// plugin metadata JSON: { "id": "postgres", "name": "PostgreSQL", "coreApi": 4 }
 
 class IDriver {
 public:
@@ -576,5 +576,6 @@ The UI hides or disables features from capabilities, never from `driverId` check
 - ✅ `Result<T>` = `tl::expected` (vcpkg) while on C++20; switch to `std::expected` with C++23 (decision 078).
 - ✅ Value types get `toCbor/fromCbor` + round-trip tests from M1; no transport until the Gateway (decision 079).
 - ✅ `LISTEN/NOTIFY` is post-1.0 entirely — not part of the v1 API (decision 080).
-- ⏳ Exact `ConnectionFormSchema` format (fields, types, groups, validation) — to be specified with the
-  session manager UI.
+- ✅ `ConnectionFormSchema`: `FormField`s with type, group, default, choices, range, required and
+  visible-when; keys map to `ConnectionParams` or `option.<name>`; values ⇄ params and validation in
+  OwlCore (`owl/core/connectionform.h`, decision 166). URLs: `IDriver::parseUrl()` (decision 167).

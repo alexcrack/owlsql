@@ -41,12 +41,19 @@ SQLite driver — this is OwlSql's own local storage, not a user-database driver
 - If the keychain is unavailable (headless Linux without Secret Service), the app falls back to
   `ask` and shows a one-time banner.
 
+> **Implemented (M1.9a):** `SecretStore` (`KeychainSecretStore` over QtKeychain, `MemorySecretStore`
+> for tests); the runtime `Session` asks when the keychain has nothing or is missing, and stores a
+> typed password when the user asks to remember it (decisions 168, 169). The banner comes with the
+> session manager UI (M1.9b).
+
 ---
 
 ## 3. `owlsql.db` schema
 
 > **Implemented (M0):** migration `0001_init.sql` creates only `ui_state`. The other tables below
 > are the target design; each arrives as a new migration with the feature that uses it (M1+).
+> **M1.9a:** `0002_sessions.sql` adds `folder` and `session` (+ index on folder/position), used by
+> `SessionStore` (decision 168). `params` holds `toJson(ConnectionParams)` without the password.
 
 ```sql
 CREATE TABLE folder (
@@ -228,6 +235,10 @@ CREATE VIRTUAL TABLE entry_fts USING fts5(sql, content='entry', content_rowid='i
   SSH keys) are kept as-is and flagged if missing.
 - The same import pipeline is used by the third-party importers (HeidiSQL, pgAdmin 4, DBeaver,
   MySQL Workbench): each importer converts to this JSON model first.
+
+> **Implemented (M1.9a)** in `sessionimport.h`: JSON export / import, connection URLs, `~/.pgpass`,
+> `~/.my.cnf` → `ImportBundle` → `applyImport()` with a conflict policy (the per-conflict question is
+> UI, M1.9b). Passwords found in URLs and option files go to the keychain (decision 170).
 
 ---
 

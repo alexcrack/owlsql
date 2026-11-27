@@ -24,12 +24,15 @@ public:
         , m_driver(driver)
     { }
 
-    void open(const ConnectionParams &params)
+    void open(const ConnectionParams &params, const QStringList &startupStatements)
     {
         closeAll(/*reportClosed=*/false);
         m_connection = m_driver->createConnection();
         Result<void> result = m_connection->open(params);
+        for (qsizetype i = 0; result && i < startupStatements.size(); ++i)
+            result = runStartup(startupStatements.at(i));
         if (!result) {
+            m_connection->close();
             m_connection.reset();
             toMain([o = m_owner, e = result.error()] { o->onOpenFailed(e); });
             return;
@@ -42,6 +45,21 @@ public:
     }
 
     void close() { closeAll(/*reportClosed=*/true); }
+
+    Result<void> runStartup(const QString &sql)
+    {
+        Statement statement;
+        statement.sql = sql;
+        statement.origin = StatementOrigin::Internal;
+        Result<std::unique_ptr<IResultCursor>> cursor = m_connection->execute(statement, {});
+        if (!cursor) {
+            DbError e = cursor.error();
+            e.message = QStringLiteral("Startup script failed: %1").arg(e.message);
+            return fail(e);
+        }
+        (*cursor)->close();
+        return {};
+    }
 
     void enqueue(std::shared_ptr<detail::JobShared> job)
     {
@@ -333,10 +351,10 @@ void ConnectionWorker::post(Fn &&fn)
     QMetaObject::invokeMethod(m_executor, std::forward<Fn>(fn), Qt::QueuedConnection);
 }
 
-void ConnectionWorker::open(const ConnectionParams &params)
+void ConnectionWorker::open(const ConnectionParams &params, const QStringList &startupStatements)
 {
     setState(State::Connecting);
-    post([ex = m_executor, params] { ex->open(params); });
+    post([ex = m_executor, params, startupStatements] { ex->open(params, startupStatements); });
 }
 
 void ConnectionWorker::runTask(std::function<void(IConnection *)> task)

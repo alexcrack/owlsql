@@ -19,3 +19,8 @@ owl_add_server_runs(tst_mysql_catalog RUNS
     tst_mysql_catalog57=OWL_TEST_MYSQL57_URL
     tst_mariadb_catalog=OWL_TEST_MARIADB_URL
     tst_mariadb_catalog106=OWL_TEST_MARIADB106_URL)
+
+# Runtime sessions on PostgreSQL and MySQL (needs both URLs; each part skips on its own).
+owl_add_unit_test(tst_session_servers SOURCES tst_session_servers.cpp
+    LIBS owlsql_app owl_postgres owl_mysql owl_test_server)
+set_tests_properties(tst_session_servers PROPERTIES LABELS integration)
