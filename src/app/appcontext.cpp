@@ -6,6 +6,7 @@
 #include "keybindings.h"
 #include "owl/core/driverregistry.h"
 #include "secretstore.h"
+#include "sessionmanager.h"
 #include "sessionstore.h"
 #include "settings.h"
 #include "thememanager.h"
@@ -37,6 +38,8 @@ AppContext::~AppContext()
 {
     delete m_uiState; // flushes into the database before it closes
     m_uiState = nullptr;
+    delete m_sessionManager; // closes open sessions before the drivers go
+    m_sessionManager = nullptr;
     delete m_sessions;
     m_sessions = nullptr;
     m_database.reset();
@@ -73,6 +76,7 @@ bool AppContext::initialize(QString *error)
     else
         qCWarning(lcApp) << "Sessions are unavailable without owlsql.db";
     loadDrivers();
+    m_sessionManager = new SessionManager(m_sessions, m_drivers.get(), m_secrets, this);
 
     connect(m_settings, &Settings::valueChanged, this, &AppContext::applyThemeSettings);
     applyThemeSettings();

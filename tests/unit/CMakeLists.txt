@@ -3,6 +3,8 @@ owl_add_unit_test(tst_version SOURCES tst_version.cpp LIBS Owl::Core)
 owl_add_unit_test(tst_theme SOURCES tst_theme.cpp LIBS owlsql_theme)
 owl_add_unit_test(tst_ui_smoke SOURCES tst_ui_smoke.cpp
     LIBS owlsql_theme owlsql_themeplugin owlsql_styleplugin owlsql_app owlsql_appplugin owlsql_uiplugin Qt6::Quick Qt6::QuickControls2)
+target_compile_definitions(tst_ui_smoke PRIVATE "OWL_DRIVER_DIR=\"${OWL_DRIVER_OUTPUT_DIR}\"")
+add_dependencies(tst_ui_smoke owlsql_driver_postgres owlsql_driver_mysql owlsql_driver_sqlite)
 owl_add_unit_test(tst_commands SOURCES tst_commands.cpp LIBS owlsql_app)
 owl_add_unit_test(tst_appdata SOURCES tst_appdata.cpp LIBS owlsql_app Qt6::Sql)
 owl_add_unit_test(tst_settings SOURCES tst_settings.cpp LIBS owlsql_app)
@@ -23,3 +25,5 @@ owl_add_unit_test(tst_catalog_cache SOURCES tst_catalog_cache.cpp LIBS owl_test_
 owl_add_unit_test(tst_sqlite_catalog SOURCES tst_sqlite_catalog.cpp LIBS owl_sqlite)
 owl_add_unit_test(tst_connection_forms SOURCES tst_connection_forms.cpp LIBS owl_postgres owl_mysql owl_sqlite)
 owl_add_unit_test(tst_sessions SOURCES tst_sessions.cpp LIBS owlsql_app owl_test_fakedriver)
+owl_add_unit_test(tst_session_manager SOURCES tst_session_manager.cpp
+    LIBS owlsql_app owl_sqlite owl_postgres owl_test_fakedriver)
