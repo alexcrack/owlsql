@@ -336,7 +336,7 @@ screenshots both). Button variants: `variant: "primary" | "secondary" | "ghost" 
 
 ## 10. Open questions
 
-- Logo: placeholder owl mark — monochrome line owl in amber; final logo later.
+- ✅ Logo: "J · Folded Wings", an owl that is a database cylinder, with a hand-tuned 16–24 px drawing and an ink-tile app icon (decision 175, `resources/logo/`, `tools/make-app-icons.sh`).
 - ✅ OS colour scheme: `QStyleHints::colorScheme` / `colorSchemeChanged`; explicit Light/Dark is
   passed back with `setColorScheme()` so native title bars match (decision 107).
 - ✅ Reduced motion: Qt 6.12 exposes no OS hint, so it is an OwlSql setting

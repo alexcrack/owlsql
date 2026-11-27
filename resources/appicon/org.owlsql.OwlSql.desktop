@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=OwlSql
+GenericName=Database Client
+Comment=Browse and query PostgreSQL, MySQL / MariaDB and SQLite databases
+Exec=owlsql %U
+Icon=org.owlsql.OwlSql
+Terminal=false
+Categories=Development;Database;
+Keywords=sql;database;postgresql;mysql;mariadb;sqlite;
+StartupWMClass=owlsql

@@ -28,7 +28,13 @@ int main(int argc, char *argv[])
     QGuiApplication::setOrganizationDomain(QStringLiteral("owlsql.org"));
     QGuiApplication::setApplicationName(QStringLiteral("OwlSql"));
     QGuiApplication::setApplicationVersion(owl::core::versionString());
-    QGuiApplication::setWindowIcon(QIcon(QStringLiteral(":/owlsql/logo/owlsql.svg")));
+    // App icon: exact-size images, so 16 and 24 px use the hand-tuned drawing (decision 175).
+    QIcon appIcon;
+    for (const int size : {16, 24, 32, 48, 64, 128, 256})
+        appIcon.addFile(QStringLiteral(":/owlsql/appicon/png/owlsql-%1.png").arg(size),
+                        QSize(size, size));
+    QGuiApplication::setWindowIcon(appIcon);
+    QGuiApplication::setDesktopFileName(QStringLiteral("org.owlsql.OwlSql"));
 
     // UI translation for the system language, when one is bundled (embedded under :/i18n).
     QTranslator translator;

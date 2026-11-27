@@ -44,7 +44,7 @@ superseded ones are marked, never deleted.
 | 037 | Persistent searchable history, 90-day default retention, prod opt-out | |
 | 038 | Opt-in crash reports only, no usage telemetry | |
 | 039 | Update check via GitHub Releases; auto-updater for Win/macOS builds | |
-| 040 | Placeholder owl logo now | |
+| 040 | Placeholder owl logo now | Superseded by 175 |
 | 041 | No deadline — quality first | |
 | 042 | Drivers are **blocking**, one worker thread per physical connection; cancel is the only cross-thread call | Supersedes the "libpq async API" idea in the first proposal |
 | 043 | Connections: `meta` + one per query tab (lazy) + one per browsed PG database; "single connection" session option | |
@@ -179,3 +179,4 @@ superseded ones are marked, never deleted.
 | 172 | Password handling in the UI: "Save the password in the system keychain" is on by default when a keychain exists; a blank password field keeps the stored one; unticking it switches the session to "ask" and deletes the stored secret; without a keychain the box explains that passwords are asked | Decisions 013, 168 |
 | 173 | Safety-level visuals: tag dot everywhere a session appears (default tag per level: dev green, staging blue, prod red), STAGE / PROD badges in the list, a 2 px danger frame around the window and a PROD badge in the status bar while the active session is prod. The "active" session is the last one opened or chosen in the sidebar until query tabs exist | Decisions 015, 063 |
 | 174 | Until the object tree (M1.10), the sidebar lists the open sessions (activate, disconnect); New Connection (Ctrl+Shift+N), Import and Disconnect are commands in the File menu | |
+| 175 | Logo "J · Folded Wings": an owl whose body is a database cylinder, eyes in the cylinder's light top, wings folded along its sides; owl amber, deep amber, ink and cream. `resources/logo/owlsql.svg` is the mark used in the app; `owlsql-small.svg` is hand-tuned on a 16 px grid (no wings, thicker eye rings) for 16–24 px; the app icon puts the mark on an ink tile (`owlsql-app*.svg`). `tools/make-app-icons.sh` (Inkscape + Pillow) generates the PNGs, `.ico` and `.icns` in `resources/appicon/` | Supersedes 040; chosen from three rounds of options |
