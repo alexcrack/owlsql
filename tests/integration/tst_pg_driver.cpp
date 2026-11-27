@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // PostgreSQL driver behaviour beyond the shared conformance suite: notices, the type matrix,
 // parameter round trips, error details, transaction states, user-defined types, closing partly
-// read results, lost connections. Needs a server (tests/support/pgtestserver.h).
+// read results, lost connections. Needs a server (tests/support/testserver.h).
 #include "pgdriver.h"
-#include "pgtestserver.h"
+#include "testserver.h"
 
 #include <QElapsedTimer>
 #include <QTest>
@@ -69,7 +69,7 @@ class TestPgDriver : public QObject
 {
     Q_OBJECT
 
-    test::PgTestServer m_server = test::pgTestServer();
+    test::TestServer m_server = test::testServer("OWL_TEST_PG_URL", u"postgres"_s);
     postgres::PgDriver m_driver;
     std::unique_ptr<IConnection> m_conn;
 

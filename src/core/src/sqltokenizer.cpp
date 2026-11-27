@@ -56,7 +56,9 @@ private:
                 ++m_pos;
             return make(SqlToken::Type::Whitespace, start);
         }
-        if ((c == u'-' && at(m_pos + 1) == u'-') || (c == u'#' && m_o.hashComments)) {
+        const bool dashComment = c == u'-' && at(m_pos + 1) == u'-'
+            && (!m_o.dashCommentNeedsSpace || m_pos + 2 >= m_sql.size() || at(m_pos + 2).isSpace());
+        if (dashComment || (c == u'#' && m_o.hashComments)) {
             while (m_pos < m_sql.size() && at(m_pos) != u'\n')
                 ++m_pos;
             return make(SqlToken::Type::LineComment, start);
@@ -74,6 +76,8 @@ private:
         }
         if (c == u'\'')
             return quoted(start, u'\'', SqlToken::Type::String, m_o.backslashEscapes);
+        if (c == u'"' && m_o.doubleQuotedStrings)
+            return quoted(start, u'"', SqlToken::Type::String, m_o.backslashEscapes);
         if (c == u'"')
             return quoted(start, u'"', SqlToken::Type::QuotedIdentifier, false);
         if (c == u'`' && m_o.backtickIdentifiers)

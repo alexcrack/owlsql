@@ -1,9 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Tests against real database servers. They skip themselves unless the server URL variables are
-# set (OWL_TEST_PG_URL, see tests/support/pgtestserver.h); CI provides PostgreSQL 18 and 13 on the
-# Linux job (decision 125). Run only these: ctest -L integration
-owl_add_unit_test(tst_pg_driver SOURCES tst_pg_driver.cpp LIBS owl_postgres owl_test_pgserver)
-add_test(NAME tst_pg_driver13 COMMAND tst_pg_driver)
-set_tests_properties(tst_pg_driver PROPERTIES LABELS integration)
-set_tests_properties(tst_pg_driver13 PROPERTIES LABELS integration
-    ENVIRONMENT "OWL_TEST_PG_URL_VAR=OWL_TEST_PG13_URL")
+# Tests against real database servers. They skip themselves unless their server URL variable is set
+# (tests/support/testserver.h); CI provides PostgreSQL 18 and 13, MySQL 8.4 and 5.7, MariaDB 11.8
+# and 10.6 on the Linux job (decisions 125, 151, 161). Run only these: ctest -L integration
+owl_add_unit_test(tst_pg_driver SOURCES tst_pg_driver.cpp LIBS owl_postgres owl_test_server)
+owl_add_server_runs(tst_pg_driver RUNS tst_pg_driver13=OWL_TEST_PG13_URL)
+
+owl_add_unit_test(tst_mysql_driver SOURCES tst_mysql_driver.cpp LIBS owl_mysql owl_test_server)
+owl_add_server_runs(tst_mysql_driver RUNS
+    tst_mysql_driver57=OWL_TEST_MYSQL57_URL
+    tst_mariadb_driver=OWL_TEST_MARIADB_URL
+    tst_mariadb_driver106=OWL_TEST_MARIADB106_URL)

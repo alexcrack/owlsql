@@ -66,17 +66,18 @@ key, agent; jump hosts later via libssh2), connection URL parsing, `.pgpass` / `
 - Qt 6.12, C++20, CMake + committed `CMakePresets.json` (Qt Creator primary IDE; `.user` files ignored).
 - Qt from the Qt installer locally / `install-qt-action` in CI (Qt is **not** taken from vcpkg).
 - C libraries via **vcpkg manifest** (`vcpkg.json`, pinned `builtin-baseline`; used when
-  `VCPKG_ROOT` is set): libpq 18.4 (+ OpenSSL), sqlite3 3.54 — done (M1.1); libmariadb (M2),
-  libssh2 (M3). Windows uses the `x64-windows-static-md` triplet (static libs, Qt's /MD CRT).
+  `VCPKG_ROOT` is set): libpq 18.4 (+ OpenSSL), sqlite3 3.54 — done (M1.1); libmariadb 3.4
+  (MariaDB Connector/C) — done (M1.7); libssh2 (M3). Windows uses the `x64-windows-static-md`
+  triplet (static libs, Qt's /MD CRT).
 - Qt-based libraries — QtKeychain 0.18.0, KSyntaxHighlighting 6.32.0 (+ ECM) — done (M1.1):
   downloaded at pinned tags with `FetchContent` and built + installed at configure time in their
   own CMake process against our Qt, as static libraries (`cmake/OwlExternal.cmake`,
   decision 126). Crash reporting: decided before 1.0.
 - Tests (done): Qt Test unit suites + an offscreen UI smoke test that fails on QML warnings and can
   save screenshots (`OWL_SCREENSHOT_DIR`); `tests/integration/` and the server-backed
-  conformance runs against real servers, skipped unless `OWL_TEST_PG_URL` / `OWL_TEST_PG13_URL`
-  are set — CI starts PostgreSQL 18 and 13 in Docker on the Linux job (decisions 125, 151).
-  MariaDB/MySQL join in M2.
+  conformance runs against real servers, skipped unless their `OWL_TEST_*_URL` variable is set —
+  CI starts PostgreSQL 18 and 13, MySQL 8.4 and 5.7, MariaDB 11.8 and 10.6 in Docker on the Linux
+  job (decisions 125, 151, 161).
 - GitHub Actions (done): build + test on Linux/GCC, Windows/MSVC, macOS; format (clang-format 21,
   qmlformat), clang-tidy, qmllint. Planned: packaging and release artifacts (M4).
 
@@ -93,10 +94,10 @@ owlsql/
 │   ├── style/           # QML module OwlSql.Style (controls on QtQuick.Templates)
 │   ├── app/             # QML module OwlSql.App (+ migrations/owlsql/*.sql)
 │   ├── ui/              # QML module OwlSql.Ui (shell, gallery)
-│   └── drivers/         # (planned, M1) postgres/, sqlite/; mysql/ in M2
+│   └── drivers/         # driver plugins: postgres/, mysql/, sqlite/ (+ common/ text helpers)
 ├── resources/           # themes/*.json, fonts (Inter, JetBrains Mono), icons (Tabler), logo
 ├── i18n/                # owlsql_<lang>.ts (lupdate)
-├── tests/               # unit/ (done); integration/ (planned)
+├── tests/               # unit/, integration/ (real servers), conformance/ (per driver), support/
 ├── tools/               # format.sh, check-format.sh, setup-dev.sh, git-hooks/
 ├── packaging/           # (planned, M4) deb, rpm, snap, windows, macos
 └── docs/

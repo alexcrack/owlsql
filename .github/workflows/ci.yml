@@ -68,19 +68,38 @@ jobs:
       - name: Set up dependencies (vcpkg, Qt-based libraries)
         uses: ./.github/actions/setup-deps
 
-      # Integration tests run against real servers on Linux only (decision 125): the latest
-      # PostgreSQL and the oldest supported one (decision 048).
-      - name: Start PostgreSQL 18 and 13
+      # Integration tests run against real servers on Linux only (decision 125): the newest and
+      # the oldest supported version of each engine (decisions 048, 151, 161). The images listen
+      # on TCP only once initialisation is complete, so the readiness checks use 127.0.0.1.
+      - name: Start database servers
         if: runner.os == 'Linux'
         run: |
           docker run -d --name owl-pg18 -e POSTGRES_PASSWORD=owlsql -p 5432:5432 postgres:18
           docker run -d --name owl-pg13 -e POSTGRES_PASSWORD=owlsql -p 5433:5432 postgres:13
-          for pg in owl-pg18 owl-pg13; do
-            for i in $(seq 1 60); do docker exec $pg pg_isready -U postgres -h 127.0.0.1 && break; sleep 1; done
-          done
-          echo "OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:5432/postgres" >> "$GITHUB_ENV"
-          echo "OWL_TEST_PG13_URL=postgresql://postgres:owlsql@localhost:5433/postgres" >> "$GITHUB_ENV"
-          echo "OWL_REQUIRE_INTEGRATION_TESTS=1" >> "$GITHUB_ENV"
+          docker run -d --name owl-mysql84 -e MYSQL_ROOT_PASSWORD=owlsql -e MYSQL_DATABASE=owl -p 3306:3306 mysql:8.4
+          docker run -d --name owl-mysql57 -e MYSQL_ROOT_PASSWORD=owlsql -e MYSQL_DATABASE=owl -p 3307:3306 mysql:5.7
+          docker run -d --name owl-mariadb118 -e MARIADB_ROOT_PASSWORD=owlsql -e MARIADB_DATABASE=owl -p 3308:3306 mariadb:11.8
+          docker run -d --name owl-mariadb106 -e MARIADB_ROOT_PASSWORD=owlsql -e MARIADB_DATABASE=owl -p 3309:3306 mariadb:10.6
+          wait_for() { # <container> <command…>
+            local name=$1; shift
+            for i in $(seq 1 120); do docker exec "$name" "$@" >/dev/null 2>&1 && return 0; sleep 1; done
+            echo "$name did not become ready"; docker logs "$name" | tail -50; return 1
+          }
+          wait_for owl-pg18 pg_isready -U postgres -h 127.0.0.1
+          wait_for owl-pg13 pg_isready -U postgres -h 127.0.0.1
+          wait_for owl-mysql84 mysqladmin ping -h 127.0.0.1 -uroot -powlsql
+          wait_for owl-mysql57 mysqladmin ping -h 127.0.0.1 -uroot -powlsql
+          wait_for owl-mariadb118 mariadb-admin ping -h 127.0.0.1 -uroot -powlsql
+          wait_for owl-mariadb106 mariadb-admin ping -h 127.0.0.1 -uroot -powlsql
+          {
+            echo "OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:5432/postgres"
+            echo "OWL_TEST_PG13_URL=postgresql://postgres:owlsql@localhost:5433/postgres"
+            echo "OWL_TEST_MYSQL_URL=mysql://root:owlsql@127.0.0.1:3306/owl"
+            echo "OWL_TEST_MYSQL57_URL=mysql://root:owlsql@127.0.0.1:3307/owl"
+            echo "OWL_TEST_MARIADB_URL=mariadb://root:owlsql@127.0.0.1:3308/owl"
+            echo "OWL_TEST_MARIADB106_URL=mariadb://root:owlsql@127.0.0.1:3309/owl"
+            echo "OWL_REQUIRE_INTEGRATION_TESTS=1"
+          } >> "$GITHUB_ENV"
 
       - name: Configure
         run: cmake --preset ci

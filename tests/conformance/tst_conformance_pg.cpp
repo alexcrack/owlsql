@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// The driver conformance suite against a PostgreSQL server (tests/support/pgtestserver.h).
+// The driver conformance suite against a PostgreSQL server (tests/support/testserver.h).
 #include "conformance.h"
-#include "pgtestserver.h"
+#include "testserver.h"
 
 using namespace Qt::StringLiterals;
 
 int main(int argc, char *argv[])
 {
-    const owl::test::PgTestServer server = owl::test::pgTestServer();
+    const owl::test::TestServer server = owl::test::testServer("OWL_TEST_PG_URL", u"postgres"_s);
     owl::conformance::Fixtures f;
     f.driverId = u"postgres"_s;
     f.pluginDirectory = QStringLiteral(OWL_DRIVER_DIR);

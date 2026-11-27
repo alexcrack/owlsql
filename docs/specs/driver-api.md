@@ -127,7 +127,7 @@ Implemented in `src/core/include/owl/core/{value,resultset,dberror,result}.h`.
 > **Implemented (M1.4)** in `owl/core/driver.h` and `driverregistry.h`: `IDriver`, `IConnection`,
 > `IResultCursor`, `ICancelHandle`, `ConnectionParams`, `Statement`, `ExecOptions`, `ServerInfo`,
 > `Capabilities`. `IDriver::dialect()`/`connectionForm()`/`parseUrl()` arrive with the dialect (M1.5)
-> and sessions (M1.8); `IConnection::catalog()` with the catalog (M1.7).
+> and sessions (M1.9); `IConnection::catalog()` with the catalog (M1.8).
 > Plugin rules (decision 138): the registry reads `coreApi` from the plugin metadata **before
 > loading** and rejects mismatches; plugins link OwlCore statically, so OwlCore must not keep global
 > mutable state (each plugin has its own copy).
@@ -308,7 +308,7 @@ F5 refreshes the selected node. No background polling.
 > (`CREATE TRIGGER … BEGIN … END`, `BEGIN ATOMIC`). `classify` (decision 142): UPDATE/DELETE without a
 > top-level `WHERE` and `TRUNCATE` are `WriteUnbounded`; data-modifying CTEs are `Write`; plain
 > `EXPLAIN` is `Read` (`EXPLAIN ANALYZE` takes the inner class); `CALL`/`DO`/`VACUUM` are `Write`.
-> Type lists, keywords and SQL generation arrive with their consumers (M1.7, M1.10, M2).
+> Type lists, keywords and SQL generation arrive with their consumers (M1.8, M1.11, M2).
 
 ```cpp
 class IDialect {                      // pure, thread-safe
@@ -343,7 +343,7 @@ public:
 
 > **Implemented (M1.4)** in `owl/core/connectionworker.h` / `queryjob.h` — in OwlCore rather than the
 > app layer (decision 137): QtCore only, testable without UI, reusable by the Gateway. `Session`
-> (roles `meta` / `tab:<id>` / `meta:<db>`) comes with sessions (M1.8). Details as built:
+> (roles `meta` / `tab:<id>` / `meta:<db>`) comes with sessions (M1.9). Details as built:
 > `columnsReady(columns, resultIndex)`, `resultFinished(resultIndex, affectedRows)`, rows arrive in
 > batches of 256 with `firstRow` restarting per result set, `isComplete()` is false when a paused
 > job was closed by the next statement, cancelling a *queued* job reports immediately.
@@ -505,7 +505,19 @@ The UI hides or disables features from capabilities, never from `driverId` check
 > the notice receiver (severity, text + DETAIL/HINT, SQLSTATE). Read-only: `default_transaction_read_only`
 > between transactions (decision 153). `affectedRows()`: DML tags only (in chunked mode the tag arrives
 > with the last chunk). `lastInsertId()`: none (use RETURNING). Column origins (`PQftable`) are resolved
-> with the catalog (M1.7/M2). `setAutocommit(false)` → Unsupported until transactions (M2).
+> with the catalog (M1.8/M2). `setAutocommit(false)` → Unsupported until transactions (M2).
+
+> **MySQL / MariaDB (M1.7):** driver id `mysql` (MariaDB Connector/C 3.4, decision 154); `socketPath`
+> for Unix sockets; `database` optional (`USE` switches in-session); `driverOptions` `initCommand`.
+> Plain statements over the text protocol, parameterised ones as prepared statements, both
+> unbuffered (decision 155); `CALL` result sets via `nextResult()`. Cancel = `KILL QUERY` from a side
+> connection (decision 156); closing a partly read result as decision 149. TLS modes and read-only
+> guard: decision 157. Types: decision 158; column origins and primary-key / NOT NULL flags from the
+> result metadata. Errors: error number → category (1064 Syntax, 1045 Auth, 1142/1792 Permission,
+> 1317 Cancelled, 1205/3024 Timeout, 2006/2013 Lost, SQLSTATE `23` Constraint, `42` Syntax), position
+> from "near '…' at line N". `SHOW WARNINGS` after statements with warnings (decision 159).
+> `lastInsertId()` = `LAST_INSERT_ID()` of the statement (the first id of a multi-row insert).
+> No failed-transaction state: after an error MySQL keeps the transaction open.
 
 | | PostgreSQL | MySQL / MariaDB | SQLite |
 |---|---|---|---|
@@ -533,7 +545,13 @@ The UI hides or disables features from capabilities, never from `driverId` check
 > **PostgreSQL (M1.6):** the suite runs against PostgreSQL 18 and 13 (`tst_conformance_pg`,
 > `tst_conformance_pg13`), plus `tests/integration/tst_pg_driver.cpp` for engine specifics (notices,
 > type matrix, parameter round trips, error details, failed transactions, user-defined types,
-> closing paused results, lost connections, auth errors). Server URLs: `tests/support/pgtestserver.h`.
+> closing paused results, lost connections, auth errors). Server URLs: `tests/support/testserver.h`.
+>
+> **MySQL / MariaDB (M1.7):** the suite runs against MySQL 8.4 and 5.7 and MariaDB 11.8 and 10.6
+> (`tst_conformance_mysql`, `…57`, `tst_conformance_mariadb`, `…106`), plus
+> `tests/integration/tst_mysql_driver.cpp` (the type matrix through both protocols, column origins,
+> parameter round trips, `CALL` result sets, warnings, errors, transactions, closing paused results,
+> lost connections, TLS modes, auth errors).
 
 - **Unit (no server):** Value/CBOR round-trips, dialect split/classify/quote/placeholders, DDL diff
   generation (golden files per engine), browse query generation.

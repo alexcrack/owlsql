@@ -14,5 +14,7 @@ function(owl_add_driver_plugin target)
         RUNTIME_OUTPUT_DIRECTORY "${OWL_DRIVER_OUTPUT_DIR}")
 endfunction()
 
+add_subdirectory(common)
 add_subdirectory(sqlite)
 add_subdirectory(postgres)
+add_subdirectory(mysql)

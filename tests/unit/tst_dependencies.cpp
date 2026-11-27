@@ -7,6 +7,7 @@
 #include <KSyntaxHighlighting/Repository>
 #include <KSyntaxHighlighting/Theme>
 #include <libpq-fe.h>
+#include <mysql.h>
 #include <sqlite3.h>
 #include <utility>
 
@@ -17,6 +18,13 @@ class TestDependencies : public QObject
     Q_OBJECT
 
 private slots:
+    void mariadbConnectorVersion()
+    {
+        const unsigned long version = mysql_get_client_version();
+        qInfo("MariaDB Connector/C %s", mysql_get_client_info());
+        QVERIFY(version >= 30400); // 3.4: TLS by default, caching_sha2_password built in
+    }
+
     void libpqVersion()
     {
         // >= 17 for chunked-rows streaming (specs/driver-api.md §11).

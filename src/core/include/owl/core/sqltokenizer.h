@@ -47,6 +47,8 @@ struct SqlLexerOptions
     bool nestedBlockComments = false; // /* /* */ */ (PostgreSQL)
     bool hashComments = false; // # … (MySQL)
     bool backslashEscapes = false; // 'it\'s' (MySQL default)
+    bool doubleQuotedStrings = false; // "x" is a string, not an identifier (MySQL)
+    bool dashCommentNeedsSpace = false; // "-- x" is a comment, "--1" is not (MySQL)
     // Placeholder forms recognised outside strings and comments.
     bool questionPlaceholders = true; // ?   and ?NNN (SQLite)
     bool dollarNumberPlaceholders = false; // $1 (PostgreSQL)
