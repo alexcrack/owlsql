@@ -7,6 +7,7 @@
 #include <QObject>
 
 #include <atomic>
+#include <functional>
 #include <memory>
 
 namespace owl {
@@ -21,6 +22,8 @@ struct JobShared
     Statement statement;
     ExecOptions options;
     std::atomic<bool> cancelRequested{false};
+    // Set for ConnectionWorker::runTask() items instead of a statement.
+    std::function<void(IConnection *)> task;
 };
 } // namespace detail
 

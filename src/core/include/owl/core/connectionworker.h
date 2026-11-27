@@ -39,6 +39,11 @@ public:
     // before open() completes run after it (and fail if the connection could not be opened).
     QueryJob *execute(const Statement &statement, const ExecOptions &options = {});
 
+    // Runs `task` on the worker thread, in queue order with statements (a paused job is closed
+    // first, as for a statement). The connection is null when it is not open. The task must
+    // close the cursors it opens and posts its results back itself (catalog calls, CatalogCache).
+    void runTask(std::function<void(IConnection *)> task);
+
     State state() const { return m_state; }
     ServerInfo serverInfo() const { return m_serverInfo; }
     DbError lastError() const { return m_lastError; }

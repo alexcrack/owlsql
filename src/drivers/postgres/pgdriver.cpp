@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "pgdriver.h"
 
+#include "pgcatalog.h"
 #include "pgvalues.h"
 
 #include <QMutex>
@@ -249,6 +250,7 @@ public:
     Result<void> setAutocommit(bool on) override;
     TxState txState() const override;
     QList<ServerMessage> takeMessages() override { return std::exchange(m_messages, {}); }
+    ICatalog &catalog() override { return m_catalog; }
 
 private:
     friend class PgCursor;
@@ -266,6 +268,7 @@ private:
     PGconn *m_conn = nullptr;
     std::shared_ptr<CancelState> m_cancel = std::make_shared<CancelState>();
     TypeRegistry m_types;
+    PgCatalog m_catalog{*this, m_types};
     QSet<quint32> m_missingTypes;
     QList<ServerMessage> m_messages;
     ServerInfo m_info;
@@ -280,6 +283,7 @@ private:
 Result<void> PgConnection::open(const ConnectionParams &params)
 {
     close();
+    m_catalog.reset();
 
     QList<QByteArray> keys;
     QList<QByteArray> values;

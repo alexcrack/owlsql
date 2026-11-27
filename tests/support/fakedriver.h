@@ -7,6 +7,8 @@
 //   update N        no rows, N affected rows
 //   multi           two result sets (3 rows, then 2 rows with other columns)
 // open() fails for host "fail" (Connection) and "auth" (Auth).
+// catalog(): database "fake" → group "tables" → tables "a", "b"; a database named "fail" errors,
+// paths containing "slow" take 300 ms.
 #pragma once
 
 #include "owl/core/driver.h"

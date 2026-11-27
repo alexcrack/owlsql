@@ -46,8 +46,9 @@ Goal: daily-usable for browsing and querying PostgreSQL, MySQL / MariaDB and SQL
   cancel, warnings, column origins, TLS modes; dialect (DELIMITER, stored-program bodies, MySQL
   lexing); conformance + integration tests vs MySQL 8.4 / 5.7 and MariaDB 11.8 / 10.6
   (decisions 154–161; moved up from M2). — #15
-- [ ] **1.8 Catalog** — `ICatalog` for PG / MySQL / SQLite (tree nodes, TableDef, DDL text),
-  `CatalogCache` with invalidation. _needs: 1.5, 1.6, 1.7_
+- [x] **1.8 Catalog** — `ICatalog` for PG / MySQL / SQLite (tree nodes, TableDef, DDL text),
+  `CatalogCache` with invalidation, `ConnectionWorker::runTask()`, catalog walk in the conformance
+  suite, fixture-schema tests on all six servers (decisions 162–165). — #16
 - [ ] **1.9 Sessions** — migration 0002 (`folder`, `session`), keychain secrets, session manager in
   the Welcome tab, `ConnectionFormSchema` spec, URL / `.pgpass` / `.my.cnf` import, safety levels.
   _needs: 1.4, 1.1_

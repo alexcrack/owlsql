@@ -10,6 +10,9 @@ qt_add_library(owlcore STATIC
     include/owl/core/dberror.h
     include/owl/core/result.h
     include/owl/core/driver.h
+    include/owl/core/catalog.h
+    include/owl/core/catalogsupport.h
+    include/owl/core/catalogcache.h
     include/owl/core/dialect.h
     include/owl/core/sqltokenizer.h
     include/owl/core/driverregistry.h
@@ -21,6 +24,9 @@ qt_add_library(owlcore STATIC
     src/resultset.cpp
     src/dberror.cpp
     src/driverregistry.cpp
+    src/catalog.cpp
+    src/catalogsupport.cpp
+    src/catalogcache.cpp
     src/dialect.cpp
     src/sqltokenizer.cpp
     src/queryjob.cpp

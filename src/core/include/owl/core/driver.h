@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#include "owl/core/catalog.h"
 #include "owl/core/dberror.h"
 #include "owl/core/dialect.h"
 #include "owl/core/result.h"
@@ -20,13 +21,13 @@
 //
 // Threading contract: an IConnection and the cursors it returns are used from exactly one thread
 // (its ConnectionWorker). ICancelHandle::cancel() is the only call allowed from other threads.
-// ICatalog (M1.7) joins these interfaces with the code that needs it.
+// ICatalog (owl/core/catalog.h) belongs to its connection and follows the same rule.
 
 namespace owl {
 
 // Bumped whenever these interfaces change incompatibly. Plugins declare the version they were
 // built against in their metadata ("coreApi") and are rejected on mismatch (decision 049).
-inline constexpr int coreApiVersion = 2; // 2: IDriver::dialect()
+inline constexpr int coreApiVersion = 3; // 2: IDriver::dialect(), 3: IConnection::catalog()
 
 struct SslOptions
 {
@@ -155,6 +156,9 @@ public:
 
     // Notices/warnings produced since the last call.
     virtual QList<ServerMessage> takeMessages() = 0;
+
+    // Introspection over this connection; valid while the connection object lives.
+    virtual ICatalog &catalog() = 0;
 };
 
 class IDriver

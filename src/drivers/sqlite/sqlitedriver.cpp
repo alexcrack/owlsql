@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sqlitedriver.h"
 
+#include "sqlitecatalog.h"
+
 #include <QMutex>
 #include <QMutexLocker>
 
@@ -64,29 +66,6 @@ DbError makeError(sqlite3 *db, int rc, const QByteArray &sqlUtf8 = {})
     if (db && !sqlUtf8.isEmpty())
         e.position = utf16Offset(sqlUtf8, sqlite3_error_offset(db));
     return e;
-}
-
-ValueKind kindForDeclaredType(const QString &declared)
-{
-    // SQLite type affinity rules (https://sqlite.org/datatype3.html §3.1).
-    const QString t = declared.toUpper();
-    if (t.isEmpty())
-        return ValueKind::Unknown;
-    if (t.contains(QLatin1String("BOOL")))
-        return ValueKind::Bool;
-    if (t.contains(QLatin1String("JSON")))
-        return ValueKind::Json;
-    if (t.contains(QLatin1String("INT")))
-        return ValueKind::Int;
-    if (t.contains(QLatin1String("CHAR")) || t.contains(QLatin1String("CLOB"))
-        || t.contains(QLatin1String("TEXT")))
-        return ValueKind::Text;
-    if (t.contains(QLatin1String("BLOB")))
-        return ValueKind::Bytes;
-    if (t.contains(QLatin1String("REAL")) || t.contains(QLatin1String("FLOA"))
-        || t.contains(QLatin1String("DOUB")))
-        return ValueKind::Double;
-    return ValueKind::Decimal; // NUMERIC affinity
 }
 
 // Cuts UTF-8 at `limit` bytes without splitting a multi-byte character.
@@ -368,6 +347,7 @@ public:
     }
 
     QList<ServerMessage> takeMessages() override { return {}; }
+    ICatalog &catalog() override { return m_catalog; }
 
 private:
     sqlite3 *db() const
@@ -439,6 +419,7 @@ private:
     }
 
     std::shared_ptr<Handle> m_handle = std::make_shared<Handle>();
+    SqliteCatalog m_catalog{*this};
 };
 
 } // namespace

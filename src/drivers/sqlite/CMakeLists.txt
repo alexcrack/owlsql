@@ -2,6 +2,7 @@
 # SQLite driver: a static library (also used directly by unit tests) wrapped as a plugin.
 qt_add_library(owl_sqlite STATIC
     sqlitedialect.h sqlitedialect.cpp
+    sqlitecatalog.h sqlitecatalog.cpp
     sqlitedriver.h sqlitedriver.cpp)
 target_include_directories(owl_sqlite PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(owl_sqlite PUBLIC Owl::Core PRIVATE SQLite::SQLite3)

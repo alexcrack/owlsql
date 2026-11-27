@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "conformance.h"
 
+#include "owl/core/catalogcache.h"
 #include "owl/core/connectionworker.h"
 #include "owl/core/driverregistry.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QScopeGuard>
 #include <QSignalSpy>
 #include <QTest>
 #include <QThread>
@@ -261,6 +263,65 @@ private slots:
         QueryJob *next = worker->execute(statement);
         QTRY_COMPARE(next->state(), QueryJob::State::Finished);
         QCOMPARE(next->rowsFetched(), 2);
+    }
+
+    // Breadth-first through the catalog: every node is presentable, every table and view has a
+    // definition and DDL, and the only acceptable refusal is Unsupported (PostgreSQL's other
+    // databases). System objects are skipped, and at most a few nodes per level are followed.
+    void catalogWalk()
+    {
+        QVERIFY(runAll(*m_conn, m_f.dropWalkTable));
+        QVERIFY(runAll(*m_conn, m_f.createWalkTable));
+        const auto drop = qScopeGuard([this] { (void)runAll(*m_conn, m_f.dropWalkTable); });
+        ICatalog &catalog = m_conn->catalog();
+        QList<ObjectPath> frontier{ObjectPath{}};
+        int visited = 0;
+        int tables = 0;
+        while (!frontier.isEmpty() && visited < 150) {
+            const ObjectPath path = frontier.takeFirst();
+            const Result<QList<ObjectNode>> nodes = catalog.children(path);
+            if (!nodes) {
+                QVERIFY2(nodes.error().category == DbError::Category::Unsupported,
+                         qPrintable(path.toString() + u": "_s + nodes.error().toString()));
+                continue;
+            }
+            int followed = 0;
+            for (const ObjectNode &n : *nodes) {
+                QVERIFY2(!n.displayName.isEmpty() && !n.icon.isEmpty(),
+                         qPrintable(path.toString()));
+                if (n.isSystem || followed >= 4)
+                    continue;
+                ++followed;
+                ++visited;
+                const ObjectPath child = path.child(n.ref);
+                if (n.ref.kind == kind::Table || n.ref.kind == kind::View) {
+                    ++tables;
+                    const Result<TableDef> def = catalog.table(child);
+                    QVERIFY2(def,
+                             qPrintable(child.toString() + u": "_s
+                                        + (def ? QString() : def.error().toString())));
+                    QVERIFY(!def->columns.isEmpty());
+                    const Result<QString> ddl = catalog.ddl(child);
+                    QVERIFY2(ddl && ddl->contains(u"CREATE"_s, Qt::CaseInsensitive),
+                             qPrintable(child.toString()));
+                }
+                if (n.hasChildren)
+                    frontier.append(child);
+            }
+        }
+        qInfo("visited %d nodes, %d tables / views", visited, tables);
+        QVERIFY(tables >= 1);
+    }
+
+    void catalogThroughCache()
+    {
+        std::unique_ptr<ConnectionWorker> worker = openWorker();
+        QVERIFY(worker);
+        CatalogCache cache(worker.get());
+        QSignalSpy loaded(&cache, &CatalogCache::loaded);
+        cache.loadChildren({});
+        QVERIFY(loaded.wait(10000));
+        QVERIFY(!cache.children({}).value_or(QList<ObjectNode>{}).isEmpty());
     }
 };
 

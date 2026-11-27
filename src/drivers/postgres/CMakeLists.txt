@@ -3,6 +3,7 @@
 qt_add_library(owl_postgres STATIC
     pgdialect.h pgdialect.cpp
     pgvalues.h pgvalues.cpp
+    pgcatalog.h pgcatalog.cpp
     pgdriver.h pgdriver.cpp)
 target_include_directories(owl_postgres PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(owl_postgres PUBLIC Owl::Core PRIVATE owl_driver_common PostgreSQL::PostgreSQL)
