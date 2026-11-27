@@ -18,8 +18,8 @@ Items that move to another milestone stay unticked with a note pointing to where
 - [x] **Exit:** themed empty shell runs on all 3 OSes with CI green
 
 ## M1 — Read-only client
-Goal: daily-usable for browsing and querying PostgreSQL and SQLite. PRs in order; "needs" lists
-the PRs that must land first.
+Goal: daily-usable for browsing and querying PostgreSQL, MySQL / MariaDB and SQLite. PRs in order;
+"needs" lists the PRs that must land first.
 
 - [x] **1.1 Dependencies + CI** — vcpkg (pinned baseline, binary cache) for libpq 18.4 and sqlite3
   3.54; QtKeychain 0.18 + KSyntaxHighlighting 6.32 built against our Qt (decisions 124, 126–128);
@@ -41,27 +41,32 @@ the PRs that must land first.
 - [x] **1.6 PostgreSQL driver** — libpq plugin: chunked rows, cancel, notices, type mapping, SSL,
   sockets; dialect (dollar quotes, nested comments, `$n`, SELECT INTO, EXPLAIN (ANALYZE)); conformance
   + integration tests vs PG 13 and 18 (decisions 146–153). — #14
-- [ ] **1.7 Catalog** — `ICatalog` for PG / SQLite (tree nodes, TableDef, DDL text), `CatalogCache`
-  with invalidation. _needs: 1.5, 1.6_
-- [ ] **1.8 Sessions** — migration 0002 (`folder`, `session`), keychain secrets, session manager in
-  the Welcome tab, `ConnectionFormSchema` spec, URL / `.pgpass` import, safety levels.
+- [x] **1.7 MySQL / MariaDB driver** — MariaDB Connector/C 3.4 plugin for MySQL 5.7+ and MariaDB
+  10.6+: text protocol + prepared statements, unbuffered streaming, multiple result sets, KILL QUERY
+  cancel, warnings, column origins, TLS modes; dialect (DELIMITER, stored-program bodies, MySQL
+  lexing); conformance + integration tests vs MySQL 8.4 / 5.7 and MariaDB 11.8 / 10.6
+  (decisions 154–161; moved up from M2). — #15
+- [ ] **1.8 Catalog** — `ICatalog` for PG / MySQL / SQLite (tree nodes, TableDef, DDL text),
+  `CatalogCache` with invalidation. _needs: 1.5, 1.6, 1.7_
+- [ ] **1.9 Sessions** — migration 0002 (`folder`, `session`), keychain secrets, session manager in
+  the Welcome tab, `ConnectionFormSchema` spec, URL / `.pgpass` / `.my.cnf` import, safety levels.
   _needs: 1.4, 1.1_
-- [ ] **1.9 Object tree** — sidebar tree over the catalog: styled tree rows, lazy loading, filter,
-  full PG depth, icons, refresh. _needs: 1.7, 1.8_
-- [ ] **1.10 Data grid (read-only)** — `ResultModel`, object tab Data view, browse paging, WHERE box
-  + column filters, sorting, keyboard navigation, NULL / truncation display, copy. _needs: 1.7_
-- [ ] **1.11 SQL editor + results** — TextArea editor with `EditorHighlighter` (decisions 129–131), run keys, statement tint, result
-  tabs, Messages, error positions, placeholder prompt, safety guards. _needs: 1.2, 1.10_
-- [ ] **1.12 Log + history** — Log panel (all statements, filters), `history.db` with FTS5 search
+- [ ] **1.10 Object tree** — sidebar tree over the catalog: styled tree rows, lazy loading, filter,
+  full PG depth, icons, refresh. _needs: 1.8, 1.9_
+- [ ] **1.11 Data grid (read-only)** — `ResultModel`, object tab Data view, browse paging, WHERE box
+  + column filters, sorting, keyboard navigation, NULL / truncation display, copy. _needs: 1.8_
+- [ ] **1.12 SQL editor + results** — TextArea editor with `EditorHighlighter` (decisions 129–131), run keys, statement tint, result
+  tabs, Messages, error positions, placeholder prompt, safety guards. _needs: 1.2, 1.11_
+- [ ] **1.13 Log + history** — Log panel (all statements, filters), `history.db` with FTS5 search
   and retention. _needs: 1.4_
-- [ ] **Exit:** browse and query real PostgreSQL and SQLite databases on all 3 OSes; CI runs
-  PostgreSQL integration tests; no known crash or data-loss bug.
+- [ ] **Exit:** browse and query real PostgreSQL, MySQL / MariaDB and SQLite databases on all 3 OSes;
+  CI runs the server integration tests; no known crash or data-loss bug.
 
 ### Decisions made for M1 (2026-11-26)
 - **D1 → decision 124:** vcpkg only for C libraries (libpq, sqlite3, later libmariadb, libssh2).
   QtKeychain and KSyntaxHighlighting are built from pinned source tags with CMake `FetchContent`
   against our Qt (KSyntaxHighlighting needs extra-cmake-modules and Perl at build time).
-- **D2 → decision 125:** server integration tests (PostgreSQL now, MariaDB/MySQL in M2) run on the
+- **D2 → decision 125:** server integration tests (PostgreSQL, MySQL / MariaDB) run on the
   Linux CI job in Docker service containers; SQLite and unit tests run on every OS.
 
 ## Carried over from M0
@@ -77,7 +82,7 @@ the PRs that must land first.
 - [ ] FK jump + lookup picker.
 - [ ] Transactions: auto-commit toggle, open-TX indicator; prod safety guards.
 - [ ] Table structure editor with DDL preview.
-- [ ] MySQL / MariaDB driver.
+- [ ] MySQL / MariaDB driver → moved to M1.7 (decision 154).
 - [ ] SQLite column origin metadata (`SQLITE_ENABLE_COLUMN_METADATA` via a vcpkg overlay port) so
   SQLite query results can be edited (from M1.5).
 - [ ] **Exit:** can safely modify data and schema on all Tier-1 engines.

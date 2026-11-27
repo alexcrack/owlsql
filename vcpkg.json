@@ -6,6 +6,7 @@
   "license": "GPL-3.0-or-later",
   "builtin-baseline": "13eb3d17cbd0309c9ac279e62dfd6d98f2ac8784",
   "dependencies": [
+    "libmariadb",
     "libpq",
     {
       "name": "sqlite3",

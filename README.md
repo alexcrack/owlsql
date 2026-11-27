@@ -51,20 +51,30 @@ Qt Creator: open `CMakeLists.txt` and pick a preset or your Qt 6.12 kit.
 
 ### Integration tests
 
-Tests against real servers skip themselves unless a server URL is set (CI runs them on Linux,
-against PostgreSQL 18 and 13):
+Tests against real servers skip themselves unless a server URL is set. CI runs them on Linux
+against PostgreSQL 18 and 13, MySQL 8.4 and 5.7, MariaDB 11.8 and 10.6; locally, start the ones you
+need:
 
 ```sh
 docker run -d --rm --name owl-pg18 -e POSTGRES_PASSWORD=owlsql -p 55432:5432 postgres:18
 docker run -d --rm --name owl-pg13 -e POSTGRES_PASSWORD=owlsql -p 55433:5432 postgres:13
+docker run -d --rm --name owl-mysql84 -e MYSQL_ROOT_PASSWORD=owlsql -e MYSQL_DATABASE=owl -p 53306:3306 mysql:8.4
+docker run -d --rm --name owl-mysql57 -e MYSQL_ROOT_PASSWORD=owlsql -e MYSQL_DATABASE=owl -p 53307:3306 mysql:5.7
+docker run -d --rm --name owl-mariadb118 -e MARIADB_ROOT_PASSWORD=owlsql -e MARIADB_DATABASE=owl -p 53308:3306 mariadb:11.8
+docker run -d --rm --name owl-mariadb106 -e MARIADB_ROOT_PASSWORD=owlsql -e MARIADB_DATABASE=owl -p 53309:3306 mariadb:10.6
 export OWL_TEST_PG_URL=postgresql://postgres:owlsql@localhost:55432/postgres
 export OWL_TEST_PG13_URL=postgresql://postgres:owlsql@localhost:55433/postgres
+export OWL_TEST_MYSQL_URL=mysql://root:owlsql@127.0.0.1:53306/owl
+export OWL_TEST_MYSQL57_URL=mysql://root:owlsql@127.0.0.1:53307/owl
+export OWL_TEST_MARIADB_URL=mariadb://root:owlsql@127.0.0.1:53308/owl
+export OWL_TEST_MARIADB106_URL=mariadb://root:owlsql@127.0.0.1:53309/owl
 ctest --preset debug -L integration
-docker stop owl-pg18 owl-pg13
+docker stop owl-pg18 owl-pg13 owl-mysql84 owl-mysql57 owl-mariadb118 owl-mariadb106
 ```
 
-Each server-backed test runs once per URL variable (`tst_pg_driver`, `tst_pg_driver13`, …); a
-missing URL skips it, unless `OWL_REQUIRE_INTEGRATION_TESTS` is set (CI), which makes it fail.
+Each server-backed test runs once per URL variable (`tst_pg_driver`, `tst_pg_driver13`,
+`tst_mysql_driver57`, …); a missing URL skips it, unless `OWL_REQUIRE_INTEGRATION_TESTS` is set
+(CI), which makes it fail.
 
 ## Development
 

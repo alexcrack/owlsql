@@ -5,7 +5,7 @@ qt_add_library(owl_postgres STATIC
     pgvalues.h pgvalues.cpp
     pgdriver.h pgdriver.cpp)
 target_include_directories(owl_postgres PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(owl_postgres PUBLIC Owl::Core PRIVATE PostgreSQL::PostgreSQL)
+target_link_libraries(owl_postgres PUBLIC Owl::Core PRIVATE owl_driver_common PostgreSQL::PostgreSQL)
 set_target_properties(owl_postgres PROPERTIES POSITION_INDEPENDENT_CODE ON)
 owl_set_target_options(owl_postgres)
 

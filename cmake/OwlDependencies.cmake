@@ -7,6 +7,8 @@ find_package(PostgreSQL REQUIRED)
 if(PostgreSQL_VERSION_STRING VERSION_LESS 17)
     message(FATAL_ERROR "libpq >= 17 is required, found ${PostgreSQL_VERSION_STRING}")
 endif()
+# MariaDB Connector/C 3.4: talks to MySQL 5.7+ and MariaDB 10.6+ (decision 154).
+find_package(unofficial-libmariadb CONFIG REQUIRED)
 # SQLite >= 3.35 for RETURNING and DROP COLUMN (decision 048).
 find_package(SQLite3 3.35 REQUIRED)
 # Result<T> (decision 078); header-only.
