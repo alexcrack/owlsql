@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "pgdriver.h"
 
+#include "owl/core/formbuilder.h"
 #include "pgcatalog.h"
 #include "pgvalues.h"
 
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QScopeGuard>
 #include <QSet>
 #include <QThreadPool>
@@ -774,6 +776,101 @@ Capabilities PgDriver::capabilities() const
 std::unique_ptr<IConnection> PgDriver::createConnection() const
 {
     return std::make_unique<PgConnection>();
+}
+
+ConnectionFormSchema PgDriver::connectionForm() const
+{
+    ConnectionFormSchema schema;
+    schema.fields = form::serverFields(5432, QStringLiteral("postgres"), true, true,
+                                       QStringLiteral("/var/run/postgresql"));
+    const QString advanced = QStringLiteral("advanced");
+    schema.fields << form::text(QStringLiteral("applicationName"),
+                                QStringLiteral("Application name"), advanced, false,
+                                QStringLiteral("OwlSql"));
+    FormField options
+        = form::text(QStringLiteral("option.options"), QStringLiteral("Server options"), advanced);
+    options.placeholder = QStringLiteral("-c search_path=app,public");
+    schema.fields << options;
+    FormField attrs = form::text(QStringLiteral("option.target_session_attrs"),
+                                 QStringLiteral("Target session"), advanced);
+    attrs.type = FormField::Type::Choice;
+    attrs.choices = {{.value = QString(), .label = QStringLiteral("Any")},
+                     {.value = QStringLiteral("read-write"), .label = QStringLiteral("Read-write")},
+                     {.value = QStringLiteral("read-only"), .label = QStringLiteral("Read-only")},
+                     {.value = QStringLiteral("primary"), .label = QStringLiteral("Primary")},
+                     {.value = QStringLiteral("standby"), .label = QStringLiteral("Standby")}};
+    schema.fields << attrs;
+    return schema;
+}
+
+// libpq parses both forms: "postgresql://user@host/db?sslmode=require" and
+// "host=… dbname=…" (https://www.postgresql.org/docs/current/libpq-connect.html).
+Result<ConnectionParams> PgDriver::parseUrl(const QString &url) const
+{
+    const QString text = url.trimmed();
+    static const QRegularExpression keywordForm(QStringLiteral("^[a-z_]+\\s*="));
+    const bool uri = text.startsWith(u"postgresql://") || text.startsWith(u"postgres://");
+    if (!uri && !keywordForm.match(text).hasMatch())
+        return fail(DbError::Category::Unsupported, QStringLiteral("Not a PostgreSQL URL"));
+
+    char *error = nullptr;
+    PQconninfoOption *options = PQconninfoParse(text.toUtf8().constData(), &error);
+    if (!options) {
+        DbError e;
+        e.message = QString::fromUtf8(error ? error : "Invalid connection string").trimmed();
+        PQfreemem(error);
+        if (!uri) // "x=y" that libpq does not know: not ours
+            e.category = DbError::Category::Unsupported;
+        return fail(e);
+    }
+    ConnectionParams p;
+    p.driverId = id();
+    for (PQconninfoOption *o = options; o->keyword; ++o) {
+        if (!o->val)
+            continue;
+        const QString key = QString::fromLatin1(o->keyword);
+        const QString value = QString::fromUtf8(o->val);
+        if (key == u"host") {
+            if (value.startsWith(u'/') || value.startsWith(u'@')) {
+                p.transport = ConnectionParams::Transport::Socket;
+                p.socketPath = value;
+            } else {
+                p.host = value;
+            }
+        } else if (key == u"port") {
+            bool ok = false;
+            const uint port = value.section(u',', 0, 0).toUInt(&ok);
+            if (!ok || port == 0 || port > 65535) {
+                PQconninfoFree(options);
+                DbError e;
+                e.message = QStringLiteral("Invalid port \"%1\"").arg(value);
+                return fail(e);
+            }
+            p.port = static_cast<quint16>(port);
+        } else if (key == u"dbname") {
+            p.database = value;
+        } else if (key == u"user") {
+            p.user = value;
+        } else if (key == u"password") {
+            p.password = value;
+        } else if (key == u"sslmode") {
+            p.ssl.mode = sslModeFromName(value).value_or(SslOptions::Mode::Prefer);
+        } else if (key == u"sslrootcert") {
+            p.ssl.caFile = value;
+        } else if (key == u"sslcert") {
+            p.ssl.certFile = value;
+        } else if (key == u"sslkey") {
+            p.ssl.keyFile = value;
+        } else if (key == u"application_name") {
+            p.applicationName = value;
+        } else if (key == u"connect_timeout") {
+            p.connectTimeout = std::chrono::seconds(qMax(1, value.toInt()));
+        } else {
+            p.driverOptions.insert(key, value);
+        }
+    }
+    PQconninfoFree(options);
+    return p;
 }
 
 } // namespace owl::postgres

@@ -35,6 +35,10 @@ public:
     QList<IDriver *> drivers() const; // in registration order
     QStringList ids() const;
 
+    // The first driver that understands `url` (IDriver::parseUrl), with its ConnectionParams.
+    // Unsupported when no driver does.
+    Result<ConnectionParams> parseUrl(const QString &url) const;
+
 private:
     QList<std::shared_ptr<IDriver>> m_drivers;
     QHash<QString, IDriver *> m_byId;

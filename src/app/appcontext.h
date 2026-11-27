@@ -7,9 +7,15 @@
 
 #include <memory>
 
+namespace owl {
+class DriverRegistry;
+}
+
 namespace owl::app {
 
 class AppDatabase;
+class SecretStore;
+class SessionStore;
 class Keybindings;
 class Settings;
 class UiState;
@@ -37,15 +43,24 @@ public:
     UiState *uiState() const { return m_uiState; }
     Keybindings *keybindings() const { return m_keybindings; }
     AppDatabase *database() const { return m_database.get(); }
+    // Database drivers (plugins from OWL_DRIVER_DIR, or next to / above the executable).
+    DriverRegistry *drivers() const { return m_drivers.get(); }
+    // Saved sessions; null when owlsql.db could not be opened.
+    SessionStore *sessions() const { return m_sessions; }
+    SecretStore *secrets() const { return m_secrets; }
 
 private:
     void applyThemeSettings();
+    void loadDrivers();
 
     AppPaths m_paths;
     std::unique_ptr<AppDatabase> m_database;
     Settings *m_settings = nullptr;
     UiState *m_uiState = nullptr;
     Keybindings *m_keybindings = nullptr;
+    std::unique_ptr<DriverRegistry> m_drivers;
+    SessionStore *m_sessions = nullptr;
+    SecretStore *m_secrets = nullptr;
 };
 
 } // namespace owl::app

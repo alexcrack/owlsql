@@ -11,6 +11,8 @@ qt_add_library(owlcore STATIC
     include/owl/core/result.h
     include/owl/core/driver.h
     include/owl/core/catalog.h
+    include/owl/core/connectionform.h
+    include/owl/core/formbuilder.h
     include/owl/core/catalogsupport.h
     include/owl/core/catalogcache.h
     include/owl/core/dialect.h
@@ -25,6 +27,8 @@ qt_add_library(owlcore STATIC
     src/dberror.cpp
     src/driverregistry.cpp
     src/catalog.cpp
+    src/connectionform.cpp
+    src/formbuilder.cpp
     src/catalogsupport.cpp
     src/catalogcache.cpp
     src/dialect.cpp

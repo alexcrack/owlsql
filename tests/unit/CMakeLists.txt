@@ -21,3 +21,5 @@ owl_add_unit_test(tst_mysql_dialect SOURCES tst_mysql_dialect.cpp LIBS owl_mysql
 owl_add_unit_test(tst_mysql_values SOURCES tst_mysql_values.cpp LIBS owl_mysql)
 owl_add_unit_test(tst_catalog_cache SOURCES tst_catalog_cache.cpp LIBS owl_test_fakedriver)
 owl_add_unit_test(tst_sqlite_catalog SOURCES tst_sqlite_catalog.cpp LIBS owl_sqlite)
+owl_add_unit_test(tst_connection_forms SOURCES tst_connection_forms.cpp LIBS owl_postgres owl_mysql owl_sqlite)
+owl_add_unit_test(tst_sessions SOURCES tst_sessions.cpp LIBS owlsql_app owl_test_fakedriver)

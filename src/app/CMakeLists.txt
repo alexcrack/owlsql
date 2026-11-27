@@ -13,6 +13,11 @@ qt_add_qml_module(owlsql_app
         apppaths.h apppaths.cpp
         commandregistry.h commandregistry.cpp
         keybindings.h keybindings.cpp
+        secretstore.h secretstore.cpp
+        session.h session.cpp
+        sessionimport.h sessionimport.cpp
+        sessioninfo.h sessioninfo.cpp
+        sessionstore.h sessionstore.cpp
         settings.h settings.cpp
         singleinstance.h singleinstance.cpp
         uistate.h uistate.cpp
@@ -29,6 +34,6 @@ qt_add_resources(owlsql_app "owlsql_app_migrations"
 
 target_include_directories(owlsql_app PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(owlsql_app
-    PUBLIC Qt6::Gui Qt6::Qml Qt6::Sql
-    PRIVATE Qt6::Network Qt6::Quick Qt6::QuickControls2 owlsql_theme)
+    PUBLIC Qt6::Gui Qt6::Qml Qt6::Sql Owl::Core
+    PRIVATE Qt6::Network Qt6::Quick Qt6::QuickControls2 owlsql_theme Qt6Keychain::Qt6Keychain)
 owl_set_target_options(owlsql_app)

@@ -3,6 +3,7 @@
 
 #include <QElapsedTimer>
 #include <QThread>
+#include <QUrl>
 
 #include <atomic>
 
@@ -246,6 +247,39 @@ private:
 std::unique_ptr<IConnection> FakeDriver::createConnection() const
 {
     return std::make_unique<FakeConnection>();
+}
+
+ConnectionFormSchema FakeDriver::connectionForm() const
+{
+    ConnectionFormSchema schema;
+    FormField host;
+    host.key = QStringLiteral("host");
+    host.label = QStringLiteral("Host");
+    host.required = true;
+    schema.fields << host;
+    FormField speed;
+    speed.key = QStringLiteral("option.speed");
+    speed.label = QStringLiteral("Speed");
+    speed.type = FormField::Type::Integer;
+    speed.minimum = 1;
+    speed.maximum = 10;
+    speed.defaultValue = 5;
+    schema.fields << speed;
+    return schema;
+}
+
+Result<ConnectionParams> FakeDriver::parseUrl(const QString &text) const
+{
+    const QUrl url(text);
+    if (url.scheme() != QLatin1String("fake"))
+        return fail(DbError::Category::Unsupported, QStringLiteral("Not a fake URL"));
+    ConnectionParams p;
+    p.driverId = id();
+    p.host = url.host();
+    p.user = url.userName();
+    p.password = url.password();
+    p.database = url.path().mid(1);
+    return p;
 }
 
 } // namespace owl::test

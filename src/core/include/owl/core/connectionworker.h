@@ -32,7 +32,9 @@ public:
     // Cancels running work, stops the thread and closes the connection.
     ~ConnectionWorker() override;
 
-    void open(const ConnectionParams &params);
+    // Connects, then runs `startupStatements` (a session's startup script, already split; logged
+    // as Internal). A failing startup statement fails the open.
+    void open(const ConnectionParams &params, const QStringList &startupStatements = {});
     void close();
 
     // Queues a statement. The job is a child of this worker unless reparented; jobs queued

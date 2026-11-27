@@ -49,11 +49,15 @@ Goal: daily-usable for browsing and querying PostgreSQL, MySQL / MariaDB and SQL
 - [x] **1.8 Catalog** — `ICatalog` for PG / MySQL / SQLite (tree nodes, TableDef, DDL text),
   `CatalogCache` with invalidation, `ConnectionWorker::runTask()`, catalog walk in the conformance
   suite, fixture-schema tests on all six servers (decisions 162–165). — #16
-- [ ] **1.9 Sessions** — migration 0002 (`folder`, `session`), keychain secrets, session manager in
-  the Welcome tab, `ConnectionFormSchema` spec, URL / `.pgpass` / `.my.cnf` import, safety levels.
-  _needs: 1.4, 1.1_
+- [x] **1.9a Sessions (core)** — migration 0002 (`folder`, `session`), `SessionStore`, keychain
+  secrets, `ConnectionFormSchema` + `IDriver::parseUrl()` (coreApi 4), JSON / URL / `.pgpass` /
+  `.my.cnf` import, runtime `Session` (meta + per-database connections, startup script)
+  (decisions 166–170). — #17
+- [ ] **1.9b Session manager (UI)** — Welcome-tab manager (folders, search, add / edit / duplicate /
+  delete, import / export), generated connection form with Test, password prompt, safety-level
+  colours, prod frame and PROD badge. _needs: 1.9a_
 - [ ] **1.10 Object tree** — sidebar tree over the catalog: styled tree rows, lazy loading, filter,
-  full PG depth, icons, refresh. _needs: 1.8, 1.9_
+  full PG depth, icons, refresh. _needs: 1.8, 1.9b_
 - [ ] **1.11 Data grid (read-only)** — `ResultModel`, object tab Data view, browse paging, WHERE box
   + column filters, sorting, keyboard navigation, NULL / truncation display, copy. _needs: 1.8_
 - [ ] **1.12 SQL editor + results** — TextArea editor with `EditorHighlighter` (decisions 129–131), run keys, statement tint, result
