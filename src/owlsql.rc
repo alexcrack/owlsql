@@ -1,0 +1,3 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Windows resources of the OwlSql executable: the app icon (decision 175).
+IDI_ICON1 ICON "../resources/appicon/owlsql.ico"

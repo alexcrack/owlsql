@@ -33,6 +33,14 @@ qt_add_resources(owlsql_theme "owlsql_theme_assets"
         "${owl_resources_dir}/fonts/jetbrains-mono/JetBrainsMono-Bold.ttf"
         "${owl_resources_dir}/fonts/jetbrains-mono/JetBrainsMono-Italic.ttf"
         "${owl_resources_dir}/logo/owlsql.svg"
+        "${owl_resources_dir}/logo/owlsql-small.svg"
+        "${owl_resources_dir}/appicon/png/owlsql-16.png"
+        "${owl_resources_dir}/appicon/png/owlsql-24.png"
+        "${owl_resources_dir}/appicon/png/owlsql-32.png"
+        "${owl_resources_dir}/appicon/png/owlsql-48.png"
+        "${owl_resources_dir}/appicon/png/owlsql-64.png"
+        "${owl_resources_dir}/appicon/png/owlsql-128.png"
+        "${owl_resources_dir}/appicon/png/owlsql-256.png"
         ${owl_icon_files}
 )
 

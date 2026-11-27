@@ -1,10 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-  <!-- OwlSql placeholder mark (decision 040). SPDX-License-Identifier: GPL-3.0-or-later -->
-  <path d="M14 23 L17 9 L26 17 Q32 15 38 17 L47 9 L50 23 Q54 31 52 41 Q48 57 32 58 Q16 57 12 41 Q10 31 14 23 Z"
-        stroke="#E8A33D" stroke-width="3.5" stroke-linejoin="round" fill="#E8A33D" fill-opacity="0.12"/>
-  <circle cx="24" cy="32" r="7.5" stroke="#E8A33D" stroke-width="3"/>
-  <circle cx="40" cy="32" r="7.5" stroke="#E8A33D" stroke-width="3"/>
-  <circle cx="24" cy="32" r="2.8" fill="#E8A33D"/>
-  <circle cx="40" cy="32" r="2.8" fill="#E8A33D"/>
-  <path d="M29.5 39 L32 44.5 L34.5 39 Z" fill="#E8A33D" stroke="#E8A33D" stroke-width="1.5" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- OwlSql mark "J · Folded Wings": an owl that is a database cylinder (decision 175).
+       Use owlsql-small.svg at 16-24 px. SPDX-License-Identifier: GPL-3.0-or-later -->
+  <path d="M13.5 22 L11 5 L26 13 Z" fill="#C27A16"/>
+  <path d="M50.5 22 L53 5 L38 13 Z" fill="#C27A16"/>
+  <path d="M12 24 A20 12 0 0 1 52 24 V50 A20 7 0 0 1 12 50 Z" fill="#E8A33D"/>
+  <path d="M13.6 44 A20 7 0 0 0 50.4 44" fill="none" stroke="#2B1D0A" stroke-opacity=".3" stroke-width="3"/>
+  <path d="M12 29.5 Q7.6 40.5 12.4 51.2 Q16.6 54.4 20.4 51.8 Q15.6 42 17.2 31 Q14.6 28.6 12 29.5 Z" fill="#C27A16"/>
+  <path d="M52 29.5 Q56.4 40.5 51.6 51.2 Q47.4 54.4 43.6 51.8 Q48.4 42 46.8 31 Q49.4 28.6 52 29.5 Z" fill="#C27A16"/>
+  <ellipse cx="32" cy="24" rx="20" ry="12" fill="#F5C46A"/>
+  <circle cx="24" cy="23.5" r="7" fill="#FFF6E6" stroke="#2B1D0A" stroke-width="2.6"/>
+  <circle cx="40" cy="23.5" r="7" fill="#FFF6E6" stroke="#2B1D0A" stroke-width="2.6"/>
+  <circle cx="25" cy="24.1" r="3.3" fill="#2B1D0A"/>
+  <circle cx="41" cy="24.1" r="3.3" fill="#2B1D0A"/>
+  <path d="M28.9 30.4 L32 37.9 L35.1 30.4 Z" fill="#2B1D0A" stroke="#2B1D0A" stroke-width="1.2" stroke-linejoin="round"/>
 </svg>

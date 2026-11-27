@@ -44,7 +44,7 @@ superseded ones are marked, never deleted.
 | 037 | Persistent searchable history, 90-day default retention, prod opt-out | |
 | 038 | Opt-in crash reports only, no usage telemetry | |
 | 039 | Update check via GitHub Releases; auto-updater for Win/macOS builds | |
-| 040 | Placeholder owl logo now | |
+| 040 | Placeholder owl logo now | Superseded by 175 |
 | 041 | No deadline — quality first | |
 | 042 | Drivers are **blocking**, one worker thread per physical connection; cancel is the only cross-thread call | Supersedes the "libpq async API" idea in the first proposal |
 | 043 | Connections: `meta` + one per query tab (lazy) + one per browsed PG database; "single connection" session option | |
@@ -175,3 +175,4 @@ superseded ones are marked, never deleted.
 | 168 | Sessions in `owlsql.db` (migration 0002: `folder`, `session`) through `SessionStore`; secrets only through `SecretStore` (QtKeychain; in memory in tests). A password given with a session is never written to the database; duplicating a session does not copy its secrets; removing a folder moves its sessions to the top level | app-store.md §2–3 |
 | 169 | A runtime `Session` opens the `meta` connection with its catalog and, when the driver supports several databases but cannot switch in a session (PostgreSQL), one connection + catalog per further database browsed. The startup script runs on every physical connection; a failing statement fails that connection. Passwords: keychain → ask when missing or no keychain; "remember" stores it | Decisions 043, 088 |
 | 170 | Imports: `*.owlsql-sessions.json` v1 (secret modes become "ask"; missing certificate files are reported), connection URLs, `~/.pgpass` (wildcard hosts or users skipped), `~/.my.cnf` (`[client]` + `[mysql]`, and each `[client<suffix>]` group; `!include` reported, not followed). All merge by id with keep both / replace / skip | Decision 085 |
+| 175 | Logo "J · Folded Wings": an owl whose body is a database cylinder, eyes in the cylinder's light top, wings folded along its sides; owl amber, deep amber, ink and cream. `resources/logo/owlsql.svg` is the mark used in the app; `owlsql-small.svg` is hand-tuned on a 16 px grid (no wings, thicker eye rings) for 16–24 px; the app icon puts the mark on an ink tile (`owlsql-app*.svg`). `tools/make-app-icons.sh` (Inkscape + Pillow) generates the PNGs, `.ico` and `.icns` in `resources/appicon/` | Supersedes 040; chosen from three rounds of options |
