@@ -21,9 +21,9 @@ void later(QObject *context, SecretStore::Done done, SecretStore::Outcome outcom
 }
 
 template<typename Job>
-void run(Job *job, SecretStore::Done done, bool isRead)
+void run(Job *job, SecretStore::Done done)
 {
-    QObject::connect(job, &QKeychain::Job::finished, job, [job, done = std::move(done), isRead] {
+    QObject::connect(job, &QKeychain::Job::finished, job, [job, done = std::move(done)] {
         if (!done)
             return;
         SecretStore::Outcome o;
@@ -32,7 +32,7 @@ void run(Job *job, SecretStore::Done done, bool isRead)
         if (!o.ok)
             o.error = job->errorString();
         if constexpr (std::is_same_v<Job, QKeychain::ReadPasswordJob>) {
-            if (o.ok && isRead)
+            if (o.ok)
                 o.value = job->textData();
         }
         done(o);
@@ -64,7 +64,7 @@ void KeychainSecretStore::read(const QString &sessionId, const QString &secret, 
     auto *job = new QKeychain::ReadPasswordJob(service, this);
     job->setAutoDelete(true);
     job->setKey(account(sessionId, secret));
-    run(job, std::move(done), true);
+    run(job, std::move(done));
 }
 
 void KeychainSecretStore::write(const QString &sessionId, const QString &secret,
@@ -74,7 +74,7 @@ void KeychainSecretStore::write(const QString &sessionId, const QString &secret,
     job->setAutoDelete(true);
     job->setKey(account(sessionId, secret));
     job->setTextData(value);
-    run(job, std::move(done), false);
+    run(job, std::move(done));
 }
 
 void KeychainSecretStore::remove(const QString &sessionId, const QString &secret, Done done)
@@ -82,7 +82,7 @@ void KeychainSecretStore::remove(const QString &sessionId, const QString &secret
     auto *job = new QKeychain::DeletePasswordJob(service, this);
     job->setAutoDelete(true);
     job->setKey(account(sessionId, secret));
-    run(job, std::move(done), false);
+    run(job, std::move(done));
 }
 
 void MemorySecretStore::read(const QString &sessionId, const QString &secret, Done done)
@@ -116,7 +116,7 @@ void MemorySecretStore::write(const QString &sessionId, const QString &secret, c
 void MemorySecretStore::remove(const QString &sessionId, const QString &secret, Done done)
 {
     Outcome o;
-    o.ok = m_values.remove(account(sessionId, secret)) > 0;
+    o.ok = m_values.remove(account(sessionId, secret)); // QHash::remove() → bool
     o.notFound = !o.ok;
     later(this, std::move(done), o);
 }
