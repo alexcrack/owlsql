@@ -40,6 +40,9 @@ struct Fixtures
     QString updateAllRows; // UPDATE owl_conf SET x = x + 10
     // A statement that writes, for the read-only guard (must not need owl_conf)
     QString writeStatement;
+    // A permanent table the catalog walk must find (owl_conf_walk), and how to drop it again
+    QString createWalkTable;
+    QString dropWalkTable;
 };
 
 int runConformance(int argc, char **argv, const Fixtures &fixtures);

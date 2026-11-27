@@ -139,7 +139,7 @@ the core refuses plugins whose `coreApi` differs.
 ```cpp
 #define OWL_DRIVER_IID "org.owlsql.Driver/1"
 
-// plugin metadata JSON: { "id": "postgres", "name": "PostgreSQL", "coreApi": 2 }
+// plugin metadata JSON: { "id": "postgres", "name": "PostgreSQL", "coreApi": 3 }
 
 class IDriver {
 public:
@@ -198,7 +198,7 @@ public:
     virtual Result<void> useDatabase(const QString&) = 0;  // MySQL: USE; PG: Unsupported
     virtual Result<void> setSearchPath(const QStringList&) = 0;
 
-    virtual ICatalog& catalog() = 0;
+    virtual ICatalog& catalog() = 0;                       // M1.8, coreApi 3
 
     // server messages (NOTICE, warnings) produced during the last call
     virtual QList<ServerMessage> takeMessages() = 0;
@@ -296,6 +296,16 @@ options) is the shared model for the table editor, grid editing (PK detection) a
 them per session. Invalidation: any DDL executed by OwlSql invalidates affected paths
 (dialect's `classify()` reports touched objects where it can; otherwise the parent schema);
 F5 refreshes the selected node. No background polling.
+
+> **Implemented (M1.8)** in `owl/core/catalog.h` / `catalogcache.h` and each driver's
+> `*catalog.cpp`: `ObjectRef` / `ObjectPath` / `ObjectNode` as above (kinds and group names are
+> constants in `owl::kind` / `owl::group`; folders are `group` nodes), `TableDef` with `ColumnDef`,
+> `IndexDef`, `ForeignKeyDef`, `ConstraintDef` (uniques, checks), `TriggerDef` and engine `options`.
+> `ICatalog` v1 = `children()`, `table()`, `ddl()` (decision 164); `nodeKinds()` was not needed — the
+> UI renders whatever nodes come back. Tree shapes per engine: decision 163. Icons: `iconFor(kind,
+> detail)` in OwlCore. `CatalogCache` runs the calls as `ConnectionWorker::runTask()` items (in queue
+> order with statements) and clears itself after DDL (decision 162). The conformance suite walks
+> every driver's tree.
 
 ---
 

@@ -93,6 +93,11 @@ private:
             m_queue.pop_front();
             if (job->cancelRequested)
                 continue; // already reported as cancelled by the main thread
+            if (job->task) {
+                const bool open = m_connection && m_connection->isOpen();
+                job->task(open ? m_connection.get() : nullptr);
+                continue;
+            }
             run(std::move(job));
         }
     }
@@ -332,6 +337,14 @@ void ConnectionWorker::open(const ConnectionParams &params)
 {
     setState(State::Connecting);
     post([ex = m_executor, params] { ex->open(params); });
+}
+
+void ConnectionWorker::runTask(std::function<void(IConnection *)> task)
+{
+    auto item = std::make_shared<detail::JobShared>();
+    item->id = m_nextJobId++;
+    item->task = std::move(task);
+    post([ex = m_executor, item] { ex->enqueue(item); });
 }
 
 void ConnectionWorker::close()

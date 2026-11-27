@@ -87,9 +87,72 @@ private:
     bool m_closed = false;
 };
 
+// Catalog: [] → database "fake"; [fake] → group tables; [fake, tables] → tables "a" and "b".
+// A database named "fail" answers with an error; paths containing "slow" take 300 ms. Every call
+// is counted in calls (for cache tests).
+class FakeCatalog : public ICatalog
+{
+public:
+    Result<QList<ObjectNode>> children(const ObjectPath &path) override
+    {
+        if (Result<void> r = enter(path); !r)
+            return fail(r.error());
+        const auto node = [](QLatin1StringView kind, const QString &name, bool more) {
+            ObjectNode n;
+            n.ref = {.kind = kind, .name = name, .oid = {}};
+            n.displayName = name;
+            n.icon = iconFor(kind);
+            n.hasChildren = more;
+            return n;
+        };
+        if (path.isRoot())
+            return QList<ObjectNode>{node(kind::Database, QStringLiteral("fake"), true)};
+        if (path.depth() == 1)
+            return QList<ObjectNode>{groupNode(group::Tables)};
+        if (path.depth() == 2)
+            return QList<ObjectNode>{node(kind::Table, QStringLiteral("a"), false),
+                                     node(kind::Table, QStringLiteral("b"), false)};
+        return QList<ObjectNode>{};
+    }
+
+    Result<TableDef> table(const ObjectPath &path) override
+    {
+        if (Result<void> r = enter(path); !r)
+            return fail(r.error());
+        TableDef t;
+        t.name = path.last().name;
+        t.kind = kind::Table;
+        t.columns = {ColumnDef{.name = QStringLiteral("id"), .type = QStringLiteral("int")}};
+        t.primaryKey = {QStringLiteral("id")};
+        return t;
+    }
+
+    Result<QString> ddl(const ObjectPath &path) override
+    {
+        if (Result<void> r = enter(path); !r)
+            return fail(r.error());
+        return QStringLiteral("CREATE TABLE %1 (id int PRIMARY KEY)").arg(path.last().name);
+    }
+
+    std::atomic<int> calls{0};
+
+private:
+    Result<void> enter(const ObjectPath &path)
+    {
+        ++calls;
+        if (path.toString().contains(QLatin1String("slow")))
+            QThread::msleep(300);
+        if (path.find(kind::Database) == QLatin1String("fail"))
+            return fail(DbError::Category::Permission, QStringLiteral("no access to fail"));
+        return {};
+    }
+};
+
 class FakeConnection : public IConnection
 {
 public:
+    ICatalog &catalog() override { return m_catalog; }
+
     Result<void> open(const ConnectionParams &params) override
     {
         if (params.host == QLatin1String("fail"))
@@ -175,6 +238,7 @@ private:
     bool m_open = false;
     std::shared_ptr<std::atomic<bool>> m_cancel = std::make_shared<std::atomic<bool>>(false);
     QList<ServerMessage> m_messages;
+    FakeCatalog m_catalog;
 };
 
 } // namespace

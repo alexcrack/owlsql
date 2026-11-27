@@ -32,5 +32,7 @@ int main(int argc, char *argv[])
     f.insertDuplicate = u"INSERT INTO owl_conf VALUES (1)"_s;
     f.updateAllRows = u"UPDATE owl_conf SET x = x + 10"_s;
     f.writeStatement = u"CREATE TEMP TABLE owl_conf_ro (x integer)"_s;
+    f.createWalkTable = u"CREATE TABLE public.owl_conf_walk (id int PRIMARY KEY)"_s;
+    f.dropWalkTable = u"DROP TABLE IF EXISTS public.owl_conf_walk"_s;
     return owl::conformance::runConformance(argc, argv, f);
 }

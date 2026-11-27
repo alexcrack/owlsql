@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "mysqldriver.h"
 
+#include "mysqlcatalog.h"
 #include "mysqlvalues.h"
 
 #include <QMutex>
@@ -479,6 +480,7 @@ public:
     Result<void> setAutocommit(bool on) override;
     TxState txState() const override;
     QList<ServerMessage> takeMessages() override { return std::exchange(m_messages, {}); }
+    ICatalog &catalog() override { return m_catalog; }
 
 private:
     friend class MySqlCursor;
@@ -501,6 +503,7 @@ private:
     ServerInfo m_info;
     QList<ServerMessage> m_messages;
     MySqlDialect m_dialect;
+    MySqlCatalog m_catalog{*this};
     bool m_busy = false;
     bool m_readOnly = false;
 };

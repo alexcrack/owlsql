@@ -10,3 +10,12 @@ owl_add_server_runs(tst_mysql_driver RUNS
     tst_mysql_driver57=OWL_TEST_MYSQL57_URL
     tst_mariadb_driver=OWL_TEST_MARIADB_URL
     tst_mariadb_driver106=OWL_TEST_MARIADB106_URL)
+
+owl_add_unit_test(tst_pg_catalog SOURCES tst_pg_catalog.cpp LIBS owl_postgres owl_test_server)
+owl_add_server_runs(tst_pg_catalog RUNS tst_pg_catalog13=OWL_TEST_PG13_URL)
+
+owl_add_unit_test(tst_mysql_catalog SOURCES tst_mysql_catalog.cpp LIBS owl_mysql owl_test_server)
+owl_add_server_runs(tst_mysql_catalog RUNS
+    tst_mysql_catalog57=OWL_TEST_MYSQL57_URL
+    tst_mariadb_catalog=OWL_TEST_MARIADB_URL
+    tst_mariadb_catalog106=OWL_TEST_MARIADB106_URL)
