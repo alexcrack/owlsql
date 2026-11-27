@@ -29,6 +29,7 @@ QList<CommandRegistry::Command> CommandRegistry::builtinCommands()
     const QString app = tr("Application");
     const QString view = tr("View");
     const QString workspace = tr("Workspace");
+    const QString session = tr("Session");
     const QString help = tr("Help");
 
     return {
@@ -39,6 +40,9 @@ QList<CommandRegistry::Command> CommandRegistry::builtinCommands()
         command("view.themeSystem", tr("Theme: Follow System"), view),
         command("view.themeLight", tr("Theme: Light"), view),
         command("view.themeDark", tr("Theme: Dark"), view),
+        command("session.new", tr("New Connection…"), session, keys("Ctrl+Shift+N")),
+        command("session.import", tr("Import Connections…"), session),
+        command("session.disconnect", tr("Disconnect"), session),
         command("workspace.showWelcome", tr("Show Welcome Tab"), workspace),
         command("workspace.closeTab", tr("Close Tab"), workspace, keys("Ctrl+W")),
         command("workspace.nextTab", tr("Next Tab"), workspace, keys("Ctrl+Tab")),

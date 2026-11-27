@@ -7,7 +7,8 @@ import OwlSql.App
 import OwlSql.Style
 import OwlSql.Theme
 
-// Session · transaction · metrics · cursor (decision 067). Only the session slot is live in M0.
+// Session · transaction · metrics · cursor (decision 067). The session slot shows the active
+// session (M1.9b); the other slots follow with the SQL editor.
 Rectangle {
     id: root
 
@@ -26,22 +27,55 @@ Rectangle {
         anchors.rightMargin: Theme.space.xs
         spacing: Theme.space.l
 
-        Row {
+        RowLayout {
+            id: sessionSlot
+
+            readonly property var info: Sessions.activeInfo
+            readonly property bool active: info.id !== undefined
+
             spacing: Theme.space.s
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 8
-                height: 8
-                radius: 4
-                color: Theme.color.textMuted
+            SafetyBadge {
+                visible: sessionSlot.active && sessionSlot.info.level === "prod"
+                level: "prod"
+            }
+
+            TagDot {
+                tag: sessionSlot.active ? sessionSlot.info.tag : ""
+                color: sessionSlot.active ? tagColor(sessionSlot.info.tag) : Theme.color.textMuted
             }
 
             Label {
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("Not connected")
+                Layout.maximumWidth: 420
+                elide: Text.ElideRight
                 font: Theme.font.uiSmall
-                color: Theme.color.textSecondary
+                color: sessionSlot.info.state === "failed" ? Theme.color.danger :
+                                                             Theme.color.textSecondary
+                text: {
+                    const i = sessionSlot.info;
+                    const name = i.name ?? "";
+                    if (!sessionSlot.active)
+                        return qsTr("Not connected");
+                    switch (i.state ?? "") {
+                    case "connected":
+                        return qsTr("%1 · %2 %3").arg(name).arg(i.product ?? "").arg(i.version
+                                                                                     ?? "");
+                    case "connecting":
+                        return qsTr("%1 · connecting…").arg(name);
+                    case "needsPassword":
+                        return qsTr("%1 · waiting for the password").arg(name);
+                    case "failed":
+                        return qsTr("%1 · %2").arg(name).arg(i.error ?? "");
+                    default:
+                        return name;
+                    }
+                }
+                ToolTip.visible: hoverHandler.hovered && sessionSlot.info.state === "failed"
+                ToolTip.text: sessionSlot.info.error ?? ""
+
+                HoverHandler {
+                    id: hoverHandler
+                }
             }
         }
 

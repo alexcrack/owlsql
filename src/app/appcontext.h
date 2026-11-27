@@ -15,6 +15,7 @@ namespace owl::app {
 
 class AppDatabase;
 class SecretStore;
+class SessionManager;
 class SessionStore;
 class Keybindings;
 class Settings;
@@ -48,6 +49,7 @@ public:
     // Saved sessions; null when owlsql.db could not be opened.
     SessionStore *sessions() const { return m_sessions; }
     SecretStore *secrets() const { return m_secrets; }
+    SessionManager *sessionManager() const { return m_sessionManager; }
 
 private:
     void applyThemeSettings();
@@ -61,6 +63,7 @@ private:
     std::unique_ptr<DriverRegistry> m_drivers;
     SessionStore *m_sessions = nullptr;
     SecretStore *m_secrets = nullptr;
+    SessionManager *m_sessionManager = nullptr;
 };
 
 } // namespace owl::app

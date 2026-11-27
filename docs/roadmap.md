@@ -53,9 +53,10 @@ Goal: daily-usable for browsing and querying PostgreSQL, MySQL / MariaDB and SQL
   secrets, `ConnectionFormSchema` + `IDriver::parseUrl()` (coreApi 4), JSON / URL / `.pgpass` /
   `.my.cnf` import, runtime `Session` (meta + per-database connections, startup script)
   (decisions 166–170). — #17
-- [ ] **1.9b Session manager (UI)** — Welcome-tab manager (folders, search, add / edit / duplicate /
-  delete, import / export), generated connection form with Test, password prompt, safety-level
-  colours, prod frame and PROD badge. _needs: 1.9a_
+- [x] **1.9b Session manager (UI)** — Welcome-tab manager (folders, search, add / edit / duplicate /
+  delete, import / export), generated connection form with Test and Paste URL, password prompt,
+  safety-level colours, prod frame and PROD badge, open sessions in the sidebar and status bar
+  (decisions 171–174). — #18
 - [ ] **1.10 Object tree** — sidebar tree over the catalog: styled tree rows, lazy loading, filter,
   full PG depth, icons, refresh. _needs: 1.8, 1.9b_
 - [ ] **1.11 Data grid (read-only)** — `ResultModel`, object tab Data view, browse paging, WHERE box

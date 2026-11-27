@@ -4,6 +4,7 @@
 #include "appcontext.h"
 #include "commandregistry.h"
 #include "iconprovider.h"
+#include "sessionmanager.h"
 #include "settings.h"
 #include "thememanager.h"
 #include "uistate.h"
@@ -22,6 +23,7 @@ Q_IMPORT_QML_PLUGIN(OwlSql_StylePlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_AppPlugin)
 Q_IMPORT_QML_PLUGIN(OwlSql_UiPlugin)
 
+using namespace Qt::StringLiterals;
 using owl::theme::ThemeManager;
 
 namespace {
@@ -47,6 +49,7 @@ class TestUiSmoke : public QObject
 private slots:
     void initTestCase()
     {
+        qputenv("OWL_DRIVER_DIR", OWL_DRIVER_DIR); // the real driver plugins
         QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
         QQuickStyle::setStyle(QStringLiteral("OwlSql.Style"));
         // Isolated settings and owlsql.db for this test run.
@@ -112,6 +115,92 @@ private slots:
             QTest::qWait(250);
             saveShot(window, shotName + QStringLiteral("-dialog"));
         }
+
+        QVERIFY2(warnings.isEmpty(), qPrintable(warnings.join(u'\n')));
+    }
+
+    void sessionManager_data()
+    {
+        QTest::addColumn<ThemeManager::Mode>("mode");
+        QTest::addRow("light") << ThemeManager::Mode::Light;
+        QTest::addRow("dark") << ThemeManager::Mode::Dark;
+    }
+
+    // The Welcome tab with saved sessions: folder tree, the editor generated from a driver's form,
+    // and an open prod session (status bar, sidebar, prod frame). Fails on any QML warning.
+    void sessionManager()
+    {
+        QFETCH(ThemeManager::Mode, mode);
+        ThemeManager::instance()->setMode(mode);
+        const QString theme = mode == ThemeManager::Mode::Light ? u"light"_s : u"dark"_s;
+
+        owl::app::SessionManager *sessions = m_context->sessionManager();
+        QVERIFY(sessions);
+        QCOMPARE(sessions->drivers().size(), 3);
+        static QString prodId;
+        static QString liteId;
+        if (prodId.isEmpty()) {
+            const QString work = sessions->addFolder(u"Work"_s);
+            const QString clients = sessions->addFolder(u"Clients"_s, work);
+            const auto add = [&](const QString &driver, const QString &name, const QString &folder,
+                                 const QString &level, const QVariantMap &values) {
+                QVariantMap d = sessions->newDraft(driver, folder);
+                d.insert(u"name"_s, name);
+                d.insert(u"level"_s, level);
+                QVariantMap v = d.value(u"values"_s).toMap();
+                v.insert(values);
+                d.insert(u"values"_s, v);
+                const QVariantMap r = sessions->save(d);
+                if (!r.value(u"ok"_s).toBool())
+                    qWarning("save failed: %s", qPrintable(r.value(u"error"_s).toString()));
+                return r.value(u"id"_s).toString();
+            };
+            prodId = add(u"postgres"_s, u"prod-pg"_s, work, u"prod"_s,
+                         {{u"host"_s, u"db.internal"_s},
+                          {u"user"_s, u"app"_s},
+                          {u"database"_s, u"app_db"_s},
+                          {u"ssl.mode"_s, u"verify-full"_s}});
+            add(u"postgres"_s, u"stage-pg"_s, work, u"staging"_s,
+                {{u"host"_s, u"stage.internal"_s}, {u"user"_s, u"app"_s}});
+            add(u"mysql"_s, u"shop-mysql"_s, clients, u"dev"_s,
+                {{u"host"_s, u"127.0.0.1"_s}, {u"user"_s, u"root"_s}, {u"database"_s, u"shop"_s}});
+            liteId = add(u"sqlite"_s, u"local-lite"_s, QString(), u"prod"_s,
+                         {{u"database"_s, u":memory:"_s}});
+            QVERIFY(!prodId.isEmpty() && !liteId.isEmpty());
+        }
+
+        QQmlApplicationEngine engine;
+        owl::theme::IconProvider::install(engine);
+        QStringList warnings;
+        connect(&engine, &QQmlEngine::warnings, this, [&warnings](const QList<QQmlError> &errors) {
+            for (const QQmlError &e : errors)
+                warnings << e.toString();
+        });
+        engine.loadFromModule("OwlSql.Ui", "Main");
+        auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().value(0));
+        QVERIFY(window);
+        QVERIFY(QTest::qWaitForWindowExposed(window));
+        auto *welcome = window->findChild<QObject *>(u"welcomePage"_s);
+        QVERIFY(welcome);
+
+        QVERIFY(QMetaObject::invokeMethod(welcome, "select", Q_ARG(QString, prodId)));
+        QTest::qWait(250);
+        QVERIFY(welcome->property("editing").toBool());
+        saveShot(window, u"welcome-sessions-"_s + theme);
+
+        // An open prod session: status bar, sidebar and the red frame.
+        sessions->open(liteId);
+        QTRY_COMPARE(sessions->state(liteId), u"connected"_s);
+        QCOMPARE(sessions->activeSession(), liteId);
+        QVERIFY(QMetaObject::invokeMethod(welcome, "select", Q_ARG(QString, liteId)));
+        QTest::qWait(250);
+        saveShot(window, u"welcome-prod-open-"_s + theme);
+        sessions->close(liteId);
+        QTRY_VERIFY(sessions->state(liteId).isEmpty());
+
+        QVERIFY(QMetaObject::invokeMethod(welcome, "startNew", Q_ARG(QString, QString())));
+        QTest::qWait(150);
+        saveShot(window, u"welcome-new-"_s + theme);
 
         QVERIFY2(warnings.isEmpty(), qPrintable(warnings.join(u'\n')));
     }

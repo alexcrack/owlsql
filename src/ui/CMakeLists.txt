@@ -18,7 +18,18 @@ qt_add_qml_module(owlsql_ui
         qml/StatusBar.qml
         qml/WelcomePage.qml
         qml/WorkspaceTabBar.qml
+        qml/ConfirmDialog.qml
+        qml/ConnectionField.qml
+        qml/ImportDialog.qml
+        qml/NameDialog.qml
+        qml/PasswordDialog.qml
+        qml/SafetyBadge.qml
+        qml/SessionEditor.qml
+        qml/SessionList.qml
+        qml/SessionRow.qml
+        qml/TagDot.qml
+        qml/TagSwatch.qml
 )
 
-target_link_libraries(owlsql_ui PRIVATE Qt6::Quick Qt6::QuickControls2 owlsql_theme owlsql_style owlsql_app)
+target_link_libraries(owlsql_ui PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::QuickDialogs2 owlsql_theme owlsql_style owlsql_app)
 owl_set_target_options(owlsql_ui)
